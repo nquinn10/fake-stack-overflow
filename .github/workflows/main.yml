@@ -1,0 +1,10 @@
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cypress_tests:
+    runs-on: [self-hosted, macOS, X64]
+    steps:
+      - name: Checkout Repo
