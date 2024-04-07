@@ -26,7 +26,8 @@ jobs:
         run: |
           cd client/
           npm install
-          npm start
+          npm start &
+          sleep 30
       - name: Start server
         run: | 
           cd server/
