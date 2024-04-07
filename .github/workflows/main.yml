@@ -24,6 +24,7 @@ jobs:
       - name: Start client and server
         run: |
           cd client/
+          npm install
           npm start &
           cd ..
           cd server/
