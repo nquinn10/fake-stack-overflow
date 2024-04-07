@@ -23,7 +23,6 @@ jobs:
         uses: actions/setup-node@v4
       - name: Start client and server
         run: |
-          cd ..
           cd client/
           npm start &
           cd ..
