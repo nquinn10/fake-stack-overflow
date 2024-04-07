@@ -30,6 +30,7 @@ jobs:
           sleep 30
       - name: Start server
         run: | 
+          cd ..
           cd server/
           node server.js
       - name: Run Cypress tests in headless mode
