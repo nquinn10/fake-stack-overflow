@@ -11,16 +11,16 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          cd server/
+          npm install
       - name: Start MongoDB
         run: |
           cd server/
           node init.js
       - name: Setup Node
         uses: actions/setup-node@v4
-      - name: Install dependencies
-        run: |
-          cd server/
-          npm install
       - name: Start client and server
         run: |
           cd ..
