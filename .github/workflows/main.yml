@@ -16,7 +16,6 @@ jobs:
           node-version: '16.15'
       - run: npm install --prefix client
       - run: npm install --prefix server
-      - run: npm install
       - name: Start MongoDB
         run: |
           cd server/
