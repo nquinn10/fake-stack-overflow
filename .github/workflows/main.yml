@@ -10,10 +10,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - name: Start MongoDB
-        run: |
-          cd server/
-          node init.js
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -21,9 +17,13 @@ jobs:
       - run: npm install --prefix client
       - run: npm install --prefix server
       - run: npm install
+      - name: Start MongoDB
+        run: |
+          cd server/
+          node init.js
       - name: Install Cypress
         run: npm install cypress --save-dev
-      - name: Run Cypress tests in headless mode
+      - name: Run Cypress tests
         uses: cypress-io/github-action@v5
         with:
           project: ./client
