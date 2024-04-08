@@ -15,8 +15,10 @@
         "express-session": "*",
         "jest": "^29.7.0",
         "jsonwebtoken": "*",
+        "mockingoose": "^2.16.2",
         "mongoose": "*",
-        "mysql": "*"
+        "mysql": "*",
+        "supertest": "^6.3.4"
     },
     "devDependencies": {
         "eslint": "^8.54.0"
