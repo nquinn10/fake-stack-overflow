@@ -3,8 +3,6 @@ on:
   pull_request:
     branches:
       - main
-      - feature-workflow
-      - testdev
 
 jobs:
   cypress_tests:
