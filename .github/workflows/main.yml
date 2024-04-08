@@ -10,32 +10,27 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          cd server/
-          npm install
       - name: Start MongoDB
         run: |
           cd server/
           node init.js
       - name: Setup Node
         uses: actions/setup-node@v4
-      - name: Start client
-        run: |
-          cd client/
-          npm install
-          npm start &
-          sleep 30
-      - name: Start server
-        run: | 
-          cd server/
-          node server.js
+        with:
+          node-version: '16.15'
+      - run: npm install --prefix client
+      - run: npm install --prefix server
+      - run: npm install
+      - name: Install Cypress
+        run: npm install cypress --save-dev
       - name: Run Cypress tests in headless mode
-        run: |
-          cd ..
-          cd client/
-          npx cypress run
-    
+        uses: cypress-io/github-action@v5
+        with:
+          project: ./client
+          start: npm run start --prefix client, npm run start --prefix server
+          wait-on: 'http://localhost:3000,http://localhost:8000'
+          browser: chrome
+          timeout: 400
 
   jest_tests:
     runs-on: [self-hosted, macOS, X64]
