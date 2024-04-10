@@ -18,6 +18,7 @@ function tagCreate(name) {
     return tag.save();
 }
 
+// we added vote_count and flag, but gave both default init. values
 function answerCreate(text, ans_by, ans_date_time) {
     let answerdetail = {text:text};
     if (ans_by != false) answerdetail.ans_by = ans_by;
@@ -27,6 +28,7 @@ function answerCreate(text, ans_by, ans_date_time) {
     return answer.save();
 }
 
+// We added vote_count, question_status, and flag
 function questionCreate(title, text, tags, answers, asked_by, ask_date_time, views) {
     let qstndetail = {
         title: title,
@@ -41,6 +43,8 @@ function questionCreate(title, text, tags, answers, asked_by, ask_date_time, vie
     let qstn = new Question(qstndetail);
     return qstn.save();
 }
+
+// need to add a function userCreate(...)
 
 const init = async () => {
     console.log('insert test data into the database')
