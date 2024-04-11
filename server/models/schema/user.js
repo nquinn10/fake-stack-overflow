@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {Schema} = require("mongoose");
 
 // Schema for users
 module.exports = mongoose.Schema(
@@ -15,16 +16,16 @@ module.exports = mongoose.Schema(
         is_moderator: {type: Boolean, required: true},
         questions: [{type: Schema.Types.ObjectId, ref: 'Question', default: []}],
         answers: [{type: Schema.Types.ObjectId, ref: 'Answer', default: []}],
-        tags: [{types: Schema.Types.ObjectId, ref: 'Tag', required: true}],
+        tags: [{type: Schema.Types.ObjectId, ref: 'Tag', required: true}],
 
         // double check if this schema setup is valid
         question_vote: {
-            upvote: [{type: Schema.Types.ObjectId, ref: 'Question'}],
-            downvote: [{type: Schema.Types.ObjectId, ref: 'Question'}] },
+            upvote: [{type: Schema.Types.ObjectId, ref: 'Question', default: []}],
+            downvote: [{type: Schema.Types.ObjectId, ref: 'Question', default: []}] },
 
         answer_vote: {
-            upvote: [{type: Schema.Types.ObjectId, ref: 'Answer'}],
-            downvote: [{type: Schema.Types.ObjectId, ref: 'Answer'}] }
+            upvote: [{type: Schema.Types.ObjectId, ref: 'Answer', default: []}],
+            downvote: [{type: Schema.Types.ObjectId, ref: 'Answer', default: []}] }
 
         // UML also has accountStatus (ENUM: Active, UnderReview, Banned). Not sure we want to keep it
     },

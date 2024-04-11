@@ -3,6 +3,7 @@
 let Tag = require('./models/tags')
 let Answer = require('./models/answers')
 let Question = require('./models/questions')
+let User = require('./models/user')
 
 const mongoose = require("mongoose");
 
@@ -35,6 +36,7 @@ function questionCreate(title, text, tags, answers, asked_by, ask_date_time, vie
         text: text,
         tags: tags,
         asked_by: asked_by
+        // vote_count and flag has default values, do we have to add them?
     }
     if (answers != false) qstndetail.answers = answers;
     if (ask_date_time != false) qstndetail.ask_date_time = ask_date_time;
@@ -45,6 +47,25 @@ function questionCreate(title, text, tags, answers, asked_by, ask_date_time, vie
 }
 
 // need to add a function userCreate(...)
+function userCreate(first_name, last_name, email, hashed_password, display_name, about_me, location, account_creation_date_time, is_moderator, questions, answers, tags) {
+    let userDetail = {
+        first_name: first_name, 
+        last_name: last_name,
+        email: email, 
+        hashed_password: hashed_password, 
+        display_name: display_name, 
+        about_me: about_me,
+        location: location, 
+        is_moderator: is_moderator
+    }
+    if (account_creation_date_time != false) userDetail.account_creation_date_time = account_creation_date_time;
+    if (questions != false) userDetail.questions = questions;
+    if (answers != false) userDetail.answers = answers;
+    if (tags != false) userDetail.tags = tags;
+
+    let user = new User(userDetail);
+    return user.save();
+}
 
 const init = async () => {
     console.log('insert test data into the database')
@@ -63,6 +84,13 @@ const init = async () => {
     let a6 = await answerCreate('Storing content as BLOBs in databases.', 'abhi3241', new Date('2023-02-19T18:20:59'));
     let a7 = await answerCreate('Using GridFS to chunk and store content.', 'mackson3332', new Date('2023-02-22T17:19:00'));
     let a8 = await answerCreate('Store data in a SQLLite database.', 'ihba001', new Date('2023-03-22T21:17:53'));
+
+    // create user objects
+    // initialized them all with no questions/answers/tags, can go back and add more Question/Answer objects to the database
+    let u1 = await userCreate('John', 'Doe', 'john@email.com', 'WXYZ123', 'johnny_d', 'Im new here', 'USA', new Date('2023-03-22T21:17:53'), false, [], [], []);
+    let u2 = await userCreate('Betty', 'Jones', 'betty@yahoo.com', 'ABCD876', 'betty_j', '', '', new Date('2020-08-31T20:16:53'), false, [], [], []);
+    let u3 = await userCreate('Sammy', 'Smith', 'sammy@email.com', 'GHJK543', 'sammysmith', 'Memorized every leetcode question ever', 'Basement', new Date('2019-11-15T22:19:53'), true, [], [], []);
+
     await questionCreate('Programmatically navigate using React router', 'the alert shows the proper index for the li clicked, and when I alert the variable within the last function Im calling, moveToNextImage(stepClicked), the same value shows but the animation isnt happening. This works many other ways, but Im trying to pass the index value of the list item clicked to use for the math to calculate.', [t1, t2], [a1, a2], 'Joji John', new Date('2022-01-20T03:00:00'), 10);
     await questionCreate('android studio save string shared preference, start activity and load the saved string', 'I am using bottom navigation view but am using custom navigation, so my fragments are not recreated every time i switch to a different view. I just hide/show my fragments depending on the icon selected. The problem i am facing is that whenever a config change happens (dark/light theme), my app crashes. I have 2 fragments in this activity and the below code is what i am using to refrain them from being recreated.', [t3, t4, t2], [a3, a4, a5], 'saltyPeter', new Date('2023-01-10T11:24:30'), 121);
     await questionCreate('Object storage for a web application', 'I am currently working on a website where, roughly 40 million documents and images should be served to its users. I need suggestions on which method is the most suitable for storing content with subject to these requirements.', [t5, t6], [a6, a7], 'monkeyABC', new Date('2023-02-18T01:02:15'), 200);
