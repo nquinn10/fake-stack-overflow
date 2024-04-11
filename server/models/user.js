@@ -1,6 +1,7 @@
 // User Document Schema
 const mongoose = require("mongoose");
 
-const User = require("./schema/user");
+const userSchema = require("./schema/user");
+const User = mongoose.model("User", userSchema);
 
-module.exports = mongoose.model("User", User);
+module.exports = User;
