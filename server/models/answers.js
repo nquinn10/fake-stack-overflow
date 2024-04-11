@@ -1,6 +1,8 @@
 // Answer Document Schema
 const mongoose = require("mongoose");
+const answerSchema = require("./schema/answer");
 
-const Answer = require("./schema/answer");
+// Compile schema into a model
+const Answer = mongoose.model("Answer", answerSchema);
 
-module.exports = mongoose.model("Answer", Answer);
+module.exports = Answer;

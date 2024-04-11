@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 
 // Schema for questions
-module.exports = mongoose.Schema(
-    {
+const questionSchema = new Schema({
         title: {type: String, required: true},
         text: {type: String, required: true},
         // asked_by: {type: String, required: true}, // do we want to keep this as a String, or do we want to reference a User?
@@ -22,5 +21,8 @@ module.exports = mongoose.Schema(
         
         // we also have update_timestamp, but it looks like Stack Overflow just updates the ask_date_time
     },
-    { collection: "Question" }
-);
+    { collection: "Question" });
+
+questionSchema.index({ asked_by: 1 }); // Index on the 'asked_by' field
+
+module.exports = questionSchema;
