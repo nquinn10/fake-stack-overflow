@@ -86,6 +86,7 @@ const init = async () => {
     let a8 = await answerCreate('Store data in a SQLLite database.', 'ihba001', new Date('2023-03-22T21:17:53'));
 
     // create user objects
+    // initialized them all with no questions/answers/tags, can go back and add more Question/Answer objects to the database
     let u1 = await userCreate('John', 'Doe', 'john@email.com', 'WXYZ123', 'johnny_d', 'Im new here', 'USA', new Date('2023-03-22T21:17:53'), false, [], [], []);
     let u2 = await userCreate('Betty', 'Jones', 'betty@yahoo.com', 'ABCD876', 'betty_j', '', '', new Date('2020-08-31T20:16:53'), false, [], [], []);
     let u3 = await userCreate('Sammy', 'Smith', 'sammy@email.com', 'GHJK543', 'sammysmith', 'Memorized every leetcode question ever', 'Basement', new Date('2019-11-15T22:19:53'), true, [], [], []);
