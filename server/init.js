@@ -20,8 +20,12 @@ function tagCreate(name) {
 }
 
 // we added vote_count and flag, but gave both default init. values
-function answerCreate(text, ans_by, ans_date_time) {
-    let answerdetail = {text:text};
+function answerCreate(text, ans_by, ans_date_time, vote_count, flag) {
+    let answerdetail = {
+        text:text,
+        vote_count: vote_count, 
+        flag: flag
+    };
     if (ans_by != false) answerdetail.ans_by = ans_by;
     if (ans_date_time != false) answerdetail.ans_date_time = ans_date_time;
 
@@ -30,12 +34,15 @@ function answerCreate(text, ans_by, ans_date_time) {
 }
 
 // We added vote_count, question_status, and flag
-function questionCreate(title, text, tags, answers, asked_by, ask_date_time, views) {
+function questionCreate(title, text, tags, answers, asked_by, ask_date_time, views, vote_count, flag, question_status) {
     let qstndetail = {
         title: title,
         text: text,
         tags: tags,
-        asked_by: asked_by
+        asked_by: asked_by,
+        vote_count: vote_count,
+        flag: flag,
+        question_status: question_status
         // vote_count and flag has default values, do we have to add them?
     }
     if (answers != false) qstndetail.answers = answers;
