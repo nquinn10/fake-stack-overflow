@@ -4,6 +4,7 @@ let Tag = require('./models/tags')
 let Answer = require('./models/answers')
 let Question = require('./models/questions')
 let User = require('./models/user')
+let Vote = require('./models/vote')
 
 const mongoose = require("mongoose");
 
