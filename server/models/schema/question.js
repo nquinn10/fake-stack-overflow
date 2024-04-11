@@ -6,8 +6,8 @@ module.exports = mongoose.Schema(
     {
         title: {type: String, required: true},
         text: {type: String, required: true},
-        asked_by: {type: String, required: true}, // do we want to keep this as a String, or do we want to reference a User?
-        // asked_by: {type: Schema.Types.ObjectId, ref: 'User'}
+        // asked_by: {type: String, required: true}, // do we want to keep this as a String, or do we want to reference a User?
+        asked_by: {type: Schema.Types.ObjectId, ref: 'User', required: true},
         ask_date_time: {type: Date, required: true},
         views: {type: Number, default: 0},
         answers: [{type: Schema.Types.ObjectId, ref: 'Answer'}],
