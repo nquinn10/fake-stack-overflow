@@ -49,7 +49,7 @@ const userLogin = async (req, res) => {
 
     try {
         const user = await User.findOne({ username: username });
-        console.log(user); // check user object
+        // console.log(user); // check user object
         if (user && await bcrypt.compare(password, user.password)) {  // In a real app, use a hashed password comparison
             // store session with userID
             req.session.user = { id: user._id };
