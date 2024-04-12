@@ -4,11 +4,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 
 const { MONGO_URL, port, CLIENT_URL } = require("./config");
 
-mongoose.connect(MONGO_URL);
+mongoose.connect(MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const app = express();
 app.use(
@@ -20,24 +21,28 @@ app.use(
 
 app.use(express.json());
 
-app.get("/", (_, res) => {
-    res.send("Fake SO Server Dummy Endpoint");
-    res.end();
-});
-
-
 // Configure session middleware
 app.use(session({
     secret: 'your_secret_key', // replace this with a secret key in our production environment
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true } // Set to false if not using HTTPS
+    store: MongoStore.create({
+        mongoUrl: MONGO_URL
+                             }),
+    cookie: {
+        secure: true, // Set to false if not using HTTPS
+        maxAge: 1000 * 60 * 60 * 24 // 24 hours
+    }
 }));
+
+app.get("/", (_, res) => {
+    res.send("Fake SO Server Dummy Endpoint");
+    res.end();
+});
 
 const questionController = require("./controller/question");
 const tagController = require("./controller/tag");
 const answerController = require("./controller/answer");
-// added userController
 const userController = require("./controller/user");
 
 app.use("/question", questionController);
