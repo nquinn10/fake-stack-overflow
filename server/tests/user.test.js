@@ -2,20 +2,23 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const bcrypt = require('bcryptjs');
+const { server, sessionStore } = require("../server");
 
 // ***************************** test userLogin ******************************************
 // Mock the User model
 jest.mock("../models/user");
 
-let server;
 describe('POST /user/login', () => {
 
     beforeEach(() => {
-        server = require("../server");
     });
 
     afterEach(async () => {
         server.close();
+        // Close the MongoDB store connection
+        if (sessionStore) {
+            await sessionStore.close();
+        }
         await mongoose.disconnect();
     });
 
@@ -49,7 +52,7 @@ describe('POST /user/login', () => {
         expect(response.text).toBe('Logged in successfully!');
     });
 
-    // negative test case
+    // negative test case - invalid user password
     it('should fail to log in with incorrect credentials', async () => {
          // Mocking the request body
          const correctPassword = "pass2";
@@ -81,15 +84,40 @@ describe('POST /user/login', () => {
         expect(response.text).toBe('Invalid credentials');
     });
 
+    // negative test case - user email not found
+    it('should fail to log in when the user email does not exist', async () => {
+        // Mocking the request body
+        const mockReqBody = {
+            email: "nonexistent@example.com",
+            password: "password"
+        };
+
+        // Mocking User.findOne() to simulate no user found
+        User.findOne.mockResolvedValueOnce(null);
+
+        // Making the request
+        const response = await supertest(server)
+            .post('/user/login')
+            .send(mockReqBody);
+
+        // Asserting the response
+        expect(response.status).toBe(404);
+        expect(response.text).toBe('User not found');
+    });
+});
+
 // ***************************** test userRegistration *************************************
 describe('POST /user/register', () => {
 
     beforeEach(() => {
-        server = require("../server");
     });
 
     afterEach(async () => {
         server.close();
+        // Close the MongoDB store connection
+        if (sessionStore) {
+            await sessionStore.close();
+        }
         await mongoose.disconnect();
     });
 
@@ -155,4 +183,3 @@ describe('POST /user/register', () => {
     });
 });
 
-});
