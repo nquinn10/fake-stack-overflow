@@ -1,6 +1,7 @@
 const supertest = require("supertest");
 const mongoose = require("mongoose");
 const User = require("../models/user");
+const bcrypt = require('bcryptjs');
 
 // Mock the User model
 jest.mock("../models/user");
@@ -20,15 +21,18 @@ describe('POST /user/login', () => {
     // positive test case
     it('should log in successfully with correct credentials', async () => {
         // Mocking the request body
+        const password = "pass1";
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const mockReqBody = {
             username: "user1",
-            password: "pass1"
+            password: password
         };
 
         const mockUser = {
             _id: "dummyUserId",
             username: "user1",
-            password: "pass1"
+            password: hashedPassword
         };
 
         // Mocking User.findOne()
@@ -47,15 +51,19 @@ describe('POST /user/login', () => {
     // negative test case
     it('should fail to log in with incorrect credentials', async () => {
          // Mocking the request body
+         const correctPassword = "pass2";
+         const incorrectPassword = "pass1";
+         const hashedPassword = await bcrypt.hash(correctPassword, 10);
+
          const mockReqBody = {
             username: "user2",
-            password: "pass2"
+            password: incorrectPassword
         };
 
         const mockUser2 = {
             _id: "dummyUserId2",
             username: "user2",
-            password: "pass1" // wrong password, should fail
+            password: hashedPassword // wrong password, should fail
         };
 
         // Mocking User.findOne()
