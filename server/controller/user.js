@@ -25,7 +25,7 @@ const userRegistration = async (req, res) => {
             first_name, 
             last_name, 
             email, 
-            hashed_password: password, // will be hashed automatically
+            password: password, // will be hashed automatically
             display_name, 
             about_me, 
             location, 
@@ -35,6 +35,7 @@ const userRegistration = async (req, res) => {
 
         // save new user
         await newUser.save();
+        req.session.userId = newUser._id;  // Start a new session after registering
         
         // send a success response
         res.status(201).send('User registered successfully');
@@ -45,14 +46,18 @@ const userRegistration = async (req, res) => {
 };
 
 const userLogin = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ username: username });
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
         // console.log(user); // check user object
         if (user && await bcrypt.compare(password, user.password)) {  // In a real app, use a hashed password comparison
             // store session with userID
-            req.session.user = { id: user._id };
+            req.session.userId = user._id;
             res.send("Logged in successfully!");
         } else {
             res.status(401).send("Invalid credentials");
