@@ -11,12 +11,15 @@ jest.mock("../models/user");
 describe('POST /user/login', () => {
 
     beforeEach(() => {
+        jest.resetAllMocks();
     });
 
     afterEach(async () => {
-        server.close();
-        // Close the MongoDB store connection
-        if (sessionStore) {
+        if (server && server.close) {
+            await server.close();  // Ensure server is closed after tests
+        }
+        // Ensure all connections are closed
+        if (sessionStore && sessionStore.close) {
             await sessionStore.close();
         }
         await mongoose.disconnect();
@@ -29,13 +32,13 @@ describe('POST /user/login', () => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const mockReqBody = {
-            username: "user1",
+            email: "user1",
             password: password
         };
 
         const mockUser = {
             _id: "dummyUserId",
-            username: "user1",
+            email: "user1",
             password: hashedPassword
         };
 
@@ -48,6 +51,7 @@ describe('POST /user/login', () => {
             .send(mockReqBody);
 
         // Assert response
+        expect(User.findOne).toHaveBeenCalledWith({ email: "user1" });
         expect(response.status).toBe(200);
         expect(response.text).toBe('Logged in successfully!');
     });
@@ -60,13 +64,13 @@ describe('POST /user/login', () => {
          const hashedPassword = await bcrypt.hash(correctPassword, 10);
 
          const mockReqBody = {
-            username: "user2",
+             email: "user2",
             password: incorrectPassword
         };
 
         const mockUser2 = {
             _id: "dummyUserId2",
-            username: "user2",
+            email: "user2",
             password: hashedPassword // wrong password, should fail
         };
 
@@ -110,6 +114,7 @@ describe('POST /user/login', () => {
 describe('POST /user/register', () => {
 
     beforeEach(() => {
+        jest.resetAllMocks();
     });
 
     afterEach(async () => {
@@ -133,11 +138,12 @@ describe('POST /user/register', () => {
             location: "Testville"
         };
 
-        // Mock User.findOne to stimulate no existing user
-        User.prototype.save = jest.fn().mockResolvedValueOnce(null);
+        // Mock User.findOne to return null, indicating no existing user
+        User.findOne.mockResolvedValueOnce(null);
+        // simulating mongodb behavior by setting unique id for new user
+        const newUser = {...mockReqBody, _id: '12345'};
+        User.prototype.save.mockResolvedValueOnce(newUser);
 
-        // mock User.save
-        User.prototype.save = jest.fn().mockResolvedValueOnce(mockReqBody);
 
         const response = await supertest(server)
             .post('/user/register')
