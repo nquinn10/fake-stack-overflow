@@ -21,14 +21,14 @@ app.use(
 
 app.use(express.json());
 
+const sessionStore = MongoStore.create({ mongoUrl: MONGO_URL });
+
 // Configure session middleware
 app.use(session({
     secret: 'your_secret_key', // replace this with a secret key in our production environment
     resave: false,
     saveUninitialized: true,
-    store: MongoStore.create({
-        mongoUrl: MONGO_URL
-                             }),
+    store: sessionStore,
     cookie: {
         secure: true, // Set to false if not using HTTPS
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
@@ -63,4 +63,4 @@ process.on("SIGINT", () => {
     process.exit(0);
 });
 
-module.exports = server
+module.exports = { server, sessionStore };
