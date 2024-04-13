@@ -8,6 +8,7 @@ const User = require("../models/user");
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
+const { authRequired } = require("../utils/authMiddleware");
 
 const userRegistration = async (req, res) => {
     const { first_name, last_name, email, password, display_name, about_me, location } = req.body;
@@ -65,9 +66,41 @@ const userLogin = async (req, res) => {
         console.error(error); // Log the error for debugging purposes
         res.status(500).send("An error occurred while processing your request.");
     }
-}
+};
+
+const userProfileSummary = async (req, res) => {
+    try {
+        const userId = req.session.userId; // Assumes user ID is stored in the session upon authentication
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
+
+        // Find the user by ID and only return the specified fields
+        const user = await User.findById(userId).select('first_name last_name email display_name about_me location reputation');
+        if (!user) {
+            return res.status(404).send("User not found.");
+        }
+
+        // Constructing a profile object to ensure only specified data is sent
+        const profileSummary = {
+            firstName: user.first_name,
+            lastName: user.last_name,
+            email: user.email,
+            displayName: user.display_name,
+            aboutMe: user.about_me,
+            location: user.location,
+            reputation: user.reputation
+        };
+
+        res.json(profileSummary);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("An error occurred while fetching the user profile.");
+    }
+};
 
 router.post('/register', userRegistration);
 router.post('/login', userLogin);
+router.get('/profile', authRequired, userProfileSummary);
 
 module.exports = router;
