@@ -118,9 +118,11 @@ describe('POST /user/register', () => {
     });
 
     afterEach(async () => {
-        server.close();
-        // Close the MongoDB store connection
-        if (sessionStore) {
+        if (server && server.close) {
+            await server.close();  // Ensure server is closed after tests
+        }
+        // Ensure all connections are closed
+        if (sessionStore && sessionStore.close) {
             await sessionStore.close();
         }
         await mongoose.disconnect();
@@ -129,7 +131,7 @@ describe('POST /user/register', () => {
     // Test for successful registration
     it('should register a new user successfully', async () => {
         const mockReqBody = {
-            first_name: "Jane", 
+            first_name: "Jane",
             last_name: "Dixon",
             email: "janedixon@example.com",
             password: "pass123",
@@ -148,7 +150,7 @@ describe('POST /user/register', () => {
         const response = await supertest(server)
             .post('/user/register')
             .send(mockReqBody);
-        
+
         expect(response.status).toBe(201);
         expect(response.text).toBe('User registered successfully');
         expect(User.findOne).toHaveBeenCalledWith({ email: "janedixon@example.com" });
@@ -182,7 +184,7 @@ describe('POST /user/register', () => {
         const response = await supertest(server)
             .post('/user/register')
             .send(mockReqBody);
-        
+
         expect(response.status).toBe(400);
         expect(response.text).toBe('User already exists');
         expect(User.findOne).toHaveBeenCalledWith({ email: "existing@email.com" });
