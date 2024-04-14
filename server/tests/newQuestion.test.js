@@ -6,7 +6,6 @@ const { default: mongoose } = require("mongoose");
 
 const Question = require('../models/questions');
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
-const { server, sessionStore } = require("../server");
 
 // Mocking the models
 jest.mock("../models/questions");
@@ -16,6 +15,7 @@ jest.mock('../utils/question', () => ({
     filterQuestionsBySearch: jest.fn(),
 }));
 
+let server;
 
 const tag1 = {
     _id: '507f191e810c19729de860ea',
@@ -62,15 +62,11 @@ const mockQuestions = [
 describe('GET /getQuestion', () => {
 
     beforeEach(() => {
+        server = require("../server");
     })
 
     afterEach(async() => {
-        if (server && server.close) {
-            await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
+        server.close();
         await mongoose.disconnect()
     });
 
@@ -97,15 +93,11 @@ describe('GET /getQuestion', () => {
 describe('GET /getQuestionById/:qid', () => {
 
     beforeEach(() => {
+        server = require("../server");
     })
 
     afterEach(async() => {
-        if (server && server.close) {
-            await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
+        server.close();
         await mongoose.disconnect()
     });
 
@@ -137,15 +129,11 @@ describe('GET /getQuestionById/:qid', () => {
 describe('POST /addQuestion', () => {
 
     beforeEach(() => {
+        server = require("../server");
     })
 
     afterEach(async() => {
-        if (server && server.close) {
-            await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
+        server.close();
         await mongoose.disconnect()
     });
 

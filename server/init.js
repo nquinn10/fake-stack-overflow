@@ -56,7 +56,7 @@ function questionCreate(title, text, tags, answers, asked_by, ask_date_time, vie
 }
 
 // need to add a function userCreate(...)
-function userCreate(first_name, last_name, email, hashed_password, display_name, about_me, location, account_creation_date_time, is_moderator) {
+function userCreate(first_name, last_name, email, hashed_password, display_name, about_me, location, reputation, account_creation_date_time, is_moderator) {
     let userDetail = {
         first_name: first_name, 
         last_name: last_name,
@@ -65,6 +65,7 @@ function userCreate(first_name, last_name, email, hashed_password, display_name,
         display_name: display_name, 
         about_me: about_me,
         location: location, 
+        reputation: reputation,
         is_moderator: is_moderator
     }
     if (account_creation_date_time != false) userDetail.account_creation_date_time = account_creation_date_time;
@@ -87,9 +88,10 @@ const init = async () => {
     console.log('insert test data into the database')
 // create user objects
     // initialized them all with no questions/answers/tags, can go back and add more Question/Answer objects to the database
-    let u1 = await userCreate('John', 'Doe', 'john@email.com', 'WXYZ123', 'johnny_d', 'Im new here', 'USA', new Date('2023-03-22T21:17:53'), false);
-    let u2 = await userCreate('Betty', 'Jones', 'betty@yahoo.com', 'ABCD876', 'betty_j', '', '', new Date('2020-08-31T20:16:53'), false);
-    let u3 = await userCreate('Sammy', 'Smith', 'sammy@email.com', 'GHJK543', 'sammysmith', 'Memorized every leetcode question ever', 'Basement', new Date('2019-11-15T22:19:53'), true);
+    let u1 = await userCreate('John', 'Doe', 'john@email.com', 'WXYZ123', 'johnny_d', 'Im new here', 'USA', 0, new Date('2023-03-22T21:17:53'), false);
+    let u2 = await userCreate('Betty', 'Jones', 'betty@yahoo.com', 'ABCD876', 'betty_j', '', '', 0, new Date('2020-08-31T20:16:53'), false);
+    let u3 = await userCreate('Sammy', 'Smith', 'sammy@email.com', 'GHJK543', 'sammysmith', 'Memorized every leetcode question ever', 'Basement', 14, new Date('2019-11-15T22:19:53'), true);
+    let u4 = await userCreate('Dax', 'Davis', 'dd@email.com', 'TEST1234', 'dd', 'Big Reputation', 'On Tour', 100, new Date('2016-08-31T20:16:53'), false);
 
     let t1 = await tagCreate('react');
     let t2 = await tagCreate('javascript');

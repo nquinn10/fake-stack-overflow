@@ -5,7 +5,6 @@ const supertest = require("supertest")
 const Tag = require('../models/tags');
 const Question = require('../models/questions');
 const { default: mongoose } = require("mongoose");
-const { server, sessionStore } = require("../server");
 
 // Mock data for tags
 const mockTags = [
@@ -19,17 +18,14 @@ const mockQuestions = [
     { tags: [mockTags[0]] },
 ]
 
+let server;
 describe('GET /getTagsWithQuestionNumber', () => {
 
     beforeEach(() => {
+        server = require("../server");
     })
     afterEach(async() => {
-        if (server && server.close) {
-            await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
+        server.close();
         await mongoose.disconnect()
     });
 

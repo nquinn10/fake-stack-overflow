@@ -6,23 +6,18 @@ const { default: mongoose } = require("mongoose");
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
 
-const { server, sessionStore } = require("../server");
-
 // Mock the Answer model
 jest.mock("../models/answers");
 
+let server;
 describe("POST /addAnswer", () => {
 
     beforeEach(() => {
+        server = require("../server");
     })
 
     afterEach(async() => {
-        if (server && server.close) {
-            await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
+        server.close();
         await mongoose.disconnect()
     });
 
