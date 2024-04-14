@@ -4,6 +4,7 @@ const Vote = require('../models/vote');  // Ensure you have a model for Vote
 const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
+const User = require('../models/user');
 
 /**
  * Function to cast a vote, on either a Question or Answer object.
@@ -18,6 +19,24 @@ const castVote = async (req, res) => {
     } 
 
     try {
+        // Retrieve user from the database to check reputation
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send("User not found.");
+        }
+
+        // check that the user has enough reputation points to vote. (User.reputation must be >= 15)
+        if (user.reputation < 15) {
+            return res.status(403).send("You don't have enough reputation points to cast a vote. Try answering more questions and engaging with the community to build up your points!");
+        }
+
+        // verify that the referenced question or answer exists
+        const Model = onModel === 'Question' ? Question : Answer;
+        const item = await Model.findById(referenceId);
+        if (!item) {
+            return res.status(404).send(`${onModel} not found.`);
+        }
+        
         // ensure user not voting on the same object twice
         const existingVote = await Vote.findOne( {user: userId, referenceId, onModel });
         // if user previously upvoted but wants to downvote or vice versa
@@ -29,7 +48,6 @@ const castVote = async (req, res) => {
     
                 // Adjust vote counts: subtract one vote of the old type and add one of the new type
                 const voteChange = (voteType === 'upvote') ? 2 : -2;
-                const Model = onModel === 'Question' ? Question : Answer;
                 await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } });
     
                 return res.status(200).send("Vote updated successfully");
@@ -50,7 +68,6 @@ const castVote = async (req, res) => {
         await newVote.save();
 
         // update vote count on question/answer
-        const Model = onModel === 'Question' ? Question : Answer;
         const voteIncrement = voteType === 'upvote' ? 1 : -1;
         await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteIncrement } });
 
@@ -62,6 +79,6 @@ const castVote = async (req, res) => {
 };
 
 // define routes
-router.post('/vote', authRequired, castVote);
+router.post('/', authRequired, castVote);
 
 module.exports = router;
