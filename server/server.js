@@ -30,7 +30,7 @@ app.use(session({
     saveUninitialized: true,
     store: sessionStore,
     cookie: {
-        secure: true, // Set to false if not using HTTPS
+        secure: true, // Set to false if not using HTTPS, but for Postman for example needs false!
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         httpOnly: true,
         sameSite: true
