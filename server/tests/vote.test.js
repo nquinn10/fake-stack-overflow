@@ -35,6 +35,7 @@ jest.mock('../utils/authMiddleware', () => ({
 const mockQuestion = {
     _id: '65e9b58910afe6e94fc6e6fe',
     vote_count: 0,
+    save: jest.fn().mockResolvedValue({}),
 };
 
 const mockUser = {
@@ -47,9 +48,16 @@ const mockUserInvalid = {
     reputation: 0,
 };
 
-User.findById = jest.fn();
+// Mock findById to return the mock user or question depending on the input
+User.findById = jest.fn().mockImplementation((id) => {
+    return id === "661c4bfa7a744bd3c591926a" ? Promise.resolve(mockUser) : Promise.resolve(null);
+});
+
+Question.findById = jest.fn().mockImplementation((id) => {
+    return id === "65e9b58910afe6e94fc6e6fe" ? Promise.resolve(mockQuestion) : Promise.resolve(null);
+});
+
 Vote.prototype.save = jest.fn();
-Question.findById = jest.fn();
 
 // ***************************** test vote on Question/Answer ***************************************
 
@@ -95,16 +103,23 @@ describe('POST /vote/', () => {
 
     // if vote successful, Question.vote_count or Answer.vote_count incremented/decremented correctly
     it('should increment Question.vote_count correctly after successful vote', async () => {
+        // Specific mock setup for this test
+        Question.findByIdAndUpdate = jest.fn().mockImplementation((id, update, options) => {
+            if (id === '65e9b58910afe6e94fc6e6fe') {
+                return Promise.resolve({ _id: id, vote_count: update.$inc.vote_count + 1 });
+            }
+            return Promise.resolve(null);
+        });
+    
         User.findById.mockResolvedValue({ _id: '661c4bfa7a744bd3c591926a', reputation: 20 });
-        Question.findByIdAndUpdate.mockResolvedValue({ vote_count: 1 });
-
         const response = await supertest(server)
             .post('/vote/')
             .send({ userId: '661c4bfa7a744bd3c591926a', referenceId: '65e9b58910afe6e94fc6e6fe', voteType: 'upvote', onModel: 'Question' });
-
+    
         expect(response.status).toBe(201);
-        expect(Question.findByIdAndUpdate).toHaveBeenCalledWith('65e9b58910afe6e94fc6e6fe', { $inc: { vote_count: 1 } });
+        expect(Question.findByIdAndUpdate).toHaveBeenCalledWith('65e9b58910afe6e94fc6e6fe', { $inc: { vote_count: 1 } }, { new: true });
     });
+    
 
     // return error if Question/Answer object not found or invalud id/object type
     it('should return an error if the question/answer id does not exist', async () => {
