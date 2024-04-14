@@ -83,11 +83,11 @@ const userProfileSummary = async (req, res) => {
 
         // Constructing a profile object to ensure only specified data is sent
         const profileSummary = {
-            firstName: user.first_name,
-            lastName: user.last_name,
+            first_name: user.first_name,
+            last_name: user.last_name,
             email: user.email,
-            displayName: user.display_name,
-            aboutMe: user.about_me,
+            display_name: user.display_name,
+            about_me: user.about_me,
             location: user.location,
             reputation: user.reputation
         };

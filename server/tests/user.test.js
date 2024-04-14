@@ -2,12 +2,32 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const bcrypt = require('bcryptjs');
-const { server, sessionStore } = require("../server");
+const { server } = require("../server");
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+jest.mock('../models/user');
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+jest.mock('../utils/authMiddleware', () => ({
+    authRequired: (req, res, next) => {
+        req.session = { userId: 'validUserId' };
+        next();
+    }
+}));
 
 // ***************************** test userLogin ******************************************
-// Mock the User model
-jest.mock("../models/user");
-
 describe('POST /user/login', () => {
 
     beforeEach(() => {
@@ -17,10 +37,6 @@ describe('POST /user/login', () => {
     afterEach(async () => {
         if (server && server.close) {
             await server.close();  // Ensure server is closed after tests
-        }
-        // Ensure all connections are closed
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();
         }
         await mongoose.disconnect();
     });
@@ -121,10 +137,6 @@ describe('POST /user/register', () => {
         if (server && server.close) {
             await server.close();  // Ensure server is closed after tests
         }
-        // Ensure all connections are closed
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();
-        }
         await mongoose.disconnect();
     });
 
@@ -191,3 +203,70 @@ describe('POST /user/register', () => {
     });
 });
 
+// ***************************** test userProfileSummary *************************************
+
+describe('GET /user/profile', () => {
+
+    beforeAll(async () => {
+        jest.resetAllMocks();
+    });
+
+    afterEach(async () => {
+        if (server && server.close) {
+            await server.close();  // Ensure server is closed after tests
+        }
+        await mongoose.disconnect();
+    });
+
+    it('should retrieve a user profile successfully', async () => {
+        User.findById.mockImplementation(() => ({
+            select: jest.fn().mockResolvedValue({
+                                                    _id: 'validUserId',
+                                                    first_name: 'John',
+                                                    last_name: 'Doe',
+                                                    email: 'john@example.com',
+                                                    display_name: 'JohnD',
+                                                    about_me: 'Developer',
+                                                    location: 'Earth',
+                                                    reputation: 100
+                                                })
+        }));
+
+        const response = await supertest(server)
+            .get('/user/profile');
+
+        expect(User.findById).toHaveBeenCalledWith("validUserId");
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+                                          first_name: "John",
+                                          last_name: "Doe",
+                                          email: "john@example.com",
+                                          display_name: "JohnD",
+                                          about_me: "Developer",
+                                          location: "Earth",
+                                          reputation: 100
+                                      });
+    });
+
+    // it('should return 401 unauthorized if no userId in session', async () => {
+    //     // Simulate a request with no userId in session
+    //     const response = await supertest(server)
+    //         .get('/user/profile');
+    //
+    //     expect(response.status).toBe(401);
+    //     expect(response.text).toContain("Unauthorized access. Please log in.");
+    // });
+
+    it('should return 404 if user is not found', async () => {
+        User.findById.mockImplementation(() => ({
+            select: jest.fn().mockResolvedValue(null)
+        }));
+
+        const response = await supertest(server)
+            .get('/user/profile');
+
+        expect(User.findById).toHaveBeenCalledWith("validUserId");
+        expect(response.status).toBe(404);
+        expect(response.text).toContain("User not found");
+    });
+});
