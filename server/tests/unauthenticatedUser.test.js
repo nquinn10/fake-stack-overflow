@@ -37,7 +37,7 @@ jest.mock('../utils/authMiddleware', () => ({
 
 
 // Tests specifically for unauthorized access
-describe('Unauthorized Access to /user/profile', () => {
+describe('Unauthorized Access to /user/ endpoints ', () => {
 
     beforeAll(async () => {
         // Resetting mocks can clear any previously set return values before each test suite runs
@@ -56,6 +56,14 @@ describe('Unauthorized Access to /user/profile', () => {
     it('should return 401 unauthorized if no userId in session', async () => {
         const response = await supertest(server)
             .get('/user/profile');
+
+        expect(response.status).toBe(401);
+        expect(response.text).toContain("Unauthorized access. Please log in.");
+    });
+
+    it('should return 401 unauthorized if no userId in session', async () => {
+        const response = await supertest(server)
+            .get('/user/my-questions');
 
         expect(response.status).toBe(401);
         expect(response.text).toContain("Unauthorized access. Please log in.");
