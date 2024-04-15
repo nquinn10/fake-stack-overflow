@@ -110,8 +110,7 @@ const getUserQuestions = async (req, res) => {
 
         // Find questions where 'asked_by' matches the logged-in user's ID
         const userQuestions = await Question.find({ asked_by: userId })
-            .populate('tags', 'name') // Assuming you might want to show tag names
-            .exec();
+            .populate('tags', 'name'); // Assuming you might want to show tag name;
 
         if (!userQuestions.length) {
             return res.status(404).send("No questions found.");
