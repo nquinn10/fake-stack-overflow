@@ -6,6 +6,7 @@
 const express = require("express");
 const User = require("../models/user");
 const bcrypt = require('bcryptjs');
+const Question = require("../models/questions");
 
 const router = express.Router();
 const { authRequired } = require("../utils/authMiddleware");
@@ -99,8 +100,33 @@ const userProfileSummary = async (req, res) => {
     }
 };
 
+// Fetch questions posted by the current user
+const getUserQuestions = async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
+
+        // Find questions where 'asked_by' matches the logged-in user's ID
+        const userQuestions = await Question.find({ asked_by: userId })
+            .populate('tags', 'name') // Assuming you might want to show tag names
+            .exec();
+
+        if (!userQuestions.length) {
+            return res.status(404).send("No questions found.");
+        }
+
+        res.json(userQuestions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("An error occurred while fetching the questions.");
+    }
+};
+
 router.post('/register', userRegistration);
 router.post('/login', userLogin);
 router.get('/profile', authRequired, userProfileSummary);
+router.get('/my-questions', authRequired, getUserQuestions);
 
 module.exports = router;
