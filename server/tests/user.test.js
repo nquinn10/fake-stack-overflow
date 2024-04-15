@@ -248,15 +248,6 @@ describe('GET /user/profile', () => {
                                       });
     });
 
-    // it('should return 401 unauthorized if no userId in session', async () => {
-    //     // Simulate a request with no userId in session
-    //     const response = await supertest(server)
-    //         .get('/user/profile');
-    //
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
-
     it('should return 404 if user is not found', async () => {
         User.findById.mockImplementation(() => ({
             select: jest.fn().mockResolvedValue(null)
