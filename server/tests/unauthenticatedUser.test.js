@@ -16,9 +16,9 @@ jest.mock('../models/user');
 // Mock express-session to manipulate session directly
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
-        // Dynamic session management; here, do not set a valid userId by default
+        // Don't set userId to simulate unauthorized access
         req.session = req.testSession || {
-            // Don't set userId to simulate unauthorized access
+
             touch: () => {},
         };
         next();
