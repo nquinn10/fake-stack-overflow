@@ -82,6 +82,7 @@ const addQuestion = async (req, res) => {
 };
 
 // Edit Question
+// note: later with post moderation we could alter this function to change the q_status if admin
 const editQuestion = async (req, res) => {
 
     const { qid } = req.params;
@@ -116,6 +117,7 @@ const editQuestion = async (req, res) => {
 };
 
 // Delete question
+// note: later with post moderation we could alter this function to change the q_status/delete if admin
 const deleteQuestion = async (req, res) => {
     const { qid } = req.params;
     const userId = req.session.userId; // userId from session (must match Question.askedBy reference)
