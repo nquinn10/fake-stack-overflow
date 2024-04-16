@@ -184,32 +184,88 @@ const getUserTags = async (req, res) => {
     }
 };
 
-const getUserVotes = async (req, res) => {
+const getUserQuestionVotes = async (req, res) => {
     try {
         const userId = req.session.userId;
+        const { voteType } = req.query;
+
         if (!userId) {
             return res.status(401).send("Unauthorized access.");
         }
 
-        // Fetch all votes made by the user
-        const userVotes = await Vote.find({ user: userId })
-            .populate({
-                          path: 'referenceId', // This populates the referenceId field based on the 'onModel' value
-                          populate: {
-                              path: 'tags', // Assuming you might also want to show tags for questions
-                              select: 'name'
-                          }
-                      })
-            .select('referenceId voteType createdAt'); // Select fields to minimize data transfer
-
-        if (!userVotes.length) {
-            return res.status(404).send("No votes found.");
+        let query = { user: userId, onModel: 'Question' };
+        if (voteType) {
+            query.voteType = voteType;
         }
 
-        res.json(userVotes);  // Send the vote details back to the client
+        const votes = await Vote.find(query)
+            .populate({
+                          path: 'referenceId',
+                          populate: [
+                              {
+                                  path: 'tags',
+                                  model: 'Tag',
+                                  select: 'name'
+                              },
+                              {
+                                  path: 'asked_by',
+                                  model: 'User',
+                                  select: 'display_name'
+                              }
+                          ],
+                          model: 'Question',
+                          select: 'title text asked_by ask_date_time views vote_count'
+                      })
+            .select('voteType createdAt referenceId');
+
+        if (!votes.length) {
+            return res.status(404).send("No question votes found.");
+        }
+
+        res.json(votes);
     } catch (error) {
         console.error(error);
-        res.status(500).send("An error occurred while fetching the votes.");
+        res.status(500).send("An error occurred while fetching question votes.");
+    }
+};
+
+const getUserAnswerVotes = async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const { voteType } = req.query;
+
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
+
+        let query = { user: userId, onModel: 'Answer' };
+        if (voteType) {
+            query.voteType = voteType;
+        }
+
+        const votes = await Vote.find(query)
+            .populate({
+                          path: 'referenceId',
+                          populate: [
+                              {
+                                  path: 'ans_by',
+                                  model: 'User',
+                                  select: 'display_name'
+                              }
+                          ],
+                          model: 'Answer',
+                          select: 'text ans_by ans_date_time vote_count'
+                      })
+            .select('voteType createdAt referenceId');
+
+        if (!votes.length) {
+            return res.status(404).send("No answer votes found.");
+        }
+
+        res.json(votes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("An error occurred while fetching answer votes.");
     }
 };
 
@@ -219,6 +275,7 @@ router.get('/profile', authRequired, userProfileSummary);
 router.get('/my-questions', authRequired, getUserQuestions);
 router.get('/my-answers', authRequired, getUserAnswers);
 router.get('/my-tags', authRequired, getUserTags);
-router.get('/my-votes', authRequired, getUserVotes);
+router.get('/my-question-votes', authRequired, getUserQuestionVotes);
+router.get('/my-answer-votes', authRequired, getUserAnswerVotes);
 
 module.exports = router;
