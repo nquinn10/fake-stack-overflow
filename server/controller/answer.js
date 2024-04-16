@@ -29,6 +29,8 @@ const addAnswer = async (req, res) => {
 };
 
 // Edit Question
+// note: add || condition to author, so 
+// if userId = author || userId = admin, then they can edit/delete
 const editAnswer = async (req, res) => {
 
     const { aid } = req.params;

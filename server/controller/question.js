@@ -83,6 +83,8 @@ const addQuestion = async (req, res) => {
 
 // Edit Question
 // note: later with post moderation we could alter this function to change the q_status if admin
+// note: add || condition to author, so 
+// if userId = author || userId = admin, then they can edit/delete
 const editQuestion = async (req, res) => {
 
     const { qid } = req.params;
