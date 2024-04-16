@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 
 // Schema for questions
-const questionSchema = new Schema({
+const questionSchema = new mongoose.Schema({
         title: {type: String, required: true},
         text: {type: String, required: true},
         // asked_by: {type: String, required: true}, // do we want to keep this as a String, or do we want to reference a User?

@@ -3,7 +3,7 @@ const {Schema} = require("mongoose");
 
 // Schema for vote
 
-const voteSchema = new Schema({
+const voteSchema = new mongoose.Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
