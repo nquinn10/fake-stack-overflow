@@ -359,3 +359,8 @@ describe('GET /my-questions', () => {
         expect(response.text).toContain("An error occurred while fetching the questions.");
     });
 });
+
+// ***************************** test getUserAnswers *************************************
+// ***************************** test getUserTags *************************************
+// ***************************** test getUserQuestionVotes *************************************
+// ***************************** test getUserAnswerVotes *************************************
