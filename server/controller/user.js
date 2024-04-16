@@ -303,7 +303,6 @@ const updateUserProfile = async (req, res) => {
         }
 
         res.json({
-                     message: "Profile updated successfully",
                      user: {
                          first_name: updatedUser.first_name,
                          last_name: updatedUser.last_name,

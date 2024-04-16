@@ -364,3 +364,79 @@ describe('GET /my-questions', () => {
 // ***************************** test getUserTags *************************************
 // ***************************** test getUserQuestionVotes *************************************
 // ***************************** test getUserAnswerVotes *************************************
+// ***************************** test updateUserProfile *************************************
+
+describe('PATCH /profile', () => {
+    const mockUserId = 'validUserId';
+
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
+
+    afterEach(async () => {
+        await mongoose.disconnect();
+        if (server && server.close) {
+            await server.close();
+        }
+    });
+
+    it('should return 400 when no updates are provided', async () => {
+        const response = await supertest(server)
+            .patch('/user/profile')
+            .send({}); // Empty body
+
+        expect(response.status).toBe(400);
+        expect(response.text).toContain("No updates provided.");
+    });
+
+    it('should handle user not found', async () => {
+        User.findByIdAndUpdate.mockResolvedValue(null);
+
+        const response = await supertest(server)
+            .patch('/user/profile')
+            .send({ first_name: "John" });
+
+        expect(response.status).toBe(404);
+        expect(response.text).toContain("User not found.");
+    });
+
+    it('should successfully update the user profile', async () => {
+        const updates = {
+            first_name: "John",
+            last_name: "Doe",
+            display_name: "JohnD",
+            about_me: "Hello!",
+            location: "USA"
+        };
+
+        // Simulate the existing user
+        User.findById.mockResolvedValue({
+                                            _id: mockUserId,
+                                            first_name: "James", // original data
+                                            last_name: "Doe",
+                                            display_name: "JamesDoe",
+                                            about_me: "Developer",
+                                            location: "Boston"
+                                        });
+
+        // Expect the user to be updated with new data
+        User.findByIdAndUpdate.mockResolvedValue({
+                                                     ...updates,
+                                                     _id: mockUserId,
+                                                 });
+
+        const response = await supertest(server)
+            .patch('/user/profile')
+            .send(updates);
+
+        expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+            mockUserId,
+            { $set: updates },
+            { new: true, runValidators: true, context: 'query' }
+        );
+        expect(response.status).toBe(200);
+        expect(response.body.user).toEqual(expect.objectContaining(updates));
+    });
+
+
+});
