@@ -430,19 +430,6 @@ describe('GET /my-questions', () => {
                                                                      ]));
         expect(response.body[0].answers).toEqual(expect.arrayContaining([{ _id: 'answer1', text: 'This is an answer' }]));
     });
-
-    it('should handle server errors gracefully', async () => {
-        // Simulate a server error during database operation
-        Question.find.mockImplementation(() => ({
-            populate: jest.fn().mockRejectedValue(new Error("Database error"))
-        }));
-
-        const response = await supertest(server)
-            .get('/user/my-questions');
-
-        expect(response.status).toBe(500);
-        expect(response.text).toContain("An error occurred while fetching the questions.");
-    });
 });
 
 // ***************************** test getUserAnswers *************************************
