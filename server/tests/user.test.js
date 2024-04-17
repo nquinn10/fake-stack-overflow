@@ -82,6 +82,39 @@ const mockQuestionVotes = [
     }
 ];
 
+const mockAnswerVotes = [
+    {
+        _id: "661ddc07f49939b726ea59f1",
+        referenceId: {
+            _id: "661ddc07f49939b726ea59e9",
+            text: "This is an answer.",
+            ans_by: {
+                _id: "661ddc07f49939b726ea58c7",
+                display_name: "betty_j"
+            },
+            ans_date_time: "2022-01-20T08:00:00.000Z",
+            vote_count: 2
+        },
+        voteType: "upvote",
+        createdAt: "2024-04-16T02:01:43.789Z"
+    },
+    {
+        _id: "661ddc07f49939b726ea54k9",
+        referenceId: {
+            _id: "661ddc07f49939b726ea90lk",
+            text: "Another answer here.",
+            ans_by: {
+                _id: "661ddc07f49939b726ea58c7",
+                display_name: "johnD"
+            },
+            ans_date_time: "2022-01-20T03:00:00.000Z",
+            vote_count: 5
+        },
+        voteType: "downvote",
+        createdAt: "2024-06-22T02:02:50.789Z"
+    }
+];
+
 // ***************************** test userLogin ******************************************
 describe('POST /user/login', () => {
 
@@ -563,6 +596,90 @@ describe('GET /user/my-question-votes', () => {
 
 });
 // ***************************** test getUserAnswerVotes *************************************
+describe('GET /user/my-answer-votes', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterEach(async () => {
+        if (server && server.close) {
+            await server.close();
+        }
+        await mongoose.disconnect();
+    });
+
+    it('should retrieve user answer votes successfully', async () => {
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(),
+                select: jest.fn().mockResolvedValueOnce(mockAnswerVotes)
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-answer-votes');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockAnswerVotes);
+        expect(Vote.find).toHaveBeenCalledWith({ user: 'validUserId', onModel: 'Answer' });
+    });
+
+    it('should retrieve only upvote answer votes for the user', async () => {
+        const mockUpvoteVotes = mockAnswerVotes.filter(vote => vote.voteType === "upvote");
+
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(),
+                select: jest.fn().mockResolvedValueOnce(mockUpvoteVotes)
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-answer-votes?voteType=upvote');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockUpvoteVotes);
+        expect(Vote.find).toHaveBeenCalledWith({ user: 'validUserId', onModel: 'Answer', voteType: 'upvote' });
+    });
+
+    it('should retrieve only downvote answer votes for the user', async () => {
+        const mockDownvoteVotes = mockAnswerVotes.filter(vote => vote.voteType === "downvote");
+
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(),
+                select: jest.fn().mockResolvedValueOnce(mockDownvoteVotes)
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-answer-votes?voteType=downvote');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockDownvoteVotes);
+        expect(Vote.find).toHaveBeenCalledWith({ user: 'validUserId', onModel: 'Answer', voteType: 'downvote' });
+    });
+
+    it('should handle no votes found', async () => {
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(),
+                select: jest.fn().mockResolvedValueOnce([])
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-answer-votes');
+
+        expect(response.status).toBe(404);
+        expect(response.text).toContain("No answer votes found");
+    });
+});
+
 // ***************************** test updateUserProfile *************************************
 
 describe('PATCH /profile', () => {
