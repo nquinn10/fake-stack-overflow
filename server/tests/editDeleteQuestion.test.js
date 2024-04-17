@@ -69,16 +69,6 @@ describe('PUT /editQuestion/:qid', () => {
         }
         await mongoose.disconnect()
     });
-
-    // // ensure user logged in (NOT WORKING!!!!!)
-    // it('should return 401 unauthorized if no userId in session', async () => {
-    //     const response = await supertest(server)
-    //         .put('/question/editQuestion/65e9b58910afe6e94fc6e6dc')
-    //         .send({ someData: 'data' });
-
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
     
     // ensure valid question
     it('should return 404 if question not found', async () => {
@@ -158,15 +148,6 @@ describe('DELETE /deleteQuestion/:qid', () => {
         }
         await mongoose.disconnect();
     });
-
-    // // ensure user logged in
-    // it('should return 401 unauthorized if no userId in session', async () => {
-    //     const response = await supertest(server)
-    //         .delete('/question/Question/65e9b58910afe6e94fc6e6dc');
-
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
 
     // Test question not found
     it('should return 404 if question not found', async () => {
