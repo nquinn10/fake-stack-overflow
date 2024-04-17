@@ -154,6 +154,16 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
         expect(response.text).toContain("Unauthorized access");
     });
 
+    // ***************************** test post /question/addQuestion endpoint ***********************************
+    it("should return 401 unauthorized if no userId in session", async () => {
+        const response = await supertest(server)
+            .post("/question/addQuestion")
+            .send({ qid: "dummyQuestionId", ans: { text: "Sample answer" } });
+
+        expect(response.status).toBe(401);
+        expect(response.text).toContain("Unauthorized access");
+    });
+
 
 
 
