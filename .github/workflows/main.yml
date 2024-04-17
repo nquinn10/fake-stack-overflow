@@ -51,3 +51,6 @@ jobs:
           npm test tests/server.test.js
           npm test tests/tags.test.js
           npm test tests/user.test.js
+          npm test tests/vote.test.js
+          npm test tests/editDeleteQuestion.test.js
+          npm test tests/editDeleteAnswer.js
