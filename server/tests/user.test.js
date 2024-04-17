@@ -3,6 +3,7 @@ const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
 const Question = require("../models/questions");
 const Vote = require("../models/vote");
+const Answer = require("../models/answers");
 const bcrypt = require('bcryptjs');
 const { server } = require("../server");
 jest.mock('connect-mongo', () => ({
@@ -15,6 +16,7 @@ jest.mock('connect-mongo', () => ({
 jest.mock('../models/user');
 jest.mock("../models/questions");
 jest.mock('../models/vote');
+jest.mock("../models/answers");
 // jest.mock('../models/questions', () => ({
 //     find: jest.fn().mockReturnThis(),
 //     populate: jest.fn().mockReturnThis(),
@@ -433,6 +435,66 @@ describe('GET /my-questions', () => {
 });
 
 // ***************************** test getUserAnswers *************************************
+describe('GET /user/my-answered-questions', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterEach(async () => {
+        if (server && server.close) {
+            await server.close();  // Ensure server is closed after tests
+        }
+        await mongoose.disconnect();
+    });
+
+    it('should retrieve answered questions posted by the user', async () => {
+        const mockAnswers = [{
+            _id: 'answer1',
+            text: 'This is an answer',
+            ans_date_time: new Date('2023-11-20T08:24:42.000Z'),
+            vote_count: 5,
+            question: {
+                _id: 'question1',
+                title: 'Question 1 Title',
+                text: 'Question 1 Text',
+                asked_by: 'validUserId',
+                tags: [{ _id: 'tag1', name: 'JavaScript' }],
+                ask_date_time: new Date('2022-01-20T08:00:00.000Z'),
+                views: 10,
+                vote_count: 1
+            }
+        }];
+
+        // Set up the mock to return answers
+        Answer.find.mockImplementation(() => ({
+            populate: jest.fn().mockResolvedValueOnce(mockAnswers)
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-answers');
+
+        expect(response.status).toBe(200);
+        expect(Answer.find).toHaveBeenCalledWith({ ans_by: 'validUserId' });
+        expect(response.body.length).toBe(1);
+        expect(response.body[0]).toHaveProperty('question.title', 'Question 1 Title');
+        expect(response.body[0].answer).toHaveProperty('text', 'This is an answer');
+    });
+
+    it('should return an empty array when no answers are found', async () => {
+        // Set up the mock to return an empty array
+        Answer.find.mockImplementation(() => ({
+            populate: jest.fn().mockResolvedValueOnce([])
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-answers');
+
+        expect(response.status).toBe(404);
+        expect(Answer.find).toHaveBeenCalledWith({ ans_by: 'validUserId' });
+        expect(response.text).toContain("No answered questions found.");
+    });
+});
+
 // ***************************** test getUserTags *************************************
 describe('GET /my-tags', () => {
     beforeEach(() => {
