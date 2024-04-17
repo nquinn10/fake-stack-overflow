@@ -52,8 +52,13 @@ const getQuestionById = async (req, res) => {
 // To add Question
 const addQuestion = async (req, res) => {
     try {
+        const userId = req.session.userId;
         // extract question data from request body
         const { title, text, tags, asked_by, ask_date_time } = req.body;
+
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
 
         const tagIds = [];
 
@@ -156,7 +161,7 @@ const deleteQuestion = async (req, res) => {
 // add appropriate HTTP verbs and their endpoints to the router
 router.get("/getQuestion", getQuestionsByFilter);
 router.get("/getQuestionById/:qid", getQuestionById);
-router.post("/addQuestion", addQuestion); // need to add authRequired middleware here too
+router.post("/addQuestion", authRequired, addQuestion);
 router.put("/editQuestion/:qid", authRequired, editQuestion);
 router.delete("/deleteQuestion/:qid", authRequired, deleteQuestion);
 

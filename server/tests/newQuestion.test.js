@@ -1,12 +1,10 @@
 // unit tests for functions in controller/question.js
-
-
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 
 const Question = require('../models/questions');
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
-const { server, sessionStore } = require("../server");
+const { server } = require("../server");
 
 // Mocking the models
 jest.mock("../models/questions");
@@ -14,6 +12,28 @@ jest.mock('../utils/question', () => ({
     addTag: jest.fn(),
     getQuestionsByOrder: jest.fn(),
     filterQuestionsBySearch: jest.fn(),
+}));
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+jest.mock('../utils/authMiddleware', () => ({
+    authRequired: (req, res, next) => {
+        req.session = { userId: 'validUserId' };
+        next();
+    }
 }));
 
 
@@ -68,9 +88,6 @@ describe('GET /getQuestion', () => {
         if (server && server.close) {
             await server.close();  // Safely close the server
         }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
         await mongoose.disconnect()
     });
 
@@ -102,9 +119,6 @@ describe('GET /getQuestionById/:qid', () => {
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
         }
         await mongoose.disconnect()
     });
@@ -143,9 +157,6 @@ describe('POST /addQuestion', () => {
         if (server && server.close) {
             await server.close();  // Safely close the server
         }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
         await mongoose.disconnect()
     });
 
@@ -173,6 +184,8 @@ describe('POST /addQuestion', () => {
         // Asserting the response
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockQuestion);
+        expect(addTag).toHaveBeenCalledTimes(mockTags.length);
+        expect(Question.create).toHaveBeenCalled();
 
     });
 });
