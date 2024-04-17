@@ -179,8 +179,6 @@ describe('PUT /vote', () => {
         expect(response.body).toEqual(mockPopulatedAnswer);  // The response should match the updated answer
     });
     
-
-
     // Additional tests can follow similar structure:
     // - Testing double voting behavior
     // test that after vote is cast, Question.vote_count and/or Answer.vote_count incremented correctly (CYPRESS)

@@ -144,6 +144,51 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
         expect(response.text).toContain("Unauthorized access. Please log in.");
     });
 
+});
 
+describe('Unauthorized access to question/ endpoints', () => {
+    // ***************************** test /question/editQuestion *************************************
+    
+    it('should return 401 unauthorized if no userId in session', async () => {
+        const response = await supertest(server)
+            .put('/question/editQuestion/65e9b58910afe6e94fc6e6dc')
+            .send({ someData: 'data' });
 
+        expect(response.status).toBe(401);
+        expect(response.text).toContain("Unauthorized access. Please log in.");
+    });
+ 
+
+ // ***************************** test /question/deleteQuestion ***********************************
+
+    it('should return 401 unauthorized if no userId in session', async () => {
+        const response = await supertest(server)
+            .delete('/question/deleteQuestion/65e9b58910afe6e94fc6e6dc');
+
+        expect(response.status).toBe(401);
+        expect(response.text).toContain("Unauthorized access. Please log in.");
+    });
+});
+
+describe('Unauthorized access to answer/ endpoints', () => {
+    // ******************************* test /answer/editAnswer ***************************************
+
+    it('should return 401 unauthorized if no userId in session', async () => {
+        const response = await supertest(server)
+            .put('/answer/editAnswer/661dc096d916cd1c9d51655a')
+            .send({ someData: 'data' });
+
+        expect(response.status).toBe(401);
+        expect(response.text).toContain("Unauthorized access. Please log in.");
+    });
+
+ // ******************************* test /answer/deleteAnswer ***************************************
+
+    it('should return 401 unauthorized if no userId in session', async () => {
+        const response = await supertest(server)
+            .delete('/answer/deleteAnswer/661dc096d916cd1c9d51655a');
+
+        expect(response.status).toBe(401);
+        expect(response.text).toContain("Unauthorized access. Please log in.");
+    });
 });

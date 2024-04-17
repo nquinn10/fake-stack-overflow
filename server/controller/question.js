@@ -150,7 +150,6 @@ const deleteQuestion = async (req, res) => {
         console.error('Error deleting question: ', error);
         res.status(500).json({ error: 'Internal service error' });
     }
-
 };
 
 // add appropriate HTTP verbs and their endpoints to the router
