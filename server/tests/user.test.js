@@ -2,6 +2,7 @@ const supertest = require("supertest");
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
 const Question = require("../models/questions");
+const Vote = require("../models/vote");
 const bcrypt = require('bcryptjs');
 const { server } = require("../server");
 jest.mock('connect-mongo', () => ({
@@ -13,6 +14,7 @@ jest.mock('connect-mongo', () => ({
 }));
 jest.mock('../models/user');
 jest.mock("../models/questions");
+jest.mock('../models/vote');
 // jest.mock('../models/questions', () => ({
 //     find: jest.fn().mockReturnThis(),
 //     populate: jest.fn().mockReturnThis(),
@@ -34,6 +36,51 @@ jest.mock('../utils/authMiddleware', () => ({
         next();
     }
 }));
+
+const mockQuestionVotes = [
+    {
+        _id: "661ddc07f49939b726ea58f1",
+        referenceId: {
+            _id: "661ddc07f49939b726ea58e9",
+            title: "Programmatically navigate using React router",
+            text: "TEST TEXT",
+            asked_by: {
+                _id: "661ddc07f49939b726ea58c7",
+                display_name: "betty_j"
+            },
+            ask_date_time: "2022-01-20T08:00:00.000Z",
+            views: 10,
+            tags: [
+                { _id: "661ddc07f49939b726ea58cb", name: "react" },
+                { _id: "661ddc07f49939b726ea58cd", name: "javascript" }
+            ],
+            vote_count: 0
+        },
+        voteType: "upvote",
+        createdAt: "2024-04-16T02:01:43.789Z"
+    },
+    {
+        _id: "661ddc07f49939b726ea54j9",
+        referenceId: {
+            _id: "661ddc07f49939b726ea90lo",
+            title: "Object storage for a web application",
+            text: "TEST TEXT",
+            asked_by: {
+                _id: "661ddc07f49939b726ea58c7",
+                display_name: "johnD"
+            },
+            ask_date_time: "2022-01-20T03:00:00.000Z",
+            views: 10,
+            tags: [
+                { _id: "661ddc07f49939b726ea58cb", name: "react" },
+                { _id: "661ddc07f49939b726ea58cd", name: "javascript" }
+            ],
+            vote_count: 0
+        },
+        voteType: "downvote",
+        createdAt: "2024-06-22T02:02:50.789Z"
+    }
+];
 
 // ***************************** test userLogin ******************************************
 describe('POST /user/login', () => {
@@ -429,6 +476,92 @@ describe('GET /my-tags', () => {
 
 
 // ***************************** test getUserQuestionVotes *************************************
+describe('GET /user/my-question-votes', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterEach(async () => {
+        if (server && server.close) {
+            await server.close();
+        }
+        await mongoose.disconnect();
+    });
+
+    it('should retrieve user question votes successfully', async () => {
+        // Mock Vote.find method
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(), // For nested population
+                select: jest.fn().mockResolvedValueOnce(mockQuestionVotes)
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-question-votes');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockQuestionVotes);
+        expect(Vote.find).toHaveBeenCalledWith({ user: 'validUserId', onModel: 'Question' });
+    });
+
+    it('should retrieve only upvote question votes for the user', async () => {
+        const mockUpvoteVotes = mockQuestionVotes.filter(vote => vote.voteType === "upvote");
+
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(),
+                select: jest.fn().mockResolvedValueOnce(mockUpvoteVotes)
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-question-votes?voteType=upvote');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockUpvoteVotes);
+        expect(Vote.find).toHaveBeenCalledWith({ user: 'validUserId', onModel: 'Question', voteType: 'upvote' });
+    });
+
+    it('should retrieve only downvote question votes for the user', async () => {
+        const mockDownvoteVotes = mockQuestionVotes.filter(vote => vote.voteType === "downvote");
+
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(),
+                select: jest.fn().mockResolvedValueOnce(mockDownvoteVotes)
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-question-votes?voteType=downvote');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockDownvoteVotes);
+        expect(Vote.find).toHaveBeenCalledWith({ user: 'validUserId', onModel: 'Question', voteType: 'downvote' });
+    });
+
+    it('should handle no votes found', async () => {
+        // Mock Vote.find method
+        Vote.find.mockImplementation(() => ({
+            populate: jest.fn().mockImplementationOnce(() => ({
+                populate: jest.fn().mockReturnThis(), // For nested population
+                select: jest.fn().mockResolvedValueOnce([])
+            })),
+            select: jest.fn().mockReturnThis()
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-question-votes');
+
+        expect(response.status).toBe(404);
+        expect(response.text).toContain("No question votes found");
+    });
+
+});
 // ***************************** test getUserAnswerVotes *************************************
 // ***************************** test updateUserProfile *************************************
 
