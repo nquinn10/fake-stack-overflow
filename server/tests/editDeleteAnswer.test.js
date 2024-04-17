@@ -2,6 +2,7 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { server } = require("../server");
 const Answer = require('../models/answers');
+const Question = require("../models/questions");
 
 
 
@@ -15,6 +16,7 @@ jest.mock('connect-mongo', () => ({
 }));
 
 jest.mock('../models/answers');
+jest.mock('../models/questions');
 
 // Mock express-session to manipulate session directly
 jest.mock('express-session', () => {
@@ -42,12 +44,14 @@ jest.mock('../utils/authMiddleware', () => ({
     {
         _id: '661dc096d916cd1c9d51655a',
         ans_by: 'validUserId',
-        text: 'Old Text'
+        text: 'Old Text',
+        question: "dummyQuestionId1"
     },
     {
         _id: '661dc096d916cd1c9d51655b',
         ans_by: 'otherUserId',
-        text: 'Old Text'
+        text: 'Old Text',
+        question: "dummyQuestionId2"
     }
 ];
 
@@ -136,6 +140,7 @@ describe('DELETE /deleteAnswer/:aid', () => {
         jest.clearAllMocks();
         Answer.findById.mockReset();
         Answer.findByIdAndDelete.mockReset();
+        Question.findByIdAndUpdate.mockReset();
     });
 
     afterEach(async () => {
@@ -169,7 +174,8 @@ describe('DELETE /deleteAnswer/:aid', () => {
     it('should return 403 if user is not the author', async () => {
         Answer.findById.mockResolvedValue({
             _id: '661dc096d916cd1c9d51655a',
-            ans_by: 'otherUserId'
+            ans_by: 'otherUserId',
+            question: 'questionId'
         });
 
         const response = await supertest(server)
@@ -183,14 +189,23 @@ describe('DELETE /deleteAnswer/:aid', () => {
     it('should delete the answer if the user is the author', async () => {
         Answer.findById.mockResolvedValue({
             _id: '661dc096d916cd1c9d51655a',
-            ans_by: 'validUserId'
+            ans_by: 'validUserId',
+            question: 'questionId'
         });
+        // simulate successful deletion of answer from question
+        Question.findByIdAndUpdate.mockResolvedValue(true);
+        // simulate successful deletion answer
         Answer.findByIdAndDelete.mockResolvedValue(true);
+
 
         const response = await supertest(server)
             .delete('/answer/deleteAnswer/661dc096d916cd1c9d51655a');
 
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Answer has been deleted');
+        expect(Question.findByIdAndUpdate).toHaveBeenCalledWith(
+            'questionId',  // The ID of the question from the answer
+            { $pull: { answers: '661dc096d916cd1c9d51655a' } }  // Command to pull the answer from the question
+        );
     });
 });
