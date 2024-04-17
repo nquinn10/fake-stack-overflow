@@ -120,7 +120,6 @@ const editQuestion = async (req, res) => {
 };
 
 // Delete question
-// note: later with post moderation we could alter this function to change the q_status/delete if admin
 const deleteQuestion = async (req, res) => {
     const { qid } = req.params;
     const userId = req.session.userId; // userId from session (must match Question.askedBy reference)
@@ -136,9 +135,21 @@ const deleteQuestion = async (req, res) => {
             return res.status(404).json({ error: 'Question not found' });
         }
 
-        // check if logged in user is the one who asked the question, or has admin privileges
-        if (!user || (question.asked_by.toString() !== userId && !user.is_moderator)) {
-            return res.status(403).json({ error: 'Unauthorized: You are not the author of this question' });
+        if (!user) {
+            return res.status(403).json({ error: 'User not found' });
+        }
+
+        // check if the question has been flagged for postModeration
+        const isFlagged = question.flag;
+
+        // check if logged in user is the author of question
+        // or check if question flagged and user is moderator
+        const isAuthor = question.asked_by.toString() === userId;
+        const moderatorAndFlagged = user.is_moderator && isFlagged;
+
+        // check if conditions to delete question apply
+        if (!isAuthor && !moderatorAndFlagged) {
+            return res.status(403).json({ error: 'Unauthorized: You do not have permission to delete this question' });
         }
 
         // Delete all answers associated with this question
