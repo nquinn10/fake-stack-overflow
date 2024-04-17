@@ -1,8 +1,8 @@
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 const Question = require('../models/questions');
+const Answer = require('../models/answers');
 const { server } = require("../server");
-const { authRequired } = require('../utils/authMiddleware');
 
 // Mocking the models
 jest.mock('connect-mongo', () => ({
@@ -14,6 +14,7 @@ jest.mock('connect-mongo', () => ({
 }));
 
 jest.mock("../models/questions");
+jest.mock('../models/answers');
 
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
@@ -147,6 +148,7 @@ describe('DELETE /deleteQuestion/:qid', () => {
         jest.clearAllMocks();
         Question.findById.mockReset();
         Question.findByIdAndDelete.mockReset();
+        Answer.deleteMany.mockReset();
     });
 
     afterEach(async () => {
@@ -195,13 +197,20 @@ describe('DELETE /deleteQuestion/:qid', () => {
     it('should delete the question if the user is the author', async () => {
         Question.findById.mockResolvedValue({
             _id: '65e9b58910afe6e94fc6e6dc',
-            asked_by: 'validUserId'
+            asked_by: 'validUserId',
+            answers: ['answerId1', 'answerId2']
         });
+
+        // Mock successful deletion of the question
         Question.findByIdAndDelete.mockResolvedValue(true);
+        // Mock successful deletion of answers
+        Answer.deleteMany.mockResolvedValue({ deletedCount: 2 });
 
         const response = await supertest(server)
             .delete('/question/deleteQuestion/65e9b58910afe6e94fc6e6dc');
 
+        expect(Question.findByIdAndDelete).toHaveBeenCalledWith('65e9b58910afe6e94fc6e6dc');
+        expect(Answer.deleteMany).toHaveBeenCalledWith({ question: '65e9b58910afe6e94fc6e6dc' });
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Question has been deleted');
     });

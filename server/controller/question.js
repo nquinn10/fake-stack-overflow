@@ -1,6 +1,6 @@
 const express = require("express");
 const Question = require("../models/questions");
-//const Answer = require("../models/answers");
+const Answer = require("../models/answers");
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 
@@ -136,6 +136,10 @@ const deleteQuestion = async (req, res) => {
         if (question.asked_by.toString() !== userId) {
             return res.status(403).json({ error: 'Unauthorized: You are not the author of this question' });
         }
+
+        // Delete all answers associated with this question
+        await Answer.deleteMany({ question: qid });
+
 
         // Delete the question if user is authorized
         await Question.findByIdAndDelete(qid);
