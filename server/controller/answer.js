@@ -12,8 +12,14 @@ const addAnswer = async (req, res) => {
         // extract answer data from request body
         const { qid, ans } = req.body;
 
+        // Add qid to the answer details
+        const answerDetails = {
+            ...ans,
+            question: qid  // Ensure the qid is included
+        };
+
         // create a new answer object
-        const newAnswer = await Answer.create(ans);
+        const newAnswer = await Answer.create(answerDetails);
 
         await Question.findOneAndUpdate(
             { _id: qid },
@@ -80,6 +86,12 @@ const deleteAnswer = async (req, res) => {
         // check if logged in user is the one who asked the answer
         if (ans.ans_by.toString() !== userId) {
             return res.status(403).json({ error: 'Unauthorized: You are not the author of this answer' });
+        }
+        // If the answer is linked to a question, remove the answer from the question's answers array
+        if (ans.question) {
+            await Question.findByIdAndUpdate(ans.question, {
+                $pull: { answers: aid }
+            });
         }
 
         // Delete the answer if user is authorized
