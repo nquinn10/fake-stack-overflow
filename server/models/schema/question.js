@@ -14,9 +14,6 @@ const questionSchema = new mongoose.Schema({
 
         // in our schema, we have a Question having a vote_count, not vote object
         vote_count: {type: Number, default: 0},
-
-        // status for Post Moderation purposes
-        question_status: {type: String, enum: ['Open', 'Closed'], default: 'Open'},
         flag: {type: Boolean, default: false}
         
         // we also have update_timestamp, but it looks like Stack Overflow just updates the ask_date_time

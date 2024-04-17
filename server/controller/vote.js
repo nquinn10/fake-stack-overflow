@@ -13,7 +13,11 @@ async function updateVoteCountAndFlag(Model, referenceId, voteChange, onModel) {
 
     // check and update flag status if it hits -15 or below
     if (updateItem.vote_count <= -15) {
+        if (!updateItem.flag) {
+            updateItem.flag = true;
+        }
         updateItem.flag = true;
+        
         await updateItem.save();
     }
     return updateItem;
