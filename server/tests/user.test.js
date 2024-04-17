@@ -1,5 +1,5 @@
 const supertest = require("supertest");
-const mongoose = require("mongoose");
+const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
 const Question = require("../models/questions");
 const bcrypt = require('bcryptjs');
@@ -12,7 +12,12 @@ jest.mock('connect-mongo', () => ({
     })
 }));
 jest.mock('../models/user');
-jest.mock('../models/questions');
+jest.mock("../models/questions");
+// jest.mock('../models/questions', () => ({
+//     find: jest.fn().mockReturnThis(),
+//     populate: jest.fn().mockReturnThis(),
+//     select: jest.fn().mockReturnThis()
+// }));
 
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
@@ -362,6 +367,67 @@ describe('GET /my-questions', () => {
 
 // ***************************** test getUserAnswers *************************************
 // ***************************** test getUserTags *************************************
+describe('GET /my-tags', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterEach(async () => {
+        if (server && server.close) {
+            await server.close();
+        }
+        await mongoose.disconnect();
+    });
+
+    it('should retrieve unique tags from questions posted by the user', async () => {
+        const mockQuestions = [
+            {
+                _id: 'Question1',
+                title: 'Question 1 Text',
+                text: 'Test Question 1 ....',
+                asked_by: 'validUserId',
+                tags: [{ _id: 'tag1', name: 'JavaScript' }, { _id: 'tag2', name: 'Node.js' }],
+                answers: [{ _id: 'answer1', text: 'This is an answer to question 1' }],
+                views: 20
+            },
+            {
+                _id: 'Question2',
+                title: 'Question 2 Text',
+                text: 'Test Question 2 ....',
+                asked_by: 'validUserId',
+                tags: [{ _id: 'tag3', name: 'Python' }, { _id: 'tag1', name: 'JavaScript' }],
+                answers: [{ _id: 'answer2', text: 'This is an answer to question 2' }],
+                views: 15
+            }
+        ];
+
+        Question.find.mockImplementation(() => ({
+            populate: jest.fn().mockResolvedValueOnce(mockQuestions)
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-tags');
+
+        expect(Question.find).toHaveBeenCalledWith({ asked_by: 'validUserId' });
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(['JavaScript', 'Node.js', 'Python']);
+    });
+
+    it('should return a 404 when no questions or tags are found', async () => {
+        Question.find.mockImplementation(() => ({
+            populate: jest.fn().mockResolvedValueOnce([])
+        }));
+
+        const response = await supertest(server)
+            .get('/user/my-tags');
+
+        expect(Question.find).toHaveBeenCalledWith({ asked_by: 'validUserId' });
+        expect(response.status).toBe(404);
+        expect(response.text).toContain("No questions or tags found.");
+    });
+});
+
+
 // ***************************** test getUserQuestionVotes *************************************
 // ***************************** test getUserAnswerVotes *************************************
 // ***************************** test updateUserProfile *************************************

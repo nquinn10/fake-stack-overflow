@@ -112,7 +112,7 @@ const getUserQuestions = async (req, res) => {
 
         // Find questions where 'asked_by' matches the logged-in user's ID
         const userQuestions = await Question.find({ asked_by: userId })
-            .populate('tags', 'name'); // Assuming you might want to show tag name;
+            .populate('tags', 'name');
 
         if (!userQuestions.length) {
             return res.status(404).send("No questions found.");
@@ -161,7 +161,6 @@ const getUserTags = async (req, res) => {
                           path: 'tags',   // Populate the tags array in the question documents
                           select: 'name'  // Only select the name field from the tags documents
                       })
-            .select('tags'); // Select only the tags field to minimize the data transfer
 
         if (!userQuestions.length) {
             return res.status(404).send("No questions or tags found.");
