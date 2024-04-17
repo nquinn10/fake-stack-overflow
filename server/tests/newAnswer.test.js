@@ -37,7 +37,8 @@ describe("POST /addAnswer", () => {
 
         const mockAnswer = {
             _id: "dummyAnswerId",
-            text: "This is a test answer"
+            text: "This is a test answer",
+            question: "dummyQuestionId"
         }
         // Mock the create method of the Answer model
         Answer.create.mockResolvedValueOnce(mockAnswer);
@@ -59,7 +60,8 @@ describe("POST /addAnswer", () => {
 
         // Verifying that Answer.create method was called with the correct arguments
         expect(Answer.create).toHaveBeenCalledWith({
-                                                       text: "This is a test answer"
+                                                       text: "This is a test answer",
+                                                       question: "dummyQuestionId"
                                                    });
 
         // Verifying that Question.findOneAndUpdate method was called with the correct arguments
