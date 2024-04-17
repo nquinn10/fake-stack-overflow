@@ -9,8 +9,13 @@ const router = express.Router();
 // Adding answer
 const addAnswer = async (req, res) => {
     try {
+        const userId = req.session.userId;
         // extract answer data from request body
         const { qid, ans } = req.body;
+
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
 
         // Add qid to the answer details
         const answerDetails = {
@@ -105,7 +110,7 @@ const deleteAnswer = async (req, res) => {
 };
 
 // add appropriate HTTP verbs and their endpoints to the router.
-router.post("/addAnswer", addAnswer);
+router.post("/addAnswer", authRequired, addAnswer);
 router.put("/editAnswer/:aid", authRequired, editAnswer);
 router.delete("/deleteAnswer/:aid", authRequired, deleteAnswer);
 
