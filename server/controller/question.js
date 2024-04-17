@@ -1,6 +1,7 @@
 const express = require("express");
 const Question = require("../models/questions");
 const Answer = require("../models/answers");
+const User = require("../models/user");
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 
@@ -125,15 +126,18 @@ const deleteQuestion = async (req, res) => {
     const userId = req.session.userId; // userId from session (must match Question.askedBy reference)
 
     try {
-        // First, find question and ensure it exists and is asked by current userId stored in session
-        const question = await Question.findById(qid);
+        // retrieve user and question from the database:
+        const [user, question] = await Promise.all([
+            User.findById(userId),
+            Question.findById(qid)
+        ]);
 
         if (!question) {
             return res.status(404).json({ error: 'Question not found' });
         }
 
-        // check if logged in user is the one who asked the question
-        if (question.asked_by.toString() !== userId) {
+        // check if logged in user is the one who asked the question, or has admin privileges
+        if (!user || (question.asked_by.toString() !== userId && !user.is_moderator)) {
             return res.status(403).json({ error: 'Unauthorized: You are not the author of this question' });
         }
 
