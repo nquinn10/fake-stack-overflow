@@ -126,7 +126,7 @@ const init = async () => {
     await Question.findByIdAndUpdate(q1._id,  { $push: { answers: { $each: [a1._id, a2._id] } } });
     await Question.findByIdAndUpdate(q2._id,  { $push: { answers: { $each: [a3._id, a4._id, a5._id] } } });
     await Question.findByIdAndUpdate(q3._id,  { $push: { answers: { $each: [a6._id, a7._id] } } });
-    await Question.findByIdAndUpdate(q4._id, { $push: { answers: a8._id } });
+    await Question.findByIdAndUpdate(q4._id, { $push: { answers: { $each: [a8._id, a9._id] } } });
 
 
     // Create votes
