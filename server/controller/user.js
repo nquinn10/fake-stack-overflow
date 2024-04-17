@@ -112,7 +112,7 @@ const getUserQuestions = async (req, res) => {
 
         // Find questions where 'asked_by' matches the logged-in user's ID
         const userQuestions = await Question.find({ asked_by: userId })
-            .populate('tags', 'name'); // Assuming you might want to show tag name;
+            .populate('tags', 'name');
 
         if (!userQuestions.length) {
             return res.status(404).send("No questions found.");
@@ -161,7 +161,6 @@ const getUserTags = async (req, res) => {
                           path: 'tags',   // Populate the tags array in the question documents
                           select: 'name'  // Only select the name field from the tags documents
                       })
-            .select('tags'); // Select only the tags field to minimize the data transfer
 
         if (!userQuestions.length) {
             return res.status(404).send("No questions or tags found.");
@@ -269,6 +268,54 @@ const getUserAnswerVotes = async (req, res) => {
     }
 };
 
+const updateUserProfile = async (req, res) => {
+    const userId = req.session.userId;
+    const { first_name, last_name, display_name, about_me, location } = req.body;
+
+    if (!userId) {
+        return res.status(401).send("Unauthorized access.");
+    }
+
+    try {
+        const updates = {
+            ...(first_name && { first_name }),
+            ...(last_name && { last_name }),
+            ...(display_name && { display_name }),
+            ...(about_me && { about_me }),
+            ...(location && { location })
+        };
+
+        // Ensure there are updates to apply
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).send("No updates provided.");
+        }
+
+        // Find the user and update their profile
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updates },
+            { new: true, runValidators: true, context: 'query' } // options to return the updated document and run model validators
+        );
+
+        if (!updatedUser) {
+            return res.status(404).send("User not found.");
+        }
+
+        res.json({
+                     user: {
+                         first_name: updatedUser.first_name,
+                         last_name: updatedUser.last_name,
+                         display_name: updatedUser.display_name,
+                         about_me: updatedUser.about_me,
+                         location: updatedUser.location
+                     }
+                 });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("An error occurred while updating the profile.");
+    }
+};
+
 router.post('/register', userRegistration);
 router.post('/login', userLogin);
 router.get('/profile', authRequired, userProfileSummary);
@@ -277,5 +324,6 @@ router.get('/my-answers', authRequired, getUserAnswers);
 router.get('/my-tags', authRequired, getUserTags);
 router.get('/my-question-votes', authRequired, getUserQuestionVotes);
 router.get('/my-answer-votes', authRequired, getUserAnswerVotes);
+router.patch('/profile', authRequired, updateUserProfile);
 
 module.exports = router;
