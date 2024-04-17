@@ -6,6 +6,20 @@ const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
 const User = require('../models/user');
 
+// Helper function to Flag Question/Answer object if vote count reaches -15, which will flag object for post moderation
+async function updateVoteCountAndFlag(Model, referenceId, voteChange, onModel) {
+    // update the vote count on the Question or Answer
+    const updateItem = await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } }, { new: true });
+
+    // check and update flag status if it hits -15 or below
+    if (updateItem.vote_count <= -15) {
+        updateItem.flag = true;
+        await updateItem.save();
+    }
+    return updateItem;
+}
+
+
 /**
  * Function to cast a vote, on either a Question or Answer object.
  * Requires: userID and valid session (authenticated user), reputation score >= 15.
@@ -56,8 +70,7 @@ const castVote = async (req, res) => {
         }
 
         // Update the vote count on the Question or Answer
-        const updatedItem = await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } }, { new: true });
-        console.log("Updated item: ", updatedItem);
+        const updatedItem = await updateVoteCountAndFlag(Model, referenceId, voteChange, onModel);
         return res.status(201).json(updatedItem); // Return the updated item
     } catch (error) {
         console.error("Error casting vote: ", error);
