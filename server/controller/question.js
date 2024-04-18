@@ -13,7 +13,17 @@ const getQuestionsByFilter = async (req, res) => {
         const { order, search } = req.query;
 
         // retrieve questions based on specified order
-        const questions = await getQuestionsByOrder(order);
+        let questions = await getQuestionsByOrder(order);
+        questions = await Question.populate(questions, {
+            path: 'asked_by',
+            select: 'display_name -_id' // Selects display_name and excludes the _id field
+        });
+
+        // Modify each question to replace 'asked_by' object with the 'display_name' string
+        questions = questions.map(question => ({
+            ...question.toObject(), // Convert document to a plain object
+            asked_by: question.asked_by.display_name // Replace 'asked_by' object with display name string
+        }));
 
         // if search term provided, filter questions by search term
         const filteredQuestions = search ? filterQuestionsBySearch(questions, search) : questions;
@@ -40,12 +50,23 @@ const getQuestionById = async (req, res) => {
             { _id: qid },
             { $inc: { views: 1 } }, // Increment the 'views' field by 1
             { new: true } // Return the updated document
-        ).populate('answers');
+        ).populate({
+                       path: 'answers',
+                       populate: {
+                           path: 'ans_by',
+                           select: 'display_name -_id'  // Only get the display name, exclude _id
+                       }
+                   })
+            .populate({           // Populate the 'asked_by' field to get 'display_name'
+                          path: 'asked_by',
+                          select: 'display_name -_id'
+                      });
 
         if (!question) {
             return res.status(404).json({ error: 'Question not found' });
         }
-        res.status(200).json(question);
+        const formattedQuestion = formatQuestionData(question);
+        res.status(200).json(formattedQuestion);
     } catch (error) {
         console.error('Error fetching question by ID:', error);
         res.status(500).json({ error: 'Internal server error' })
@@ -55,6 +76,30 @@ const getQuestionById = async (req, res) => {
 // helper function  verify valid qid format
 const isValidObjectId = (id) => {
     return /^[0-9a-fA-F]{24}$/.test(id);
+};
+
+// helper to format question data
+const formatQuestionData = (question) => {
+    return {
+        _id: question._id,
+        title: question.title,
+        text: question.text,
+        asked_by: question.asked_by.display_name,
+        ask_date_time: question.ask_date_time,
+        views: question.views,
+        tags: question.tags,
+        answers: question.answers.map(ans => ({
+            _id: ans._id,
+            text: ans.text,
+            ans_by: ans.ans_by.display_name,
+            ans_date_time: ans.ans_date_time,
+            vote_count: ans.vote_count,
+            flag: ans.flag
+        })),
+        vote_count: question.vote_count,
+        question_status: question.question_status,
+        flag: question.flag
+    };
 };
 
 // To add Question
