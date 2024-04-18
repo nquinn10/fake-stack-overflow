@@ -120,6 +120,7 @@ const deleteAnswer = async (req, res) => {
 
 
 
+
 router.get('/flaggedQuestions',authRequired, adminRequired, getFlaggedQuestions); 
 router.get('/flaggedAnswers', authRequired, adminRequired, getFlaggedAnswers);
 router.put('/resetQuestion/:qid', authRequired, adminRequired, resetFlaggedQuestion);
