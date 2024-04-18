@@ -12,9 +12,9 @@ jest.mock('connect-mongo', () => ({
         destroy: jest.fn(),
     })
 }));
-jest.mock('../models/user');
+jest.mock('../models/users');
 jest.mock("../models/questions");
-jest.mock('../models/vote');
+jest.mock('../models/votes');
 // jest.mock('../models/questions', () => ({
 //     find: jest.fn().mockReturnThis(),
 //     populate: jest.fn().mockReturnThis(),

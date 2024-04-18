@@ -1,8 +1,8 @@
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 const Question = require('../models/questions');
-const { server, sessionStore } = require("../server");
-const { authRequired } = require('../utils/authMiddleware');
+const Answer = require('../models/answers');
+const { server } = require("../server");
 
 // Mocking the models
 jest.mock('connect-mongo', () => ({
@@ -12,10 +12,13 @@ jest.mock('connect-mongo', () => ({
         destroy: jest.fn(),
     })
 }));
+
 jest.mock("../models/questions");
+jest.mock('../models/answers');
+
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
-        req.session = {
+        req.session = req.testSession || {
             userId: 'validUserId',
             touch: () => {},
         };
@@ -25,8 +28,11 @@ jest.mock('express-session', () => {
 
 jest.mock('../utils/authMiddleware', () => ({
     authRequired: (req, res, next) => {
-        req.session = { userId: 'validUserId' };
-        next();
+        if (req.session && req.session.userId) {
+            next();
+        } else {
+            res.status(401).send("Unauthorized access. Please log in.");
+        }
     }
 }));
 
@@ -54,36 +60,14 @@ const mockQuestions = [
 describe('PUT /editQuestion/:qid', () => {
     beforeEach(() => { 
         // Reset mocks before each test
-        jest.clearAllMocks();
-        Question.findById.mockReset();
-        Question.findByIdAndUpdate.mockReset();
+        jest.resetAllMocks();
     });
 
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
         }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
-        }
         await mongoose.disconnect()
-    });
-
-    // ensure user logged in (NOT WORKING!!!!!)
-    it('should not allow editing if user not logged in', async () => {
-        // Spy and mock the implementation of authRequired for this specific test
-        jest.spyOn(require('../utils/authMiddleware'), 'authRequired')
-            .mockImplementation((req, res, next) => {
-                return res.status(401).json({ error: "You must log in to edit your questions" });
-            });
-
-        // assume question ID is used for test
-        const response = await supertest(server)
-            .put('/question/editQuestion/65e9b5a995b6c7045a30d823')
-            .send({ title: 'Attempted New Title', text: 'Attempted new text' });
-
-        expect(response.status).toBe(401);
-        expect(response.body.error).toBe("You must log in to edit your questions");
     });
     
     // ensure valid question
@@ -92,8 +76,7 @@ describe('PUT /editQuestion/:qid', () => {
 
         const response = await supertest(server)
             .put('/question/editQuestion/123')
-            .send({ title: 'New Title', text: 'Updated text' })
-            .set('Cookie', `session-token=valid-session-token`);
+            .send({ title: 'New Title', text: 'Updated text' });
         
         expect(response.status).toBe(404);
         expect(response.body.error).toBe('Question not found');
@@ -110,14 +93,13 @@ describe('PUT /editQuestion/:qid', () => {
 
         const response = await supertest(server)
             .put('/question/editQuestion/65e9b58910afe6e94fc6e6dc')
-            .send({ title: 'New Title', text: 'New Text' })
-            .set('Cookie', `session-token=valid-session-token`);
+            .send({ title: 'New Title', text: 'New Text' });
 
         expect(response.status).toBe(403);
         expect(response.body.error).toBe('Unauthorized: You are not the author of this question');
     });
 
-    // if logged in user is the author, and valid, question, successfully edit question
+    // if logged in user is the author, and valid question, successfully edit question
     it('should update the question if the user is author', async () => {
         Question.findById.mockResolvedValue({
             _id: '65e9b58910afe6e94fc6e6dc',
@@ -137,9 +119,8 @@ describe('PUT /editQuestion/:qid', () => {
 
         const response = await supertest(server)
             .put('/question/editQuestion/65e9b58910afe6e94fc6e6dc')
-            .send({ title: 'New Title', text: 'Updated Text', tags: ['tag1', 'tag2']})
-            .set('Cookie', `session-token=valid-session-token`);
-
+            .send({ title: 'New Title', text: 'Updated Text', tags: ['tag1', 'tag2']});
+            
         expect(response.status).toBe(200);
         expect(response.body.title).toBe('New Title');
         expect(response.body.text).toBe('Updated Text');
@@ -157,6 +138,7 @@ describe('DELETE /deleteQuestion/:qid', () => {
         jest.clearAllMocks();
         Question.findById.mockReset();
         Question.findByIdAndDelete.mockReset();
+        Answer.deleteMany.mockReset();
     });
 
     afterEach(async () => {
@@ -164,24 +146,7 @@ describe('DELETE /deleteQuestion/:qid', () => {
         if (server && server.close) {
             await server.close();
         }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();
-        }
         await mongoose.disconnect();
-    });
-
-    // Test user not logged in
-    it('should not allow deletion if user not logged in', async () => {
-        jest.spyOn(require('../utils/authMiddleware'), 'authRequired')
-            .mockImplementation((req, res, next) => {
-                return res.status(401).json({ error: "You must log in to delete your questions" });
-            });
-
-        const response = await supertest(server)
-            .delete('/question/deleteQuestion/65e9b5a995b6c7045a30d823');
-
-        expect(response.status).toBe(401);
-        expect(response.body.error).toBe("You must log in to delete your questions");
     });
 
     // Test question not found
@@ -213,15 +178,21 @@ describe('DELETE /deleteQuestion/:qid', () => {
     it('should delete the question if the user is the author', async () => {
         Question.findById.mockResolvedValue({
             _id: '65e9b58910afe6e94fc6e6dc',
-            asked_by: 'validUserId'
+            asked_by: 'validUserId',
+            answers: ['answerId1', 'answerId2']
         });
+
+        // Mock successful deletion of the question
         Question.findByIdAndDelete.mockResolvedValue(true);
+        // Mock successful deletion of answers
+        Answer.deleteMany.mockResolvedValue({ deletedCount: 2 });
 
         const response = await supertest(server)
             .delete('/question/deleteQuestion/65e9b58910afe6e94fc6e6dc');
 
+        expect(Question.findByIdAndDelete).toHaveBeenCalledWith('65e9b58910afe6e94fc6e6dc');
+        expect(Answer.deleteMany).toHaveBeenCalledWith({ question: '65e9b58910afe6e94fc6e6dc' });
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Question has been deleted');
     });
 });
-

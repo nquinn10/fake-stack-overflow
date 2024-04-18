@@ -1,7 +1,7 @@
 const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { server } = require("../server");
-const User = require("../models/user");
+const User = require("../models/users");
 
 // Mock connect-mongo used for MongoDB session storage in express-session
 jest.mock('connect-mongo', () => ({
@@ -12,7 +12,7 @@ jest.mock('connect-mongo', () => ({
     })
 }));
 
-jest.mock('../models/user');
+jest.mock('../models/users');
 
 // Mock express-session to manipulate session directly
 jest.mock('express-session', () => {
