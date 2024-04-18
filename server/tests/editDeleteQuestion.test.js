@@ -43,28 +43,6 @@ jest.mock('../utils/authMiddleware', () => ({
 }));
 
 
-const tag1 = {
-    _id: '507f191e810c19729de860ea',
-    name: 'tag1'
-};
-const tag2 = {
-    _id: '65e9a5c2b26199dbcc3e6dc8',
-    name: 'tag2'
-};
-const ans1 = {
-    _id: '65e9b58910afe6e94fc6e6dc',
-    text: 'Answer 1 Text',
-    ans_by: 'answer1_user',
-
-}
-
-const ans2 = {
-    _id: '65e9b58910afe6e94fc6e6dd',
-    text: 'Answer 2 Text',
-    ans_by: 'answer2_user',
-
-}
-
 
 // ******************************* Test Edit Question *************************************
 describe('PUT /editQuestion/:qid', () => {
