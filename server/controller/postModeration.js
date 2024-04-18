@@ -3,9 +3,8 @@ const mongoose = require("mongoose");
 
 const Question = require('../models/questions');
 const Answer = require('../models/answers');
+const Vote = require('../models/votes');
 
-const { deleteQuestion } = require('./question');
-const { deleteAnswer } = require('./answer');
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 const { adminRequired } = require("../utils/adminMiddleware");
 
@@ -73,12 +72,60 @@ const resetFlaggedAnswer = async (req, res) => {
     }
 };
 
- 
+// delete question if flagged:
+const deleteQuestion = async (req, res) => {
+    const { qid } = req.params;
+    try {
+        const question = await Question.findById(qid);
+
+        if (!question) {
+            return res.status(404).json({ message: 'Question not found' });
+        }
+        
+        // Check if the question is flagged
+        if (!question.flag) {
+            return res.status(403).json({ message: 'This question is not flagged for deletion' });
+        }
+
+        await Question.deleteOne({ _id: qid });
+        res.status(200).json({ message: 'Question successfully deleted' });
+    } catch (error) {
+        console.error('Error deleting question:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// delete answer if flagged:
+const deleteAnswer = async (req, res) => {
+    const { aid } = req.params;
+    try {
+        const answer = await Answer.findById(aid);
+
+        if (!answer) {
+            return res.status(404).json({ message: 'Answer not found' });
+        }
+        
+        // Check if the answer is flagged
+        if (!answer.flag) {
+            return res.status(403).json({ message: 'This answer is not flagged for deletion' });
+        }
+
+        await Answer.deleteOne({ _id: aid });
+        res.status(200).json({ message: 'Answer successfully deleted' });
+    } catch (error) {
+        console.error('Error deleting answer:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
 
 router.get('/flaggedQuestions',authRequired, adminRequired, getFlaggedQuestions); 
 router.get('/flaggedAnswers', authRequired, adminRequired, getFlaggedAnswers);
 router.put('/resetQuestion/:qid', authRequired, adminRequired, resetFlaggedQuestion);
 router.put('/resetAnswer/:aid', authRequired, adminRequired, resetFlaggedAnswer);
+router.delete('/deleteQuestion/:qid', authRequired, adminRequired, deleteQuestion);
+router.delete('/deleteAnswer/:aid', authRequired, adminRequired, deleteAnswer);
 
 module.exports = router;
 

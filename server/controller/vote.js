@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Vote = require('../models/vote');  // Ensure you have a model for Vote
+const Vote = require('../models/votes');  // Ensure you have a model for Vote
 const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
-const User = require('../models/user');
+const User = require('../models/users');
 
 // Helper function to Flag Question/Answer object if vote count reaches -15, which will flag object for post moderation
 async function updateVoteCountAndFlag(Model, referenceId, voteChange, onModel) {

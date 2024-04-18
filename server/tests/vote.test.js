@@ -4,8 +4,8 @@ const mongoose = require("mongoose");
 const { server } = require("../server");
 
 const Question = require('../models/questions');
-const Vote = require('../models/vote');
-const User = require('../models/user');
+const Vote = require('../models/votes');
+const User = require('../models/users');
 const Answer = require('../models/answers');
 
 // Mocking the models

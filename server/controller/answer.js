@@ -1,7 +1,7 @@
 const express = require("express");
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
-const User = require("../models/user");
+const User = require("../models/users");
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 
 
@@ -82,33 +82,17 @@ const deleteAnswer = async (req, res) => {
     const userId = req.session.userId; // userId from session (must be logged in)
 
     try {
-        // retrieve user and answer from the database
-        const [user, ans] = await Promise.all([
-            User.findById(userId),
-            Answer.findById(aid)
-        ]);
+        // First, find answer and ensure it exists and is asked by current userId stored in session
+        const ans = await Answer.findById(aid);
 
         if (!ans) {
             return res.status(404).json({ error: 'Answer not found' });
         }
 
-        if (!user) {
-            return res.status(403).json({ error: 'User not found' });
+        // check if logged in user is the one who asked the answer
+        if (ans.ans_by.toString() !== userId) {
+            return res.status(403).json({ error: 'Unauthorized: You are not the author of this answer' });
         }
-
-        // check if answer has been flagged for postModeration
-        const isFlagged = ans.flag;
-
-        // check if logged in user is the author of the answer
-        // or check if answer is flagged and user is moderator
-        const isAuthor = ans.ans_by.toString() === userId;
-        const moderatorAndFlagged = user.is_moderator && isFlagged;
-
-        // check if logged in user is the one who asked the answer, or has admin privileges
-        if (!isAuthor && !moderatorAndFlagged) {
-            return res.status(403).json({ error: 'Unauthorized: You do not have permission to delete this answer' });
-        }
-
         // If the answer is linked to a question, remove the answer from the question's answers array
         if (ans.question) {
             await Question.findByIdAndUpdate(ans.question, {

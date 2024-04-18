@@ -3,7 +3,7 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { server } = require("../server");
 
-const User = require('../models/user');
+const User = require('../models/users');
 const Answer = require('../models/answers');
 
 // Mocking the models

@@ -1,7 +1,7 @@
 const express = require("express");
 const Question = require("../models/questions");
 const Answer = require("../models/answers");
-const User = require("../models/user");
+const User = require("../models/users");
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 
@@ -125,31 +125,16 @@ const deleteQuestion = async (req, res) => {
     const userId = req.session.userId; // userId from session (must match Question.askedBy reference)
 
     try {
-        // retrieve user and question from the database:
-        const [user, question] = await Promise.all([
-            User.findById(userId),
-            Question.findById(qid)
-        ]);
+        // First, find question and ensure it exists and is asked by current userId stored in session
+        const question = await Question.findById(qid);
 
         if (!question) {
             return res.status(404).json({ error: 'Question not found' });
         }
 
-        if (!user) {
-            return res.status(403).json({ error: 'User not found' });
-        }
-
-        // check if the question has been flagged for postModeration
-        const isFlagged = question.flag;
-
-        // check if logged in user is the author of question
-        // or check if question flagged and user is moderator
-        const isAuthor = question.asked_by.toString() === userId;
-        const moderatorAndFlagged = user.is_moderator && isFlagged;
-
-        // check if conditions to delete question apply
-        if (!isAuthor && !moderatorAndFlagged) {
-            return res.status(403).json({ error: 'Unauthorized: You do not have permission to delete this question' });
+        // check if logged in user is the one who asked the question
+        if (question.asked_by.toString() !== userId) {
+            return res.status(403).json({ error: 'Unauthorized: You are not the author of this question' });
         }
 
         // Delete all answers associated with this question
@@ -165,6 +150,7 @@ const deleteQuestion = async (req, res) => {
         console.error('Error deleting question: ', error);
         res.status(500).json({ error: 'Internal service error' });
     }
+
 };
 
 // add appropriate HTTP verbs and their endpoints to the router
@@ -173,6 +159,5 @@ router.get("/getQuestionById/:qid", getQuestionById);
 router.post("/addQuestion", addQuestion); // need to add authRequired middleware here too
 router.put("/editQuestion/:qid", authRequired, editQuestion);
 router.delete("/deleteQuestion/:qid", authRequired, deleteQuestion);
-
 
 module.exports = router;

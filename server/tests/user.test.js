@@ -1,8 +1,8 @@
 const supertest = require("supertest");
 const { default: mongoose } = require("mongoose");
-const User = require("../models/user");
+const User = require("../models/users");
 const Question = require("../models/questions");
-const Vote = require("../models/vote");
+const Vote = require("../models/votes");
 const bcrypt = require('bcryptjs');
 const { server } = require("../server");
 jest.mock('connect-mongo', () => ({
