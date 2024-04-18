@@ -72,30 +72,6 @@ const isValidObjectId = (id) => {
     return /^[0-9a-fA-F]{24}$/.test(id);
 };
 
-// helper to format question data
-const formatQuestionData = (question) => {
-    return {
-        _id: question._id,
-        title: question.title,
-        text: question.text,
-        asked_by: question.asked_by.display_name,
-        ask_date_time: question.ask_date_time,
-        views: question.views,
-        tags: question.tags,
-        answers: question.answers.map(ans => ({
-            _id: ans._id,
-            text: ans.text,
-            ans_by: ans.ans_by.display_name,
-            ans_date_time: ans.ans_date_time,
-            vote_count: ans.vote_count,
-            flag: ans.flag
-        })),
-        vote_count: question.vote_count,
-        question_status: question.question_status,
-        flag: question.flag
-    };
-};
-
 // To add Question
 const addQuestion = async (req, res) => {
     try {
@@ -141,7 +117,7 @@ const editQuestion = async (req, res) => {
 
     const { qid } = req.params;
     const userId = req.session.userId; // user ID from session (must match Question.askedBy reference)
-    const updateData = req.body;
+    const { title, text, tags } = req.body;
 
     try {
         // First, find question and ensure it exists and is askedBy current userId stored in session
@@ -155,9 +131,19 @@ const editQuestion = async (req, res) => {
         if (question.asked_by.toString() !== userId) {
             return res.status(403).json({ error: 'Unauthorized: You are not the author of this question'});
         }
+        const tagIds = [];
 
-        // Update the question if the user is authorized
-        const updatedQuestion = await Question.findByIdAndUpdate(qid, updateData, { new: true });
+        for (const tagName of tags) {
+            const tagId = await addTag(tagName);
+            tagIds.push(tagId);
+        }
+
+        // Update the question with new data
+        const updatedQuestion = await Question.findByIdAndUpdate(
+            qid,
+            { title, text, tags: tagIds },
+            { new: true }
+        );
         if (!updatedQuestion) {
             return res.status(404).json({ error: 'Unable to update the question' });
         }
