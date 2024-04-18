@@ -107,8 +107,7 @@ describe('PUT /editQuestion/:qid', () => {
                                                 asked_by: 'validUserId',
                                                 title: 'Original Title',
                                                 text: 'Original Text',
-                                                tags: ['507f191e810c19729de860ea', '65e9a5c2b26199dbcc3e6dc8'], // Existing tag IDs
-                                                answers: [ans1]
+                                                tags: ['507f191e810c19729de860ea', '65e9a5c2b26199dbcc3e6dc8']// Existing tag IDs
                                             });
         addTag.mockResolvedValueOnce(mockTags);
         Question.findByIdAndUpdate.mockResolvedValue({
