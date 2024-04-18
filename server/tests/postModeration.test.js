@@ -40,6 +40,13 @@ jest.mock('express-session', () => {
     };
 });
 
+// jest.mock('../utils/adminMiddleware', () => ({
+//     adminRequired: (req, res, next) => {
+//         req.user = req.testSession || { is_admin: true };
+//         next();
+//     }
+// }));
+
 const mockQuestion = {
     _id: '65e9b58910afe6e94fc6e6dc',
     vote_count: -14,
@@ -49,6 +56,8 @@ const mockQuestion = {
 
 const request = supertest(server);
 
-describe('Object is flagged for post moderation when vote_count <= -15', () => {
+describe('DELETE /question/deleteQuestion', () => {
+    it('should allow deletion of question by admin if question flagged', async () => {
 
+    });
 });

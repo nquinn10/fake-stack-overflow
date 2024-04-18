@@ -102,7 +102,7 @@ const init = async () => {
     let t4 = await tagCreate('shared-preferences');
     let t5 = await tagCreate('storage');
     let t6 = await tagCreate('website');
-    let t7 = await tagCreate('Flutter'); t7
+    let t7 = await tagCreate('Flutter');
 
     // set the q1 and q2 vote_count according to below vote objects
     let q1 = await questionCreate('Programmatically navigate using React router', 'the alert shows the proper index for the li clicked, and when I alert the variable within the last function Im calling, moveToNextImage(stepClicked), the same value shows but the animation isnt happening. This works many other ways, but Im trying to pass the index value of the list item clicked to use for the math to calculate.', [t1, t2], [], u2, new Date('2022-01-20T03:00:00'), 10, 1, false);
