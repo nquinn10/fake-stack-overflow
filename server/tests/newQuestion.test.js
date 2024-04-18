@@ -145,7 +145,30 @@ describe('GET /getQuestionById/:qid', () => {
         // Asserting the response
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockPopulatedQuestion);
+        expect(Question.findOneAndUpdate).toHaveBeenCalledWith(
+            { _id: mockReqParams.qid },
+            { $inc: { views: 1 } },
+            { new: true }
+        );
     });
+
+    it('should return 400 for invalid question ID format', async () => {
+        const invalidId = 'invalid-id';
+        const response = await supertest(server)
+            .get(`/question/getQuestionById/${invalidId}`);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toContain('Invalid question ID format');
+    });
+
+    it('should return 404 if the question does not exist', async () => {
+        const nonexistentId = '66202d26f7ed0f8e05e7996b'; // Valid format but nonexistent
+        Question.findOneAndUpdate = jest.fn().mockImplementation(() => ({ populate: jest.fn().mockResolvedValueOnce(null)}));
+        const response = await supertest(server)
+            .get(`/question/getQuestionById/${nonexistentId}`);
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe('Question not found');
+    });
+
 });
 
 describe('POST /addQuestion', () => {

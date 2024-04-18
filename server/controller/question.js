@@ -29,9 +29,12 @@ const getQuestionsByFilter = async (req, res) => {
 
 // To get Questions by Id
 const getQuestionById = async (req, res) => {
-    try {
-        let { qid } = req.params;
-        qid = qid.trim();
+    let { qid } = req.params;
+    qid = qid.trim();
+    try { // try block in case of DOS attempt on qid input
+        if (!isValidObjectId(qid)) {
+            return res.status(400).json({ error: 'Invalid question ID format' });
+        }
 
         const question = await Question.findOneAndUpdate(
             { _id: qid },
@@ -45,8 +48,13 @@ const getQuestionById = async (req, res) => {
         res.status(200).json(question);
     } catch (error) {
         console.error('Error fetching question by ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error' })
     }
+};
+
+// helper function  verify valid qid format
+const isValidObjectId = (id) => {
+    return /^[0-9a-fA-F]{24}$/.test(id);
 };
 
 // To add Question
