@@ -36,34 +36,49 @@ const getFlaggedAnswers = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 
-
-const getFlaggedContent = async (req, res) => {
+// reset flagged question
+const resetFlaggedQuestion = async (req, res) => {
+    const { qid } = req.params; 
     try {
-        // fetch all questions where question.flag === true
-        const [flaggedQuestions, flaggedAnswers] = await Promise.all([
-            Question.find({ flag: true }).populate('asked_by').select('title text vote_count'),
-            // for now, don't populate with question, too bulky
-            Answer.find({ flag: true }).populate('ans_by', 'question').select('text vote_count')
-        ]);
+        const updatedQuestion = await Question.findByIdAndUpdate(qid, {
+            $set: { flag: false, vote_count: 0 }
+        }, { new: true }).select('title text vote_count');
+        if (!updatedQuestion) {
+            return res.status(404).json({ message: 'Question not found' });
+        }
 
-        // combine the results into single object
-        const flaggedContent = {
-            questions: flaggedQuestions,
-            answers: flaggedAnswers
-        };
-
-        // return returned result
-        res.status(200).json(flaggedContent);
+        res.status(200).json(updatedQuestion);
     } catch (error) {
-        console.error('Error fetching flagged questions: ', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
+// reset flagged answer
+const resetFlaggedAnswer = async (req, res) => {
+    const { aid } = req.params;
+    try {
+        const updatedAnswer = await Answer.findByIdAndUpdate(aid, {
+            $set: { flag: false, vote_count: 0 }
+        }, { new: true }).select('text vote_count');
+
+        if (!updatedAnswer) {
+            return res.status(404).json({ message: "Answer not found" });
+        }
+
+        res.status(200).json(updatedAnswer);
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+ 
+
 router.get('/flaggedQuestions',authRequired, adminRequired, getFlaggedQuestions); 
 router.get('/flaggedAnswers', authRequired, adminRequired, getFlaggedAnswers);
+router.put('/resetQuestion/:qid', authRequired, adminRequired, resetFlaggedQuestion);
+router.put('/resetAnswer/:aid', authRequired, adminRequired, resetFlaggedAnswer);
 
 module.exports = router;
 
