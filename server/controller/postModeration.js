@@ -45,7 +45,8 @@ const resetFlaggedQuestion = async (req, res) => {
     try {
         const updatedQuestion = await Question.findByIdAndUpdate(qid, {
             $set: { flag: false, vote_count: 0 }
-        }, { new: true }).select('title text vote_count');
+        }, { new: true, select: 'title text vote_count' });
+
         if (!updatedQuestion) {
             return res.status(404).json({ message: 'Question not found' });
         }
@@ -62,7 +63,7 @@ const resetFlaggedAnswer = async (req, res) => {
     try {
         const updatedAnswer = await Answer.findByIdAndUpdate(aid, {
             $set: { flag: false, vote_count: 0 }
-        }, { new: true }).select('text vote_count');
+        }, { new: true, select: 'text vote_count' });
 
         if (!updatedAnswer) {
             return res.status(404).json({ message: "Answer not found" });
