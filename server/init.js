@@ -3,8 +3,8 @@
 let Tag = require('./models/tags')
 let Answer = require('./models/answers')
 let Question = require('./models/questions')
-let User = require('./models/user')
-let Vote = require('./models/vote')
+let User = require('./models/users')
+let Vote = require('./models/votes')
 
 const mongoose = require("mongoose");
 
