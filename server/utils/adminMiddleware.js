@@ -5,6 +5,7 @@ const adminRequired = async (req, res, next) => {
     const userId = req.session.userId;
    
     const user = await User.findById(userId);
+    console.log(user);
 
     if (!user || !user.is_moderator) {
         // note: use 403 error, user authenticates but doesn't have required privileges

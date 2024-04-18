@@ -23,7 +23,7 @@ jest.mock('../models/answers');
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
         req.session = req.testSession || {
-            userId: 'validUserId',
+            userId: '66207344b20c040394889db7',
             touch: () => {},
         };
         next();
@@ -44,7 +44,7 @@ jest.mock('../utils/authMiddleware', () => ({
 jest.mock('../utils/adminMiddleware', () => ({
     adminRequired: (req, res, next) => {
         // Simulating an admin user
-        req.user = { id: 'validUserId', is_moderator: true };
+        req.user = { id: '66207344b20c040394889db9', is_moderator: true, reputation: 20 };
         next();
     }
 }));
@@ -52,28 +52,16 @@ jest.mock('../utils/adminMiddleware', () => ({
 
 // mock questions with the fields you can alter 
 // note: later with post moderation we could alter this function to allow to change the status
-const mockQuestions = [
-    {
+const mockQuestion = {
         _id: '65e9b58910afe6e94fc6e6dc',
-        title: 'Question 1 Title',
-        text: 'Question 1 Text',
-        tags: ['tag1'],
-        asked_by: 'validUserId',
-        vote_count: 0,
+        vote_count: -14,
         flag: false
-    },
-    {
-        _id: '65e9b5a995b6c7045a30d823',
-        title: 'Question 2 Title',
-        text: 'Question 2 Text',
-        tags: ['tag2'],
-        asked_by: 'validUserId',
-        vote_count: -20,
-        flag: true
-    }
-];
+};
 
-// ******************************* Test Correct Flagging of Content *********************************
+// ******************************* Test PostMod Reset flag/vote_count *********************************
+
+
+// ******************************* Test PostMod Get Flagged Content *************************************
 
 
 // ******************************* Test PostMod Delete Question *************************************

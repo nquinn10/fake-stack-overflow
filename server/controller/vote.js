@@ -5,19 +5,7 @@ const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
 const User = require('../models/users');
-
-// Helper function to Flag Question/Answer object if vote count reaches -15, which will flag object for post moderation
-async function updateVoteCountAndFlag(Model, referenceId, voteChange, onModel) {
-    // update the vote count on the Question or Answer
-    const updateItem = await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } }, { new: true });
-
-    // check and update flag status if it hits -15 or below
-    if (updateItem.vote_count <= -15) {
-        updateItem.flag = true;
-        await updateItem.save();
-    }
-    return updateItem;
-}
+const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper functionß
 
 
 /**
@@ -27,6 +15,7 @@ async function updateVoteCountAndFlag(Model, referenceId, voteChange, onModel) {
 const castVote = async (req, res) => {
     const { referenceId, voteType, onModel } = req.body;
     const userId = req.session.userId;
+    console.log("user id: ", userId);
 
     if (!userId) {
         return res.status(401).send("Authentication required to vote.");
@@ -34,18 +23,23 @@ const castVote = async (req, res) => {
 
     try {
         const user = await User.findById(userId);
+        console.log("retrieved user: ", user);
         if (!user || user.reputation < 15) {
             return res.status(403).send("Insufficient reputation to cast a vote.");
         }
 
         const Model = onModel === 'Question' ? Question : Answer;
+        console.log("Model being used: ", Model.modelName);
         const item = await Model.findById(referenceId);
+        console.log("Retrieved item:", item);
+
         if (!item) {
             return res.status(404).send(`${onModel} not found.`);
         }
 
         // Check for an existing vote
         const existingVote = await Vote.findOne({ user: userId, referenceId, onModel });
+        console.log("existing vote: ", existingVote);
         let voteChange = voteType === 'upvote' ? 1 : -1;
 
         if (existingVote) {

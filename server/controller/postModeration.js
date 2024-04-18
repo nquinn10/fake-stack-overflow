@@ -13,6 +13,7 @@ const router = express.Router();
 // Get all questions where flag === true
 const getFlaggedQuestions = async (req, res) => {
     try {
+        // add all fields in the Question component to see which fields need to be populated
         const flaggedQuestions = await Question.find({ flag: true })
             .populate('asked_by')
             .select('title text vote_count'); // add/remove fields to be returned as necessary
@@ -24,10 +25,11 @@ const getFlaggedQuestions = async (req, res) => {
 };
 
 // Get all flagged answers
+// add all fields in the Answer component to see which fields need to be populated
 const getFlaggedAnswers = async (req, res) => {
     try {
         const flaggedAnswers = await Answer.find({ flag: true })
-            .populate('ans_by', 'username')
+            .populate('ans_by')
             .populate('question', 'title')
             .select('text vote_count'); // add/remove fields to be returned as necessary
 
