@@ -65,24 +65,6 @@ const ans2 = {
 
 }
 
-const mockQuestions = [
-    {
-        _id: '65e9b58910afe6e94fc6e6dc',
-        title: 'Question 1 Title',
-        text: 'Question 1 Text',
-        tags: [tag1],
-        answers: [ans1],
-        views: 21
-    },
-    {
-        _id: '65e9b5a995b6c7045a30d823',
-        title: 'Question 2 Title',
-        text: 'Question 2 Text',
-        tags: [tag2],
-        answers: [ans2],
-        views: 99
-    }
-]
 
 // ******************************* Test Edit Question *************************************
 describe('PUT /editQuestion/:qid', () => {
