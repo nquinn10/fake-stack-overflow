@@ -125,8 +125,6 @@ describe('PUT /editQuestion/:qid', () => {
         expect(response.status).toBe(200);
         expect(response.body.title).toBe('New Title');
         expect(response.body.text).toBe('Updated Text');
-        expect(response.body.title).toBe('New Title');
-        expect(response.body.text).toBe('Updated Text');
         expect(response.body.tags).toEqual(['mocked_id_for_tag1', 'mocked_id_for_tag2', 'mocked_id_for_tag3']);
         expect(addTag).toHaveBeenCalledTimes(3);
         expect(addTag).toHaveBeenCalledWith('tag1');
