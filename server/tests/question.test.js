@@ -140,6 +140,11 @@ describe('question util module', () => {
         expect(result[1]._id).toEqual('65e9b5a995b6c7045a30d823');
     });
 
+    test('filter question with invalid tags', () => {
+        const result = filterQuestionsBySearch(_questions, '[nonexistentTag]');
+        expect(result.length).toEqual(0); // Expect no questions to match an invalid tag
+    });
+
     // getQuestionsByOrder
     test('get active questions, newest questions sorted by most recently answered 1', async () => {
         mockingoose(Question).toReturn(_questions.slice(0, 3), 'find');
