@@ -19,12 +19,6 @@ const getQuestionsByFilter = async (req, res) => {
             select: 'display_name -_id' // Selects display_name and excludes the _id field
         });
 
-        // Modify each question to replace 'asked_by' object with the 'display_name' string
-        questions = questions.map(question => ({
-            ...question.toObject(), // Convert document to a plain object
-            asked_by: question.asked_by.display_name // Replace 'asked_by' object with display name string
-        }));
-
         // if search term provided, filter questions by search term
         const filteredQuestions = search ? filterQuestionsBySearch(questions, search) : questions;
 
@@ -65,8 +59,8 @@ const getQuestionById = async (req, res) => {
         if (!question) {
             return res.status(404).json({ error: 'Question not found' });
         }
-        const formattedQuestion = formatQuestionData(question);
-        res.status(200).json(formattedQuestion);
+        //const formattedQuestion = formatQuestionData(question);
+        res.status(200).json(question);
     } catch (error) {
         console.error('Error fetching question by ID:', error);
         res.status(500).json({ error: 'Internal server error' })

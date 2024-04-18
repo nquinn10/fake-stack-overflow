@@ -79,6 +79,21 @@ const mockQuestions = [
     }
 ]
 
+const mockPopulatedQuestion = {
+    _id: '65e9b5a995b6c7045a30d823',
+    title: 'Question 2 Title',
+    text: 'Question 2 Text',
+    tags: [tag2],
+    answers: [
+        {
+            ...ans2,
+            ans_by: { display_name: 'answer2_user' }  // Mock nested data structure
+        }
+    ],
+    views: 100,
+    asked_by: { display_name: 'validUserId' }  // Mock nested data structure
+};
+
 describe('GET /getQuestion', () => {
 
     beforeEach(() => {
@@ -114,6 +129,8 @@ describe('GET /getQuestion', () => {
 describe('GET /getQuestionById/:qid', () => {
 
     beforeEach(() => {
+        Question.findOneAndUpdate = jest.fn().mockReturnThis();  // Return the mock itself to allow chaining
+        Question.populate = jest.fn().mockReturnThis();  // Return the mock itself to allow chaining
     })
 
     afterEach(async() => {
@@ -130,13 +147,10 @@ describe('GET /getQuestionById/:qid', () => {
             qid: '65e9b5a995b6c7045a30d823',
         };
 
-        const mockPopulatedQuestion = {
-            answers: [mockQuestions.filter(q => q._id == mockReqParams.qid)[0]['answers']], // Mock answers
-            views: mockQuestions[1].views + 1
-        };
-
         // Provide mock question data
-        Question.findOneAndUpdate = jest.fn().mockImplementation(() => ({ populate: jest.fn().mockResolvedValueOnce(mockPopulatedQuestion)}));
+        Question.findOneAndUpdate.mockImplementationOnce(() => ({
+            populate: () => ({ populate: () => Promise.resolve(mockPopulatedQuestion) })
+        }));
 
         // Making the request
         const response = await supertest(server)
@@ -162,7 +176,9 @@ describe('GET /getQuestionById/:qid', () => {
 
     it('should return 404 if the question does not exist', async () => {
         const nonexistentId = '66202d26f7ed0f8e05e7996b'; // Valid format but nonexistent
-        Question.findOneAndUpdate = jest.fn().mockImplementation(() => ({ populate: jest.fn().mockResolvedValueOnce(null)}));
+        Question.findOneAndUpdate.mockImplementationOnce(() => ({
+            populate: () => ({ populate: () => Promise.resolve(null) })
+        }));
         const response = await supertest(server)
             .get(`/question/getQuestionById/${nonexistentId}`);
         expect(response.status).toBe(404);
