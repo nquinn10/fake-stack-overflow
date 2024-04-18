@@ -4,17 +4,20 @@ const Question = require("../models/questions");
 
 const addTag = async (tname) => {
     try {
-        // search for the tag in the database
-        const existingTag = await Tag.findOne({ name: tname });
+        // Normalize the tag name to lowercase
+        const normalizedTagName = tname.toLowerCase();
+
+        // Search for the tag in the database using the normalized tag name
+        const existingTag = await Tag.findOne({ name: normalizedTagName });
 
         if (existingTag) {
-            // if the tag exists, return its ID
+            // If the tag exists, return its ID
             return existingTag._id.toString();
         } else {
-            // if the tag does not exist, create a new tag
-            const newTag = new Tag({ name: tname });
+            // If the tag does not exist, create a new tag with the normalized name
+            const newTag = new Tag({ name: normalizedTagName });
             const savedTag = await newTag.save();
-            // return the ID of the newly created tag
+            // Return the ID of the newly created tag
             return savedTag._id.toString();
         }
     } catch (error) {
