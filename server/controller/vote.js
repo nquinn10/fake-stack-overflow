@@ -15,7 +15,6 @@ const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper f
 const castVote = async (req, res) => {
     const { referenceId, voteType, onModel } = req.body;
     const userId = req.session.userId;
-    console.log("user id: ", userId);
 
     if (!userId) {
         return res.status(401).send("Authentication required to vote.");
@@ -23,15 +22,12 @@ const castVote = async (req, res) => {
 
     try {
         const user = await User.findById(userId);
-        console.log("retrieved user: ", user);
         if (!user || user.reputation < 15) {
             return res.status(403).send("Insufficient reputation to cast a vote.");
         }
 
         const Model = onModel === 'Question' ? Question : Answer;
-        console.log("Model being used: ", Model.modelName);
         const item = await Model.findById(referenceId);
-        console.log("Retrieved item:", item);
 
         if (!item) {
             return res.status(404).send(`${onModel} not found.`);
@@ -39,7 +35,6 @@ const castVote = async (req, res) => {
 
         // Check for an existing vote
         const existingVote = await Vote.findOne({ user: userId, referenceId, onModel });
-        console.log("existing vote: ", existingVote);
         let voteChange = voteType === 'upvote' ? 1 : -1;
 
         if (existingVote) {
