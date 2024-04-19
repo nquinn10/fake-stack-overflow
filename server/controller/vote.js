@@ -5,7 +5,7 @@ const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
 const User = require('../models/users');
-const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper functionß
+const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper functioncomm
 
 
 /**
