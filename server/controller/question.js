@@ -1,6 +1,7 @@
 const express = require("express");
 const Question = require("../models/questions");
 const Answer = require("../models/answers");
+const User = require("../models/users");
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 
@@ -157,7 +158,6 @@ const editQuestion = async (req, res) => {
 };
 
 // Delete question
-// note: later with post moderation we could alter this function to change the q_status/delete if admin
 const deleteQuestion = async (req, res) => {
     const { qid } = req.params;
     const userId = req.session.userId; // userId from session (must match Question.askedBy reference)
@@ -197,6 +197,5 @@ router.get("/getQuestionById/:qid", getQuestionById);
 router.post("/addQuestion", authRequired, addQuestion);
 router.put("/editQuestion/:qid", authRequired, editQuestion);
 router.delete("/deleteQuestion/:qid", authRequired, deleteQuestion);
-
 
 module.exports = router;

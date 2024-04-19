@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const Vote = require('../models/vote');  // Ensure you have a model for Vote
+const Vote = require('../models/votes');  // Ensure you have a model for Vote
 const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
-const User = require('../models/user');
+const User = require('../models/users');
+const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper functionß
+
 
 /**
  * Function to cast a vote, on either a Question or Answer object.
@@ -26,6 +28,7 @@ const castVote = async (req, res) => {
 
         const Model = onModel === 'Question' ? Question : Answer;
         const item = await Model.findById(referenceId);
+
         if (!item) {
             return res.status(404).send(`${onModel} not found.`);
         }
@@ -56,8 +59,7 @@ const castVote = async (req, res) => {
         }
 
         // Update the vote count on the Question or Answer
-        const updatedItem = await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } }, { new: true });
-        console.log("Updated item: ", updatedItem);
+        const updatedItem = await updateVoteCountAndFlag(Model, referenceId, voteChange, onModel);
         return res.status(201).json(updatedItem); // Return the updated item
     } catch (error) {
         console.error("Error casting vote: ", error);

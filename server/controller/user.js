@@ -4,11 +4,11 @@
 // a profile, and more. 
 
 const express = require("express");
-const User = require("../models/user");
+const User = require("../models/users");
 const bcrypt = require('bcryptjs');
 const Question = require("../models/questions");
 const Answer = require("../models/answers");
-const Vote = require("../models/vote");
+const Vote = require("../models/votes");
 
 const router = express.Router();
 const { authRequired } = require("../utils/authMiddleware");

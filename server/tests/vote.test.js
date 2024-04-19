@@ -4,15 +4,15 @@ const mongoose = require("mongoose");
 const { server } = require("../server");
 
 const Question = require('../models/questions');
-const Vote = require('../models/vote');
-const User = require('../models/user');
+const Vote = require('../models/votes');
+const User = require('../models/users');
 const Answer = require('../models/answers');
 
 // Mocking the models
 jest.mock("../models/questions");
 jest.mock("../models/answers");
-jest.mock("../models/vote");
-jest.mock("../models/user");
+jest.mock("../models/votes");
+jest.mock("../models/users");
 
 jest.mock('connect-mongo', () => ({
     create: () => ({
@@ -172,18 +172,8 @@ describe('PUT /vote', () => {
         const response = await supertest(server)
             .post('/vote/vote')  // Assuming this is the endpoint to vote on an answer
             .send(mockReqBody);  // Sending the vote details
-
-        console.log(response.body);
     
         expect(response.status).toBe(201);  // Status for successful creation/update
         expect(response.body).toEqual(mockPopulatedAnswer);  // The response should match the updated answer
     });
-    
-
-
-    // Additional tests can follow similar structure:
-    // - Testing double voting behavior
-    // test that after vote is cast, Question.vote_count and/or Answer.vote_count incremented correctly (CYPRESS)
-    // test that vote unsuccessful if model=Question but given answerId.
-    // test that new Vote object successfully added to the Vote collection in DB
 });

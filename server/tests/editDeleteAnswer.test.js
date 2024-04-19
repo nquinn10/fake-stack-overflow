@@ -72,16 +72,6 @@ describe('PUT /editAnswer/:aid', () => {
         await mongoose.disconnect();
     });
 
-    // // ensure user logged in
-    // it('should return 401 authorized if no userId in session', async () => {
-    //     const response = await supertest(server)
-    //         .put('/answer/editAnswer/661dc096d916cd1c9d51655a')
-    //         .send({ someData: 'data' });
-
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
-
     // ensure valid answer
     it('should return 404 if question not found', async () => {
         Answer.findById.mockResolvedValue(null);
@@ -149,15 +139,6 @@ describe('DELETE /deleteAnswer/:aid', () => {
         }
         await mongoose.disconnect();
     });
-
-    // // ensure user logged in
-    // it('should return 401 unauthorized if no userId in session', async () => {
-    //     const response = await supertest(server)
-    //         .delete('/answer/editAnswer/661dc096d916cd1c9d51655a');
-
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
 
     //test answer not found
     it('should return 404 if answer not found', async () => {

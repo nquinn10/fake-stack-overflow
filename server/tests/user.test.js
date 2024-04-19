@@ -1,9 +1,9 @@
 const supertest = require("supertest");
 const { default: mongoose } = require("mongoose");
-const User = require("../models/user");
+const User = require("../models/users");
 const Question = require("../models/questions");
-const Vote = require("../models/vote");
 const Answer = require("../models/answers");
+const Vote = require("../models/votes");
 const bcrypt = require('bcryptjs');
 const { server } = require("../server");
 jest.mock('connect-mongo', () => ({
@@ -13,10 +13,10 @@ jest.mock('connect-mongo', () => ({
         destroy: jest.fn(),
     })
 }));
-jest.mock('../models/user');
+jest.mock('../models/users');
 jest.mock("../models/questions");
-jest.mock('../models/vote');
 jest.mock("../models/answers");
+jest.mock('../models/votes');
 // jest.mock('../models/questions', () => ({
 //     find: jest.fn().mockReturnThis(),
 //     populate: jest.fn().mockReturnThis(),
