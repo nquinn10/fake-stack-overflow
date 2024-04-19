@@ -9,31 +9,25 @@ const mockSave = jest.fn();
 jest.mock("../models/questions");
 jest.mock("../models/answers");
 
+
 describe('Question flag updates with vote_count', () => {
 
     beforeEach(() => {
         jest.resetAllMocks();
-       // mockSave.mockResolvedValue({});
-    });
-
-    afterEach(async () => {
-        console.log('Closing the server...');
-        if (server && server.close) {
-          await server.close();
-          console.log('Server closed.');
-        }
-        console.log('Disconnecting mongoose...');
-        await mongoose.disconnect();
-        console.log('Mongoose disconnected.');
-      });
-
-    it('should flag a question when vote count reaches -15', async () => {
+        mockSave.mockResolvedValue({});
         Question.findByIdAndUpdate.mockResolvedValue({
             vote_count: -15,
             flag: true,
-            save: mockSave
+            save: mockSave  // Use mockSave as the save method
         });
+    });
 
+    afterEach(async () => {
+        await server.close();  // Close server connection
+        await mongoose.disconnect();  // Disconnect from the database
+    });
+
+    it('should flag a question when vote count reaches -15', async () => {
         const result = await updateVoteCountAndFlag(Question, 'questionId', -1, 'Question');
 
         expect(Question.findByIdAndUpdate).toHaveBeenCalledWith('questionId', { $inc: { vote_count: -1 } }, { new: true });
@@ -59,26 +53,22 @@ describe('Answer flag updates with vote_count', () => {
     
     beforeEach(() => {
         jest.resetAllMocks();
-        //mockSave.mockResolvedValue({});
-    });
+        mockSave.mockResolvedValue({});
 
-    afterEach(async () => {
-        console.log('Closing the server...');
-        if (server && server.close) {
-          await server.close();
-          console.log('Server closed.');
-        }
-        console.log('Disconnecting mongoose...');
-        await mongoose.disconnect();
-        console.log('Mongoose disconnected.');
-      });
-
-    it('should flag an answer when vote count reaches -15', async () => {
         Answer.findByIdAndUpdate.mockResolvedValue({
             vote_count: -15,
             flag: true,
-            save: mockSave
+            save: mockSave  // Similarly for Answer
         });
+    });
+
+    afterEach(async () => {
+        await server.close();  // Close server connection
+        await mongoose.disconnect();  // Disconnect from the database
+    });
+
+    it('should flag an answer when vote count reaches -15', async () => {
+
 
         const result = await updateVoteCountAndFlag(Answer, 'answerId', -1, 'Answer');
 
