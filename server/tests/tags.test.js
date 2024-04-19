@@ -7,6 +7,24 @@ const Question = require('../models/questions');
 const { default: mongoose } = require("mongoose");
 const { server } = require("../server");
 
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+
 // Mock data for tags
 const mockTags = [
     { name: 'tag1' },
