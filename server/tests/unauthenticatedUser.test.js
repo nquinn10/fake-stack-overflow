@@ -19,7 +19,6 @@ jest.mock('express-session', () => {
     return () => (req, res, next) => {
         // Don't set userId to simulate unauthorized access
         req.session = req.testSession || {
-
             touch: () => {},
         };
         next();
