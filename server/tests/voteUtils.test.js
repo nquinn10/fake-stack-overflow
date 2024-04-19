@@ -134,3 +134,38 @@ describe('Reputation updates on voting', () => {
         expect(mockUser.reputation).toBe(98); // Check if the reputation is updated correctly
     });
 });
+
+describe('Reputation non-negative constraint', () => {
+    let mockUser;
+
+    beforeEach(() => {
+        jest.resetAllMocks();
+        mockUser = {
+            _id: 'authorId',
+            reputation: 2,  // Set initial reputation to the minimum before it would drop below 0
+            save: jest.fn(async function() {
+                return this; // Simulate saving and returning the updated object
+            })
+        };
+
+        // Mock findById to simulate fetching the user from the database
+        User.findById = jest.fn().mockImplementation(id => {
+            if (id === 'authorId') {
+                return Promise.resolve(mockUser);
+            }
+            return Promise.resolve(null);
+        });
+    });
+
+    afterEach(async () => {
+        await mongoose.disconnect();  // Disconnect from the database
+    });
+
+    it('should not allow reputation to fall below 1 on downvote', async () => {
+        const item = { asked_by: 'authorId' };  // Simulate a question object
+        await updateUserReputation(item, -1, false);  // false for downvote
+
+        expect(mockUser.save).toHaveBeenCalled();
+        expect(mockUser.reputation).toBe(1);  // Check that the reputation is clamped at 1
+    });
+});
