@@ -159,7 +159,7 @@ describe('POST /addQuestion', () => {
             title: 'Question 3 Title',
             text: 'Question 3 Text',
             tags: [tag1, tag2],
-            answers: [ans1],x
+            answers: [ans1],
         }
 
         addTag.mockResolvedValueOnce(mockTags);
