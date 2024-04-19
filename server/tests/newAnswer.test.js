@@ -2,14 +2,37 @@
 
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
-
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
 
-const { server, sessionStore } = require("../server");
+const { server } = require("../server");
 
-// Mock the Answer model
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+
+jest.mock("../models/questions");
 jest.mock("../models/answers");
+
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+jest.mock('../utils/authMiddleware', () => ({
+    authRequired: (req, res, next) => {
+        req.session = { userId: 'validUserId' };
+        next();
+    }
+}));
 
 describe("POST /addAnswer", () => {
 
@@ -19,9 +42,6 @@ describe("POST /addAnswer", () => {
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
         }
         await mongoose.disconnect()
     });
@@ -37,7 +57,8 @@ describe("POST /addAnswer", () => {
 
         const mockAnswer = {
             _id: "dummyAnswerId",
-            text: "This is a test answer"
+            text: "This is a test answer",
+            question: "dummyQuestionId"
         }
         // Mock the create method of the Answer model
         Answer.create.mockResolvedValueOnce(mockAnswer);
@@ -59,7 +80,8 @@ describe("POST /addAnswer", () => {
 
         // Verifying that Answer.create method was called with the correct arguments
         expect(Answer.create).toHaveBeenCalledWith({
-                                                       text: "This is a test answer"
+                                                       text: "This is a test answer",
+                                                       question: "dummyQuestionId"
                                                    });
 
         // Verifying that Question.findOneAndUpdate method was called with the correct arguments

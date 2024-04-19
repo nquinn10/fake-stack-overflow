@@ -1,8 +1,8 @@
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 const Question = require('../models/questions');
+const Answer = require('../models/answers');
 const { server } = require("../server");
-const { authRequired } = require('../utils/authMiddleware');
 
 // Mocking the models
 jest.mock('connect-mongo', () => ({
@@ -14,6 +14,7 @@ jest.mock('connect-mongo', () => ({
 }));
 
 jest.mock("../models/questions");
+jest.mock('../models/answers');
 
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
@@ -68,16 +69,6 @@ describe('PUT /editQuestion/:qid', () => {
         }
         await mongoose.disconnect()
     });
-
-    // // ensure user logged in (NOT WORKING!!!!!)
-    // it('should return 401 unauthorized if no userId in session', async () => {
-    //     const response = await supertest(server)
-    //         .put('/question/editQuestion/65e9b58910afe6e94fc6e6dc')
-    //         .send({ someData: 'data' });
-
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
     
     // ensure valid question
     it('should return 404 if question not found', async () => {
@@ -147,6 +138,7 @@ describe('DELETE /deleteQuestion/:qid', () => {
         jest.clearAllMocks();
         Question.findById.mockReset();
         Question.findByIdAndDelete.mockReset();
+        Answer.deleteMany.mockReset();
     });
 
     afterEach(async () => {
@@ -156,15 +148,6 @@ describe('DELETE /deleteQuestion/:qid', () => {
         }
         await mongoose.disconnect();
     });
-
-    // // ensure user logged in
-    // it('should return 401 unauthorized if no userId in session', async () => {
-    //     const response = await supertest(server)
-    //         .delete('/question/Question/65e9b58910afe6e94fc6e6dc');
-
-    //     expect(response.status).toBe(401);
-    //     expect(response.text).toContain("Unauthorized access. Please log in.");
-    // });
 
     // Test question not found
     it('should return 404 if question not found', async () => {
@@ -195,15 +178,21 @@ describe('DELETE /deleteQuestion/:qid', () => {
     it('should delete the question if the user is the author', async () => {
         Question.findById.mockResolvedValue({
             _id: '65e9b58910afe6e94fc6e6dc',
-            asked_by: 'validUserId'
+            asked_by: 'validUserId',
+            answers: ['answerId1', 'answerId2']
         });
+
+        // Mock successful deletion of the question
         Question.findByIdAndDelete.mockResolvedValue(true);
+        // Mock successful deletion of answers
+        Answer.deleteMany.mockResolvedValue({ deletedCount: 2 });
 
         const response = await supertest(server)
             .delete('/question/deleteQuestion/65e9b58910afe6e94fc6e6dc');
 
+        expect(Question.findByIdAndDelete).toHaveBeenCalledWith('65e9b58910afe6e94fc6e6dc');
+        expect(Answer.deleteMany).toHaveBeenCalledWith({ question: '65e9b58910afe6e94fc6e6dc' });
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Question has been deleted');
     });
 });
-

@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const Vote = require('../models/vote');  // Ensure you have a model for Vote
+const Vote = require('../models/votes');  // Ensure you have a model for Vote
 const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
-const User = require('../models/user');
+const User = require('../models/users');
+const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper functionß
+
 
 /**
  * Function to cast a vote, on either a Question or Answer object.
@@ -13,6 +15,7 @@ const User = require('../models/user');
 const castVote = async (req, res) => {
     const { referenceId, voteType, onModel } = req.body;
     const userId = req.session.userId;
+    console.log("user id: ", userId);
 
     if (!userId) {
         return res.status(401).send("Authentication required to vote.");
@@ -20,18 +23,23 @@ const castVote = async (req, res) => {
 
     try {
         const user = await User.findById(userId);
+        console.log("retrieved user: ", user);
         if (!user || user.reputation < 15) {
             return res.status(403).send("Insufficient reputation to cast a vote.");
         }
 
         const Model = onModel === 'Question' ? Question : Answer;
+        console.log("Model being used: ", Model.modelName);
         const item = await Model.findById(referenceId);
+        console.log("Retrieved item:", item);
+
         if (!item) {
             return res.status(404).send(`${onModel} not found.`);
         }
 
         // Check for an existing vote
         const existingVote = await Vote.findOne({ user: userId, referenceId, onModel });
+        console.log("existing vote: ", existingVote);
         let voteChange = voteType === 'upvote' ? 1 : -1;
 
         if (existingVote) {
@@ -56,8 +64,7 @@ const castVote = async (req, res) => {
         }
 
         // Update the vote count on the Question or Answer
-        const updatedItem = await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } }, { new: true });
-        console.log("Updated item: ", updatedItem);
+        const updatedItem = await updateVoteCountAndFlag(Model, referenceId, voteChange, onModel);
         return res.status(201).json(updatedItem); // Return the updated item
     } catch (error) {
         console.error("Error casting vote: ", error);

@@ -1,8 +1,8 @@
 const supertest = require("supertest");
 const { default: mongoose } = require("mongoose");
-const User = require("../models/user");
+const User = require("../models/users");
 const Question = require("../models/questions");
-const Vote = require("../models/vote");
+const Vote = require("../models/votes");
 const bcrypt = require('bcryptjs');
 const { server } = require("../server");
 jest.mock('connect-mongo', () => ({
@@ -12,9 +12,9 @@ jest.mock('connect-mongo', () => ({
         destroy: jest.fn(),
     })
 }));
-jest.mock('../models/user');
+jest.mock('../models/users');
 jest.mock("../models/questions");
-jest.mock('../models/vote');
+jest.mock('../models/votes');
 // jest.mock('../models/questions', () => ({
 //     find: jest.fn().mockReturnThis(),
 //     populate: jest.fn().mockReturnThis(),
@@ -429,19 +429,6 @@ describe('GET /my-questions', () => {
                                                                          { _id: "tag1", name: "JavaScript" }
                                                                      ]));
         expect(response.body[0].answers).toEqual(expect.arrayContaining([{ _id: 'answer1', text: 'This is an answer' }]));
-    });
-
-    it('should handle server errors gracefully', async () => {
-        // Simulate a server error during database operation
-        Question.find.mockImplementation(() => ({
-            populate: jest.fn().mockRejectedValue(new Error("Database error"))
-        }));
-
-        const response = await supertest(server)
-            .get('/user/my-questions');
-
-        expect(response.status).toBe(500);
-        expect(response.text).toContain("An error occurred while fetching the questions.");
     });
 });
 

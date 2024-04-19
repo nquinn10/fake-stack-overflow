@@ -1,6 +1,7 @@
 const express = require("express");
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
+const User = require("../models/users");
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 
 
@@ -9,11 +10,22 @@ const router = express.Router();
 // Adding answer
 const addAnswer = async (req, res) => {
     try {
+        const userId = req.session.userId;
         // extract answer data from request body
         const { qid, ans } = req.body;
 
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
+
+        // Add qid to the answer details
+        const answerDetails = {
+            ...ans,
+            question: qid  // Ensure the qid is included
+        };
+
         // create a new answer object
-        const newAnswer = await Answer.create(ans);
+        const newAnswer = await Answer.create(answerDetails);
 
         await Question.findOneAndUpdate(
             { _id: qid },
@@ -81,6 +93,12 @@ const deleteAnswer = async (req, res) => {
         if (ans.ans_by.toString() !== userId) {
             return res.status(403).json({ error: 'Unauthorized: You are not the author of this answer' });
         }
+        // If the answer is linked to a question, remove the answer from the question's answers array
+        if (ans.question) {
+            await Question.findByIdAndUpdate(ans.question, {
+                $pull: { answers: aid }
+            });
+        }
 
         // Delete the answer if user is authorized
         await Answer.findByIdAndDelete(aid);
@@ -93,7 +111,7 @@ const deleteAnswer = async (req, res) => {
 };
 
 // add appropriate HTTP verbs and their endpoints to the router.
-router.post("/addAnswer", addAnswer);
+router.post("/addAnswer", authRequired, addAnswer);
 router.put("/editAnswer/:aid", authRequired, editAnswer);
 router.delete("/deleteAnswer/:aid", authRequired, deleteAnswer);
 
