@@ -1,12 +1,10 @@
 // unit tests for functions in controller/question.js
-
-
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 
 const Question = require('../models/questions');
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
-const { server, sessionStore } = require("../server");
+const { server } = require("../server");
 
 // Mocking the models
 jest.mock("../models/questions");
@@ -14,6 +12,28 @@ jest.mock('../utils/question', () => ({
     addTag: jest.fn(),
     getQuestionsByOrder: jest.fn(),
     filterQuestionsBySearch: jest.fn(),
+}));
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+jest.mock('../utils/authMiddleware', () => ({
+    authRequired: (req, res, next) => {
+        req.session = { userId: 'validUserId' };
+        next();
+    }
 }));
 
 
@@ -59,6 +79,21 @@ const mockQuestions = [
     }
 ]
 
+const mockPopulatedQuestion = {
+    _id: '65e9b5a995b6c7045a30d823',
+    title: 'Question 2 Title',
+    text: 'Question 2 Text',
+    tags: [tag2],
+    answers: [
+        {
+            ...ans2,
+            ans_by: { display_name: 'answer2_user' }  // Mock nested data structure
+        }
+    ],
+    views: 100,
+    asked_by: { display_name: 'validUserId' }  // Mock nested data structure
+};
+
 describe('GET /getQuestion', () => {
 
     beforeEach(() => {
@@ -67,9 +102,6 @@ describe('GET /getQuestion', () => {
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
         }
         await mongoose.disconnect()
     });
@@ -97,14 +129,13 @@ describe('GET /getQuestion', () => {
 describe('GET /getQuestionById/:qid', () => {
 
     beforeEach(() => {
+        Question.findOneAndUpdate = jest.fn().mockReturnThis();  // Return the mock itself to allow chaining
+        Question.populate = jest.fn().mockReturnThis();  // Return the mock itself to allow chaining
     })
 
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
         }
         await mongoose.disconnect()
     });
@@ -116,13 +147,10 @@ describe('GET /getQuestionById/:qid', () => {
             qid: '65e9b5a995b6c7045a30d823',
         };
 
-        const mockPopulatedQuestion = {
-            answers: [mockQuestions.filter(q => q._id == mockReqParams.qid)[0]['answers']], // Mock answers
-            views: mockQuestions[1].views + 1
-        };
-
         // Provide mock question data
-        Question.findOneAndUpdate = jest.fn().mockImplementation(() => ({ populate: jest.fn().mockResolvedValueOnce(mockPopulatedQuestion)}));
+        Question.findOneAndUpdate.mockImplementationOnce(() => ({
+            populate: () => ({ populate: () => Promise.resolve(mockPopulatedQuestion) })
+        }));
 
         // Making the request
         const response = await supertest(server)
@@ -131,7 +159,32 @@ describe('GET /getQuestionById/:qid', () => {
         // Asserting the response
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockPopulatedQuestion);
+        expect(Question.findOneAndUpdate).toHaveBeenCalledWith(
+            { _id: mockReqParams.qid },
+            { $inc: { views: 1 } },
+            { new: true }
+        );
     });
+
+    it('should return 400 for invalid question ID format', async () => {
+        const invalidId = 'invalid-id';
+        const response = await supertest(server)
+            .get(`/question/getQuestionById/${invalidId}`);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toContain('Invalid question ID format');
+    });
+
+    it('should return 404 if the question does not exist', async () => {
+        const nonexistentId = '66202d26f7ed0f8e05e7996b'; // Valid format but nonexistent
+        Question.findOneAndUpdate.mockImplementationOnce(() => ({
+            populate: () => ({ populate: () => Promise.resolve(null) })
+        }));
+        const response = await supertest(server)
+            .get(`/question/getQuestionById/${nonexistentId}`);
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe('Question not found');
+    });
+
 });
 
 describe('POST /addQuestion', () => {
@@ -142,9 +195,6 @@ describe('POST /addQuestion', () => {
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
         }
         await mongoose.disconnect()
     });
@@ -173,6 +223,8 @@ describe('POST /addQuestion', () => {
         // Asserting the response
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockQuestion);
+        expect(addTag).toHaveBeenCalledTimes(mockTags.length);
+        expect(Question.create).toHaveBeenCalled();
 
     });
 });

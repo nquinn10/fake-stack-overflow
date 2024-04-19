@@ -14,7 +14,11 @@ const getQuestionsByFilter = async (req, res) => {
         const { order, search } = req.query;
 
         // retrieve questions based on specified order
-        const questions = await getQuestionsByOrder(order);
+        let questions = await getQuestionsByOrder(order);
+        questions = await Question.populate(questions, {
+            path: 'asked_by',
+            select: 'display_name -_id' // Selects display_name and excludes the _id field
+        });
 
         // if search term provided, filter questions by search term
         const filteredQuestions = search ? filterQuestionsBySearch(questions, search) : questions;
@@ -30,31 +34,55 @@ const getQuestionsByFilter = async (req, res) => {
 
 // To get Questions by Id
 const getQuestionById = async (req, res) => {
-    try {
-        let { qid } = req.params;
-        qid = qid.trim();
+    let { qid } = req.params;
+    qid = qid.trim();
+    try { // try block in case of DOS attempt on qid input
+        if (!isValidObjectId(qid)) {
+            return res.status(400).json({ error: 'Invalid question ID format' });
+        }
 
         const question = await Question.findOneAndUpdate(
             { _id: qid },
             { $inc: { views: 1 } }, // Increment the 'views' field by 1
             { new: true } // Return the updated document
-        ).populate('answers');
+        ).populate({
+                       path: 'answers',
+                       populate: {
+                           path: 'ans_by',
+                           select: 'display_name -_id'  // Only get the display name, exclude _id
+                       }
+                   })
+            .populate({           // Populate the 'asked_by' field to get 'display_name'
+                          path: 'asked_by',
+                          select: 'display_name -_id'
+                      });
 
         if (!question) {
             return res.status(404).json({ error: 'Question not found' });
         }
+        //const formattedQuestion = formatQuestionData(question);
         res.status(200).json(question);
     } catch (error) {
         console.error('Error fetching question by ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error' })
     }
+};
+
+// helper function  verify valid qid format
+const isValidObjectId = (id) => {
+    return /^[0-9a-fA-F]{24}$/.test(id);
 };
 
 // To add Question
 const addQuestion = async (req, res) => {
     try {
+        const userId = req.session.userId;
         // extract question data from request body
         const { title, text, tags, asked_by, ask_date_time } = req.body;
+
+        if (!userId) {
+            return res.status(401).send("Unauthorized access.");
+        }
 
         const tagIds = [];
 
@@ -90,7 +118,7 @@ const editQuestion = async (req, res) => {
 
     const { qid } = req.params;
     const userId = req.session.userId; // user ID from session (must match Question.askedBy reference)
-    const updateData = req.body;
+    const { title, text, tags } = req.body;
 
     try {
         // First, find question and ensure it exists and is askedBy current userId stored in session
@@ -104,9 +132,19 @@ const editQuestion = async (req, res) => {
         if (question.asked_by.toString() !== userId) {
             return res.status(403).json({ error: 'Unauthorized: You are not the author of this question'});
         }
+        const tagIds = [];
 
-        // Update the question if the user is authorized
-        const updatedQuestion = await Question.findByIdAndUpdate(qid, updateData, { new: true });
+        for (const tagName of tags) {
+            const tagId = await addTag(tagName);
+            tagIds.push(tagId);
+        }
+
+        // Update the question with new data
+        const updatedQuestion = await Question.findByIdAndUpdate(
+            qid,
+            { title, text, tags: tagIds },
+            { new: true }
+        );
         if (!updatedQuestion) {
             return res.status(404).json({ error: 'Unable to update the question' });
         }
@@ -156,7 +194,7 @@ const deleteQuestion = async (req, res) => {
 // add appropriate HTTP verbs and their endpoints to the router
 router.get("/getQuestion", getQuestionsByFilter);
 router.get("/getQuestionById/:qid", getQuestionById);
-router.post("/addQuestion", addQuestion); // need to add authRequired middleware here too
+router.post("/addQuestion", authRequired, addQuestion);
 router.put("/editQuestion/:qid", authRequired, editQuestion);
 router.delete("/deleteQuestion/:qid", authRequired, deleteQuestion);
 

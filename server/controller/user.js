@@ -126,27 +126,46 @@ const getUserQuestions = async (req, res) => {
 };
 
 // Fetch answers posted by the current user
-const getUserAnswers = async (req, res) => {
+const getUserAnsweredQuestions = async (req, res) => {
     try {
         const userId = req.session.userId;
         if (!userId) {
             return res.status(401).send("Unauthorized access.");
         }
 
-        // Find answers where 'ans_by' matches the logged-in user's ID
+        // Find answers where 'ans_by' matches the logged-in user's ID and populate the corresponding question details
         const userAnswers = await Answer.find({ ans_by: userId })
-            .populate();  // Assuming you want to show the question title for each answer
+            .populate({
+                          path: 'question', // Assuming 'question' is the field in Answer schema referring to the Question
+                          populate: {
+                              path: 'tags',
+                              select: 'name'
+                          },
+                          select: 'title text asked_by ask_date_time views vote_count' // Customize fields as needed
+                      });
 
         if (!userAnswers.length) {
-            return res.status(404).send("No answers found.");
+            return res.status(404).send("No answered questions found.");
         }
 
-        res.json(userAnswers);
+        // Extract the necessary data into a new array to structure it neatly
+        const results = userAnswers.map(ans => ({
+            question: ans.question,
+            answer: {
+                _id: ans._id,
+                text: ans.text,
+                ans_date_time: ans.ans_date_time, // or any other relevant answer details
+                vote_count: ans.vote_count
+            }
+        }));
+
+        res.json(results);
     } catch (error) {
         console.error(error);
-        res.status(500).send("An error occurred while fetching the answers.");
+        res.status(500).send("An error occurred while fetching the answered questions.");
     }
 };
+
 
 const getUserTags = async (req, res) => {
     try {
@@ -320,7 +339,7 @@ router.post('/register', userRegistration);
 router.post('/login', userLogin);
 router.get('/profile', authRequired, userProfileSummary);
 router.get('/my-questions', authRequired, getUserQuestions);
-router.get('/my-answers', authRequired, getUserAnswers);
+router.get('/my-answers', authRequired, getUserAnsweredQuestions);
 router.get('/my-tags', authRequired, getUserTags);
 router.get('/my-question-votes', authRequired, getUserQuestionVotes);
 router.get('/my-answer-votes', authRequired, getUserAnswerVotes);

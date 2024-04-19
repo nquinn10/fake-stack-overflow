@@ -5,12 +5,31 @@ const supertest = require("supertest")
 const Tag = require('../models/tags');
 const Question = require('../models/questions');
 const { default: mongoose } = require("mongoose");
-const { server, sessionStore } = require("../server");
+const { server } = require("../server");
+
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
 
 // Mock data for tags
 const mockTags = [
     { name: 'tag1' },
     { name: 'tag2' },
+    { name: 'tag3' },
     // Add more mock tags if needed
 ];
 
@@ -26,9 +45,6 @@ describe('GET /getTagsWithQuestionNumber', () => {
     afterEach(async() => {
         if (server && server.close) {
             await server.close();  // Safely close the server
-        }
-        if (sessionStore && sessionStore.close) {
-            await sessionStore.close();  // Ensure the session store is closed
         }
         await mongoose.disconnect()
     });
@@ -49,6 +65,7 @@ describe('GET /getTagsWithQuestionNumber', () => {
         expect(response.body).toEqual([
                                           { name: 'tag1', qcnt: 2 },
                                           { name: 'tag2', qcnt: 1 },
+                                          { name: 'tag3', qcnt: 0 }
 
                                       ]);
         expect(Tag.find).toHaveBeenCalled();

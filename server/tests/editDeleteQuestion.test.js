@@ -1,8 +1,9 @@
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
-const Question = require('../models/questions');
+const Question = require("../models/questions");
 const Answer = require('../models/answers');
 const { server } = require("../server");
+const {addTag} = require("../utils/question");
 
 // Mocking the models
 jest.mock('connect-mongo', () => ({
@@ -13,8 +14,13 @@ jest.mock('connect-mongo', () => ({
     })
 }));
 
-jest.mock("../models/questions");
 jest.mock('../models/answers');
+jest.mock("../models/questions");
+jest.mock('../utils/question', () => ({
+    addTag: jest.fn(),
+    getQuestionsByOrder: jest.fn(),
+    filterQuestionsBySearch: jest.fn(),
+}));
 
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
@@ -37,24 +43,6 @@ jest.mock('../utils/authMiddleware', () => ({
 }));
 
 
-// mock questions with the fields you can alter 
-// note: later with post moderation we could alter this function to allow to change the status
-const mockQuestions = [
-    {
-        _id: '65e9b58910afe6e94fc6e6dc',
-        title: 'Question 1 Title',
-        text: 'Question 1 Text',
-        tags: ['tag1'],
-        asked_by: 'validUserId'
-    },
-    {
-        _id: '65e9b5a995b6c7045a30d823',
-        title: 'Question 2 Title',
-        text: 'Question 2 Text',
-        tags: ['tag2'],
-        asked_by: 'validUserId'
-    }
-];
 
 // ******************************* Test Edit Question *************************************
 describe('PUT /editQuestion/:qid', () => {
@@ -101,30 +89,37 @@ describe('PUT /editQuestion/:qid', () => {
 
     // if logged in user is the author, and valid question, successfully edit question
     it('should update the question if the user is author', async () => {
-        Question.findById.mockResolvedValue({
-            _id: '65e9b58910afe6e94fc6e6dc',
-            asked_by: 'validUserId',
-            title: 'Old Title',
-            text: 'Old Text',
-            tags: ['tag1']
-        });
 
+        const mockTags = ['tag1', 'tag2', 'tag3'];
+
+        Question.findById.mockResolvedValue({
+                                                _id: '65e9b58910afe6e94fc6e6fe',
+                                                asked_by: 'validUserId',
+                                                title: 'Original Title',
+                                                text: 'Original Text',
+                                                tags: ['507f191e810c19729de860ea', '65e9a5c2b26199dbcc3e6dc8']// Existing tag IDs
+                                            });
+        addTag.mockResolvedValueOnce(mockTags);
         Question.findByIdAndUpdate.mockResolvedValue({
-            _id: '65e9b58910afe6e94fc6e6dc',
-            asked_by: 'validUserId',
-            title: 'New Title',
-            text: 'Updated Text',
-            tags: ['tag1', 'tag2']
-        });
+                                                         _id: '65e9b58910afe6e94fc6e6fe',
+                                                         asked_by: 'validUserId',
+                                                         title: 'New Title',
+                                                         text: 'Updated Text',
+                                                         tags: ['mocked_id_for_tag1', 'mocked_id_for_tag2', 'mocked_id_for_tag3'] // These are the mock IDs returned by addTag
+                                                     });
 
         const response = await supertest(server)
             .put('/question/editQuestion/65e9b58910afe6e94fc6e6dc')
-            .send({ title: 'New Title', text: 'Updated Text', tags: ['tag1', 'tag2']});
+            .send({ title: 'New Title', text: 'Updated Text', tags: ['tag1', 'tag2', 'tag3']});
             
         expect(response.status).toBe(200);
         expect(response.body.title).toBe('New Title');
         expect(response.body.text).toBe('Updated Text');
-        expect(response.body.tags).toEqual(['tag1', 'tag2']);
+        expect(response.body.tags).toEqual(['mocked_id_for_tag1', 'mocked_id_for_tag2', 'mocked_id_for_tag3']);
+        expect(addTag).toHaveBeenCalledTimes(3);
+        expect(addTag).toHaveBeenCalledWith('tag1');
+        expect(addTag).toHaveBeenCalledWith('tag2');
+        expect(addTag).toHaveBeenCalledWith('tag3');
     });
 
 });

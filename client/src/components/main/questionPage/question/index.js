@@ -33,7 +33,7 @@ const Question = ({ q, clickTag, handleAnswer }) => {
                 </div>
             </div>
             <div className="lastActivity">
-                <div className="question_author">{q.asked_by}</div>
+                <div className="question_author">{q.asked_by.display_name}</div>
                 <div>&nbsp;</div>
                 <div className="question_meta">
                     asked {getMetaData(new Date(q.ask_date_time))}
