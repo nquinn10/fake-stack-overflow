@@ -36,7 +36,6 @@ const NewAnswer = ({ qid, handleAnswer }) => {
 
         const answer = {
             text: text,
-            ans_by: usrn,
             ans_date_time: new Date(),
         };
 
