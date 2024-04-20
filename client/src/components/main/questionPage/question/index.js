@@ -12,6 +12,7 @@ const Question = ({ q, clickTag, handleAnswer }) => {
             <div className="postStats">
                 <div>{q.answers.length || 0} answers</div>
                 <div>{q.views} views</div>
+                <div>{q.vote_count} votes</div>
             </div>
             <div className="question_mid">
                 <div className="postTitle">{q.title}</div>
