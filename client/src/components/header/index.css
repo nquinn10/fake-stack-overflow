@@ -28,10 +28,26 @@
 }
 
 
-.icon {
-    width: 24px; 
-    height: 24px; 
-    cursor: pointer; 
-    margin-left: 30px;
+.icon, .auth-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 20px; /* Icon size */
+    color: #333; /* Icon color for better visibility */
+}
+
+.auth-buttons button {
+    padding: 8px 12px; /* Padding for buttons */
+    margin-left: 10px; /* Space between login and register buttons */
+    background-color: #f0f0f0; /* Subtle background for buttons */
+    border-radius: 4px; /* Rounded corners for buttons */
+    font-weight: bold; /* Bold font for text in buttons */
+}
+
+.username {
+    margin-left: 10px;
+    font-size: 16px; /* Font size for username */
 }
 
