@@ -34,14 +34,13 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
                     }
                 }}
             />
-            <div className="user-controls">
+            <div className="icons">
                 {user ? (
-                    <div className="user-info">
-                        <FaRegUser className="icon user-icon" onClick={() => {/* Navigate to profile */}} />
-                        <span className="username">{user.username}</span>
-                        <FaSignOutAlt className="icon logout-icon" onClick={logout} aria-label="Logout" />
-                        <FiFlag className="icon flag-icon" />
-                    </div>
+                    <>
+                        <FaRegUser className="icon" />
+                        <FiFlag className="icon" />
+                        <FaSignOutAlt className="icon" onClick={logout} />
+                    </>
                 ) : (
                      <div className="auth-buttons">
                          <button onClick={handleShowLogin}>
@@ -57,6 +56,7 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
             </div>
         </div>
     );
+
 };
 
 export default Header;
