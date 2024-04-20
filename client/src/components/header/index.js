@@ -1,11 +1,14 @@
 import "./index.css";
 import { useState } from "react";
+// import icons for postModeration (flag) and user (user)
+import { FaRegUser } from "react-icons/fa";
+import { FiFlag } from "react-icons/fi";
+
 
 const Header = ({ search, setQuesitonPage }) => {
     const [val, setVal] = useState(search);
     return (
         <div id="header" className="header">
-            <div></div>
             <div className="title">Fake Stack Overflow</div>
             <input
                 id="searchBar"
@@ -22,6 +25,10 @@ const Header = ({ search, setQuesitonPage }) => {
                     }
                 }}
             />
+            <div className="icons">
+                <FaRegUser className="icon" />
+                <FiFlag className="icon" />
+            </div>
         </div>
     );
 };
