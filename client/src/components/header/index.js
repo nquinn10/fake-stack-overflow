@@ -7,6 +7,7 @@ import { FiFlag } from "react-icons/fi";
 
 const Header = ({ search, setQuesitonPage }) => {
     const [val, setVal] = useState(search);
+
     return (
         <div id="header" className="header">
             <div className="title">Fake Stack Overflow</div>
@@ -28,6 +29,7 @@ const Header = ({ search, setQuesitonPage }) => {
             <div className="icons">
                 <FaRegUser className="icon" />
                 <FiFlag className="icon" />
+
             </div>
         </div>
     );
