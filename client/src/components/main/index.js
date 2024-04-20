@@ -6,9 +6,11 @@ import TagPage from "./tagPage";
 import AnswerPage from "./answerPage";
 import NewQuestion from "./newQuestion";
 import NewAnswer from "./newAnswer";
+import Login from "../auth/login";
+import Register from "../auth/register";
 
-const Main = ({ search = "", title, setQuesitonPage }) => {
-    const [page, setPage] = useState("home");
+const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, page, setPage }) => {
+    //const [page, setPage] = useState("home");
     const [questionOrder, setQuestionOrder] = useState("newest");
     const [qid, setQid] = useState("");
     let selected = "";
@@ -34,11 +36,19 @@ const Main = ({ search = "", title, setQuesitonPage }) => {
     };
 
     const handleNewQuestion = () => {
-        setPage("newQuestion");
+        if (!user) {
+            setPage("login");
+        } else {
+            setPage("newQuestion");
+        }
     };
 
     const handleNewAnswer = () => {
-        setPage("newAnswer");
+        if (!user) {
+            setPage("login");
+        } else {
+            setPage("newAnswer");
+        }
     };
 
     const getQuestionPage = (order = "newest", search = "") => {
@@ -90,6 +100,16 @@ const Main = ({ search = "", title, setQuesitonPage }) => {
         case "newAnswer": {
             selected = "";
             content = <NewAnswer qid={qid} handleAnswer={handleAnswer} />;
+            break;
+        }
+        case "login": {
+            selected = "";
+            content = <Login onLogin={handleLogin} />;
+            break;
+        }
+        case "register": {
+            selected = "";
+            content = <Register onRegister={handleLogin} />;
             break;
         }
         default:
