@@ -3,6 +3,9 @@ import { useState } from "react";
 import Header from "./header";
 import Main from "./main";
 import { login } from "../services/userService";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 export default function FakeStackOverflow() {
@@ -20,6 +23,8 @@ export default function FakeStackOverflow() {
         try {
             const userData = await login(email, password);
             setUser(userData);
+            toast.success('Login successful!', { autoClose: 2000 });
+            setPage('home')
         } catch (error) {
             alert('Login failed: ' + error.message);
         }
