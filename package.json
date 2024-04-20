@@ -4,6 +4,8 @@
     "supertest": "^6.3.4"
   },
   "dependencies": {
-    "express-session": "^1.18.0"
+    "express-session": "^1.18.0",
+    "react-icons": "^5.1.0",
+    "react-toastify": "^10.0.5"
   }
 }
