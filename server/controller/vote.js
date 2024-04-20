@@ -5,7 +5,7 @@ const Question = require('../models/questions');  // Assuming model file names
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
 const User = require('../models/users');
-const { updateVoteCountAndFlag } = require('../utils/vote');  // import helper functioncomm
+const { updateVoteCountAndFlag, updateUserReputation } = require('../utils/vote');  // import helper function
 
 
 /**
@@ -36,6 +36,7 @@ const castVote = async (req, res) => {
         // Check for an existing vote
         const existingVote = await Vote.findOne({ user: userId, referenceId, onModel });
         let voteChange = voteType === 'upvote' ? 1 : -1;
+        const isUpvote = voteType === 'upvote';
 
         if (existingVote) {
             // User is changing their vote
@@ -60,6 +61,9 @@ const castVote = async (req, res) => {
 
         // Update the vote count on the Question or Answer
         const updatedItem = await updateVoteCountAndFlag(Model, referenceId, voteChange, onModel);
+        // Update reputation of the author of the question/answer
+        await updateUserReputation(item, voteChange, isUpvote);
+
         return res.status(201).json(updatedItem); // Return the updated item
     } catch (error) {
         console.error("Error casting vote: ", error);

@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
-const { server } = require("../server");
 const Question = require('../models/questions');
 const Answer = require('../models/answers');
-
-const { updateVoteCountAndFlag } = require('../utils/vote');
+const User = require('../models/users');
+const { updateVoteCountAndFlag, updateUserReputation } = require('../utils/vote');
 
 const mockSave = jest.fn();
+User.prototype.save = mockSave;
 jest.mock("../models/questions");
 jest.mock("../models/answers");
+jest.mock("../models/users");
 
 
 describe('Question flag updates with vote_count', () => {
@@ -23,7 +24,6 @@ describe('Question flag updates with vote_count', () => {
     });
 
     afterEach(async () => {
-        await server.close();  // Close server connection
         await mongoose.disconnect();  // Disconnect from the database
     });
 
@@ -63,7 +63,6 @@ describe('Answer flag updates with vote_count', () => {
     });
 
     afterEach(async () => {
-        await server.close();  // Close server connection
         await mongoose.disconnect();  // Disconnect from the database
     });
 
@@ -88,5 +87,85 @@ describe('Answer flag updates with vote_count', () => {
         expect(Answer.findByIdAndUpdate).toHaveBeenCalledWith('answerId', { $inc: { vote_count: 1 } }, { new: true });
         expect(mockSave).not.toHaveBeenCalled();
         expect(result.flag).toBe(false);
+    });
+});
+
+describe('Reputation updates on voting', () => {
+    let mockUser;
+
+    beforeEach(() => {
+        jest.resetAllMocks();
+        mockSave.mockResolvedValue({});
+
+        mockUser = {
+            _id: 'authorId',
+            reputation: 100,
+            save: jest.fn(async function() {
+                return this; // Simulate saving and returning the updated object
+            })
+        };
+
+        // Mock findById to return a cloned version of mockUser to simulate database behavior
+        User.findById = jest.fn().mockImplementation(id => {
+            if (id === 'authorId') {
+                return Promise.resolve(mockUser);
+            }
+            return Promise.resolve(null);
+        });
+    });
+
+    afterEach(async () => {
+        await mongoose.disconnect();  // Disconnect from the database
+    });
+
+    it('should increase the poster reputation by 10 on upvote on answer', async () => {
+        const item = { asked_by: 'authorId' }; // Simulate answer object
+        await updateUserReputation(item, 1, true); // true for upvote
+
+        expect(mockUser.save).toHaveBeenCalled();
+        expect(mockUser.reputation).toBe(110); // Check if the reputation is updated correctly
+    });
+
+    it('should decrease the poster reputation by 2 on downvote', async () => {
+        const item = { asked_by: 'authorId' }; // Simulate a question object
+        await updateUserReputation(item, -1, false); // false for downvote
+
+        expect(mockUser.save).toHaveBeenCalled();
+        expect(mockUser.reputation).toBe(98); // Check if the reputation is updated correctly
+    });
+});
+
+describe('Reputation non-negative constraint', () => {
+    let mockUser;
+
+    beforeEach(() => {
+        jest.resetAllMocks();
+        mockUser = {
+            _id: 'authorId',
+            reputation: 2,  // Set initial reputation to the minimum before it would drop below 0
+            save: jest.fn(async function() {
+                return this; // Simulate saving and returning the updated object
+            })
+        };
+
+        // Mock findById to simulate fetching the user from the database
+        User.findById = jest.fn().mockImplementation(id => {
+            if (id === 'authorId') {
+                return Promise.resolve(mockUser);
+            }
+            return Promise.resolve(null);
+        });
+    });
+
+    afterEach(async () => {
+        await mongoose.disconnect();  // Disconnect from the database
+    });
+
+    it('should not allow reputation to fall below 1 on downvote', async () => {
+        const item = { asked_by: 'authorId' };  // Simulate a question object
+        await updateUserReputation(item, -1, false);  // false for downvote
+
+        expect(mockUser.save).toHaveBeenCalled();
+        expect(mockUser.reputation).toBe(1);  // Check that the reputation is clamped at 1
     });
 });
