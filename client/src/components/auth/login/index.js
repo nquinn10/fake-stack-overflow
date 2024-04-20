@@ -8,7 +8,6 @@ const Login = ({ onLogin }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         onLogin({ username, password });
-        // Insert login logic or API call here
     };
 
     return (
