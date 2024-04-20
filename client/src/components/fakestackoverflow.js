@@ -16,9 +16,9 @@ export default function FakeStackOverflow() {
         setMainTitle(title);
     };
 
-    const handleLogin = async (username, password) => {
+    const handleLogin = async (email, password) => {
         try {
-            const userData = await login(username, password);
+            const userData = await login(email, password);
             setUser(userData);
         } catch (error) {
             alert('Login failed: ' + error.message);

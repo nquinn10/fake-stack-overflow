@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import './index.css';
 
 const Login = ({ onLogin }) => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        onLogin({ username, password });
+        onLogin({ email, password });
     };
 
     return (
@@ -15,9 +15,9 @@ const Login = ({ onLogin }) => {
             <form onSubmit={handleSubmit} className="login-form">
                 <input
                     type="text"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                    placeholder="Username"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="Email"
                 />
                 <input
                     type="password"
