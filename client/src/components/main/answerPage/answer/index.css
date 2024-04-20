@@ -5,12 +5,44 @@
     border-bottom: #000000 1px dashed;
 }
 
+.voteContainerAnswer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.voteIcon {
+    cursor: pointer;
+    color: cornflowerblue; /* Default icon color */
+    transition: color 0.3s;
+}
+
+.voteIcon.upvote:hover,
+.voteIcon.downvote:hover {
+    color: #000000; /* Change color on hover */
+}
+
+.voteIcon.upvote {
+    margin-bottom: 5px;
+}
+
+.voteIcon.downvote {
+    margin-top: 5px;
+}
+
 .answerText {
     width: 75%;
+    margin-left: 40px;
 }
 
 .answerAuthor {
     margin-left: 5%;
+    margin-right: 10px;
+}
+
+.answerVote {
+    margin-right: 5%;
 }
 
 .answer_author {

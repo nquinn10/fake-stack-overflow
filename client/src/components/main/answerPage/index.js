@@ -41,6 +41,7 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }) => {
                      text={a.text}
                      ansBy={a.ans_by?.display_name}
                      meta={getMetaData(new Date(a.ans_date_time))}
+                     vote={a.vote_count}
                  />
              ))}
             <button
