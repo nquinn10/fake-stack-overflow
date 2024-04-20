@@ -20,18 +20,17 @@
 }
 
 .icons {
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     gap: 10px; /* Add space between icons */
     justify-content: flex-end; /* Aligns icons to the right */
-    padding-right: 40px; 
+    padding-right: 40px;
 }
 
 
 .icon {
-    width: 24px; 
-    height: 24px; 
-    cursor: pointer; 
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
     margin-left: 30px;
 }
-

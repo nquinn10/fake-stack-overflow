@@ -78,7 +78,7 @@ const addQuestion = async (req, res) => {
     try {
         const userId = req.session.userId;
         // extract question data from request body
-        const { title, text, tags, asked_by, ask_date_time } = req.body;
+        const { title, text, tags, ask_date_time } = req.body;
 
         if (!userId) {
             return res.status(401).send("Unauthorized access.");
@@ -96,7 +96,7 @@ const addQuestion = async (req, res) => {
                                              title,
                                              text,
                                              tags: tagIds,
-                                             asked_by,
+                                             asked_by: userId,
                                              ask_date_time
                                          });
 
