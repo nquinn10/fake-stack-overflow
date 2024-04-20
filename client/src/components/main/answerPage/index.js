@@ -28,6 +28,7 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }) => {
             />
             <QuestionBody
                 views={question && question.views}
+                vote = {question && question.vote_count}
                 text={question && question.text}
                 askby={question && question.asked_by?.display_name}
                 meta={question && getMetaData(new Date(question.ask_date_time))}
@@ -40,6 +41,7 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }) => {
                      text={a.text}
                      ansBy={a.ans_by?.display_name}
                      meta={getMetaData(new Date(a.ans_date_time))}
+                     vote={a.vote_count}
                  />
              ))}
             <button
