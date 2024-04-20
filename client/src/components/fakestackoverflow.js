@@ -43,6 +43,10 @@ export default function FakeStackOverflow() {
         setPage("register"); // Show register page
     };
 
+    const handleShowPostMod = async () => {
+        setPage("postMod");
+    };
+
 
     return (
         <>
@@ -51,7 +55,8 @@ export default function FakeStackOverflow() {
                     user={user}
                     logout={handleLogout}
                     showLogin={handleShowLogin} // Pass functions to handle login and register
-                    showRegister={handleShowRegister}/>
+                    showRegister={handleShowRegister}
+                    showPostMod={handleShowPostMod}/>
                 <Main
                     user={user}
                     search={search}
