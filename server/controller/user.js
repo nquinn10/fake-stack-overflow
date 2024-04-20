@@ -61,7 +61,8 @@ const userLogin = async (req, res) => {
         if (user && await bcrypt.compare(password, user.password)) {  // In a real app, use a hashed password comparison
             // store session with userID
             req.session.userId = user._id;
-            res.send("Logged in successfully!");
+            res.json({ message: "Logged in successfully!", display_name: user.display_name });
+            //res.send("Logged in successfully!");
         } else {
             res.status(401).send("Invalid credentials");
         }

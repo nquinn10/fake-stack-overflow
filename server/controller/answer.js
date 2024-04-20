@@ -21,6 +21,7 @@ const addAnswer = async (req, res) => {
         // Add qid to the answer details
         const answerDetails = {
             ...ans,
+            ans_by: userId,
             question: qid  // Ensure the qid is included
         };
 

@@ -145,6 +145,7 @@ describe('POST /user/login', () => {
         const mockUser = {
             _id: "dummyUserId",
             email: "user1",
+            display_name: "fake_display_name",
             password: hashedPassword
         };
 
@@ -159,7 +160,9 @@ describe('POST /user/login', () => {
         // Assert response
         expect(User.findOne).toHaveBeenCalledWith({ email: "user1" });
         expect(response.status).toBe(200);
-        expect(response.text).toBe('Logged in successfully!');
+        const responseJson = JSON.parse(response.text);
+        expect(responseJson.message).toBe('Logged in successfully!');
+        expect(responseJson.display_name).toBe('fake_display_name');
     });
 
     // negative test case - invalid user password

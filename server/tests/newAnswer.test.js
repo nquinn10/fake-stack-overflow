@@ -81,6 +81,7 @@ describe("POST /addAnswer", () => {
         // Verifying that Answer.create method was called with the correct arguments
         expect(Answer.create).toHaveBeenCalledWith({
                                                        text: "This is a test answer",
+                                                       ans_by: "validUserId",
                                                        question: "dummyQuestionId"
                                                    });
 
