@@ -1,0 +1,16 @@
+/* index.css for FlaggedAnswers component */
+
+.flaggedAs {
+    padding: 15px;
+    border-bottom: 1px dashed #ccc; /* adds a subtle separator */
+    margin-bottom: 10px; /* space between entries */
+}
+
+.flaggedAs div {
+    margin-bottom: 5px; /* space between the text and vote count */
+}
+
+.flaggedAs div:last-child {
+    color: red; /* makes the vote count red */
+    font-weight: bold; /* makes it stand out more */
+}

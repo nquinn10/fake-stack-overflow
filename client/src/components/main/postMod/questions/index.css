@@ -1,0 +1,45 @@
+/* index.css for FlaggedQuestions component */
+
+.flaggedQs {
+    padding: 15px;
+    border-bottom: 1px dashed #000000; /* Adds a subtle separator */
+    margin-bottom: 10px; /* Space between entries */
+}
+
+.qTitle {
+    font-size: 16px;
+}
+
+.qText {
+    font-size: 16px;
+    color: gray;
+}
+
+.qVote {
+    font-size: 16px;
+    color: red;
+    font-weight: bold;
+}
+
+.flaggedQs > div {
+    margin-bottom: 5px; /* Space between elements */
+}
+
+.resetButton, .deleteButton {
+    padding: 5px 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.resetButton {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.deleteButton {
+    background-color: #f44336; /* Red */
+    color: white;
+}

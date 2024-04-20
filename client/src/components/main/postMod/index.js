@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import PostModHeader from "./header";
-import { getFlaggedQuestions, getFlaggedAnswers } from "../../../services/postModerationService";
+import { getFlaggedQuestions, getFlaggedAnswers, resetQuestion, resetAnswer, deleteQuestion, deleteAnswer } from "../../../services/postModerationService";
 import FlaggedQuestions from "./questions";
 import FlaggedAnswers from "./answers";
 
@@ -12,20 +12,58 @@ const PostModerationPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const fetchedFlaggedQuestions = await getFlaggedQuestions();
+            console.log("fetched flagged questions: ", fetchedFlaggedQuestions);
             setFlaggedQuestions(fetchedFlaggedQuestions);
 
             const fetchedFlaggedAnswers = await getFlaggedAnswers();
+            console.log("fetched flagged answers: ", fetchedFlaggedAnswers);
             setFlaggedAnswers(fetchedFlaggedAnswers);
         };
 
         fetchData();
     }, []);
 
+    const handleResetQuestion = async (qid) => {
+        try {
+            await resetQuestion(qid);
+            setFlaggedQuestions(prev => prev.filter(q => q._id !== qid));
+        } catch (error) {
+            console.error("Error resetting question:", error.message);
+        }
+    };
+
+    const handleDeleteQuestion = async (qid) => {
+        try {
+            await deleteQuestion(qid);
+            setFlaggedQuestions(prev => prev.filter(q => q._id !== qid));
+        } catch (error) {
+            console.error("Error deleting question:", error.message);
+        }
+    };
+
+    const handleResetAnswer = async (aid) => {
+        try {
+            await resetAnswer(aid);
+            setFlaggedAnswers(prev => prev.filter(a => a._id !== aid));
+        } catch (error) {
+            console.error("Error resetting answer:", error.message);
+        }
+    };
+
+    const handleDeleteAnswer = async (aid) => {
+        try {
+            await deleteAnswer(aid);
+            setFlaggedAnswers(prev => prev.filter(a => a._id !== aid));
+        } catch (error) {
+            console.error("Error deleting answer:", error.message);
+        }
+    };
+
     return (
         <div>
             <PostModHeader
             qCount={ flaggedQuestions && flaggedQuestions.length } 
-            ansCount={ flaggedAnswers && flaggedAnswers.length}
+            ansCount={ flaggedAnswers && flaggedAnswers.length }
         />
         <div>
             {flaggedQuestions.length > 0 ? (
@@ -33,6 +71,8 @@ const PostModerationPage = () => {
                 <FlaggedQuestions
                     key={question._id}
                     question={question}
+                    onReset={handleResetQuestion}
+                    onDelete={handleDeleteQuestion}
                     />
                 ))
             ) : (
@@ -44,6 +84,8 @@ const PostModerationPage = () => {
                 <FlaggedAnswers
                     key={answer._id}
                     answer={answer}
+                    onReset={handleResetAnswer}
+                    onDelete={handleDeleteAnswer}
                     />
                 ))
             ) : (
