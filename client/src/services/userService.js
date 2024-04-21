@@ -21,4 +21,27 @@ const getUserProfileSummary = async () => {
     return response.data;
 };
 
-export { login, register, getUserProfileSummary };
+const getUserQuestions = async () => {
+    const response = await api.get(`${USER_API_URL}/my-questions`);
+    return response.data;
+};
+
+const getUserAnsweredQuestions = async () => {
+    const response = await api.get(`${USER_API_URL}/my-answers`);
+    return response.data;
+};
+const getUserTags = async () => {
+    const response = await api.get(`${USER_API_URL}/my-tags`);
+    return response.data;
+};
+const getUserQuestionVotes = async (voteType = "") => {
+    const response = await api.get(`${USER_API_URL}/my-question-votes?voteType=${voteType}`);
+    return response.data;
+};
+const getUserAnswerVotes = async (voteType = "") => {
+    const response = await api.get(`${USER_API_URL}/my-answer-votes?voteType=${voteType}`);
+    return response.data;
+};
+
+
+export { login, register, getUserProfileSummary, getUserQuestions, getUserAnsweredQuestions, getUserTags, getUserQuestionVotes, getUserAnswerVotes };
