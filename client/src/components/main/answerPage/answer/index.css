@@ -25,10 +25,12 @@
 
 .voteIcon.upvote {
     margin-bottom: 5px;
+    color: cornflowerblue;
 }
 
 .voteIcon.downvote {
     margin-top: 5px;
+    color: cornflowerblue;
 }
 
 .answerText {

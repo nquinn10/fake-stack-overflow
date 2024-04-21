@@ -20,12 +20,6 @@
     margin-left: 30px;
 }
 
-.voteIcon {
-    cursor: pointer;
-    color: cornflowerblue; 
-    transition: color 0.3s;
-}
-
 .voteIcon.active {
     color: black; /* Color changes to black when active */
 }
@@ -37,10 +31,12 @@
 
 .voteIcon.upvote {
     margin-bottom: 5px;
+    color: cornflowerblue;
 }
 
 .voteIcon.downvote {
     margin-top: 5px;
+    color: cornflowerblue;
 }
 
 .answer_question_vote {
