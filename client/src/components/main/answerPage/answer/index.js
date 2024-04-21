@@ -32,9 +32,9 @@ const Answer = ({ text, ansBy, meta, initialVote, aid }) => {
     return (
         <div className="answer right_padding">
             <div className="voteContainerAnswer">
-                    <BiSolidUpArrow className={`bold_title voteIcon upvote ${activeVote === 'upvote' ? 'active' : ''}`} onClick={() => handleVote('upvote')} />
-                    <div className="answerVote">{voteCount}</div>
-                    <BiSolidDownArrow className={`bold_title voteIcon downvote ${activeVote === 'downvote' ? 'active' : ''}`} onClick={() => handleVote('downvote')}/>
+                    <BiSolidUpArrow id={"upVoteA"} className={`bold_title voteIcon upvote ${activeVote === 'upvote' ? 'active' : ''}`} onClick={() => handleVote('upvote')} />
+                    <div id={"vote_countA"} className="answerVote">{voteCount}</div>
+                    <BiSolidDownArrow id={"downVoteA"} className={`bold_title voteIcon downvote ${activeVote === 'downvote' ? 'active' : ''}`} onClick={() => handleVote('downvote')}/>
                 </div>
             <div id="answerText" className="answerText">
                 {handleHyperlink(text)}
