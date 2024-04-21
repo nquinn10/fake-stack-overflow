@@ -8,7 +8,7 @@ const handleRes = (res) => {
 
 const handleErr = (err) => {
     console.log(err);
-    return err;
+    return Promise.reject(err);
 };
 
 const api = _axios.create({ withCredentials: true });

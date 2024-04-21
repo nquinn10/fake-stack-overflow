@@ -46,7 +46,7 @@ const castVote = async (req, res) => {
                 await existingVote.save();
             } else {
                 // User attempting to repeat the same vote, no update needed
-                return res.status(409).send("You have already cast this vote.");
+                return res.status(409).json({ message: "You have already cast this vote." });
             }
         } else {
             // Create a new vote since one doesn't exist

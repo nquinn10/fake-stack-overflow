@@ -26,6 +26,10 @@
     transition: color 0.3s;
 }
 
+.voteIcon.active {
+    color: black; /* Color changes to black when active */
+}
+
 .voteIcon.upvote:hover,
 .voteIcon.downvote:hover {
     color: #000000; 
@@ -56,4 +60,10 @@
     display: flex;
     flex-direction: column;
     margin-left: 5%;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    padding-top: 10px;
 }
