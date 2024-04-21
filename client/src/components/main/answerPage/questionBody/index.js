@@ -4,12 +4,12 @@ import { handleHyperlink } from "../../../../tool";
 // import { FiArrowUpCircle, FiArrowDownCircle } from "react-icons/fi"; 
 import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
 import { castVote } from "../../../../services/voteService";
+import { toast } from 'react-toastify';
 
 // Component for the Question's Body
 const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
     const [voteCount, setVoteCount] = useState(initialVote);
     const [activeVote, setActiveVote] = useState(null);
-    const [error, setError] = useState(null);
 
 
     // Update vote count when initialVote changes
@@ -26,7 +26,7 @@ const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
             setVoteCount(response.vote_count);
             setActiveVote(voteType);
         } else if (response.error) {
-            setError(response.error);
+            toast.error(response.error);
         }
     };
     
@@ -37,8 +37,6 @@ const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
                     <BiSolidUpArrow className={`bold_title voteIcon upvote ${activeVote === 'upvote' ? 'active' : ''}`} onClick={() => handleVote('upvote')} />
                     <div className="bold_title answer_question_vote">{voteCount}</div>
                     <BiSolidDownArrow className={`bold_title voteIcon downvote ${activeVote === 'downvote' ? 'active' : ''}`} onClick={() => handleVote('downvote')}/>
-                    <div>{error && <div className="error-message">{error}</div>}</div>
-
                 </div>
                 <div className="bold_title answer_question_view">{views} views</div>
             </div>
