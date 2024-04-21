@@ -17,7 +17,7 @@ const EditQuestionForm = ({ question, onSave, onCancel }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const tagsArray = tags.split(' ').map(tag => tag.trim());
+        const tagsArray = tags.split(" ").filter(tag => tag.trim() !== "");
         const updatedQuestionData = {
             title,
             text,
@@ -32,8 +32,8 @@ const EditQuestionForm = ({ question, onSave, onCancel }) => {
         });
 
         try {
-            const updatedQuestion = await editQuestion(question._id, updatedQuestionData);
-            onSave(updatedQuestion); // Use the onSave prop to handle the updated question in the parent component
+            await editQuestion(question._id, updatedQuestionData);
+            onSave(); // Use the onSave prop to handle the updated question in the parent component
         } catch (error) {
             // Handle errors such as displaying error messages
             console.error('Failed to save the question:', error);
@@ -70,9 +70,7 @@ const EditQuestionForm = ({ question, onSave, onCancel }) => {
             <div className="btn_indicator_container">
                 <button
                     className="form_postBtn"
-                    onClick={() => {
-                        handleSubmit();
-                    }}
+                    onClick={handleSubmit}
                 >
                     Save
                 </button>

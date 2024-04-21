@@ -5,7 +5,7 @@ import {
     getUserTags
 } from "../../../../services/userService";
 import ProfileHeader from "./profileBodyHeader";
-import UserAnswerDisplay from "./userAnswerDisplay";
+
 import Question from "./question";
 import EditQuestionForm from "./editQuestionForm";
 
@@ -20,17 +20,14 @@ const ProfileBody = ({ activeTab, user }) => {
         setQuestionToEdit(question);
     };
 
-    const handleSave = async (updatedQuestion) => {
-        const updatedContent = content.map(q => {
-            if (q._id === updatedQuestion._id) {
-                return updatedQuestion;  // Update the specific question with the new data
-            }
-            return q;
-        });
-        setContent(updatedContent);  // Update the state with the new question list
-
+    const handleSave = async () => {
+        console.log("Active tab at save:", activeTab);
         setIsEditing(false);
+        console.log(activeTab);
         setQuestionToEdit(null);
+        const updatedQuestions = await getUserQuestions();
+        setContent(updatedQuestions);
+
     };
 
     const handleCancel = () => {
@@ -112,12 +109,6 @@ const ProfileBody = ({ activeTab, user }) => {
                         titleText="My Answers"
                         itemCount={content.length}
                     />
-                    <div className="answer_list">
-                        {content.map((item, idx) => (
-                            <UserAnswerDisplay key={idx} item={item} />
-                        ))}
-                        {!content.length && <div>No Answers Found</div>}
-                    </div>
                 </>
             )}
         </div>
