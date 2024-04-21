@@ -7,18 +7,17 @@
 }
 
 .qTitle {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .qText {
-    font-size: 16px;
+    font-size: 14px;
     color: gray;
 }
 
 .qVote {
     font-size: 16px;
     color: red;
-    font-weight: bold;
 }
 
 .flaggedQs > div {
@@ -32,6 +31,32 @@
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+}
+
+.resetButton:hover::after {
+    content: "Reset votes to 0 and reset flag";
+    position: absolute;
+    transform: translateX(-50%);
+    width: 200px;
+    background-color: #555;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.deleteButton:hover::after {
+    content: "Delete from website";
+    position: absolute;
+    transform: translateX(-50%);
+    width: 200px;
+    background-color: #555;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 5px;
+    z-index: 1;
 }
 
 .resetButton {
