@@ -9,6 +9,7 @@ import ProfileHeader from "./profileBodyHeader";
 import Question from "./question";
 import EditQuestionForm from "./editQuestionForm";
 import {deleteQuestion} from "../../../../services/questionService";
+import UserAnswer from "./answer";
 
 const ProfileBody = ({ activeTab, user }) => {
     const [content, setContent] = useState([]);
@@ -46,6 +47,16 @@ const ProfileBody = ({ activeTab, user }) => {
         }
     };
 
+    const handleEditAnswer = (answer) => {
+        // Set up logic to edit the answer
+        console.log("Edit Answer", answer);
+    };
+
+    const handleDeleteAnswer = async (answerId) => {
+        // Set up logic to delete the answer
+        console.log("Delete Answer", answerId);
+    };
+
     useEffect(() => {
         console.log("Fetching data for tab:", activeTab);
         const fetchData = async () => {
@@ -72,8 +83,9 @@ const ProfileBody = ({ activeTab, user }) => {
                     break;
                 }
                 default:
-                    setContent([]);
+                    data = [];
             }
+            console.log("Fetched data:", data);
             setContent(data || []);
         };
 
@@ -117,6 +129,20 @@ const ProfileBody = ({ activeTab, user }) => {
                         titleText="My Answers"
                         itemCount={content.length}
                     />
+                    {content && content.length > 0 ? (
+                        <div className="answer_list">
+                            {content.map((item, idx) => (
+                                <UserAnswer
+                                    key={idx}
+                                    item={item}
+                                    onEditAnswer={handleEditAnswer}
+                                    onDeleteAnswer={handleDeleteAnswer}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                         <div>No Answers Found</div>
+                     )}
                 </>
             )}
         </div>

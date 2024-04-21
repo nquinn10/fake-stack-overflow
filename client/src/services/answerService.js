@@ -10,4 +10,11 @@ const addAnswer = async (qid, ans) => {
     return res.data;
 };
 
-export { addAnswer };
+// To edit Answers
+const editAnswer = async (aid, a) => {
+    const res = await api.put(`${ANSWER_API_URL}/editAnswer/${aid}`, a);
+
+    return res.data;
+};
+
+export { addAnswer, editAnswer };
