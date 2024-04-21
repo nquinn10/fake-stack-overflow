@@ -3,6 +3,12 @@ import "./index.css";
 import {getMetaData} from "../../../../../tool";
 
 const Question = ({ q, onEdit, onDelete }) => {
+
+    if (!q || !q.answers) {
+        console.error("Question data is invalid or incomplete:", q);
+        return <div>Invalid question data</div>;
+    }
+
     return (
         <div className="question right_padding">
             <div className="postStats">
