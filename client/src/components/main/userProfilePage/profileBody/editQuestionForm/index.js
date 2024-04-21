@@ -9,11 +9,6 @@ const EditQuestionForm = ({ question, onSave, onCancel }) => {
     const [text, setText] = useState(question.text);
     const [tags, setTags] = useState(question.tags.map(tag => tag.name).join(' '));
 
-    //const [titleErr, setTitleErr] = useState("");
-    //const [textErr, setTextErr] = useState("");
-    //const [tagErr, setTagErr] = useState("");
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
