@@ -56,7 +56,7 @@ const userLogin = async (req, res) => {
     try {
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.status(404).send('User not found');
+            return res.status(404).send('User not found. Please register.');
         }
 
         // console.log(user); // check user object
@@ -65,7 +65,7 @@ const userLogin = async (req, res) => {
             req.session.userId = user._id;
             res.json({ message: "Logged in successfully!", display_name: user.display_name });
         } else {
-            res.status(401).send("Invalid credentials");
+            res.status(401).send("Invalid password. Please try again.");
         }
     } catch (error) {
         console.error(error); // Log the error for debugging purposes
