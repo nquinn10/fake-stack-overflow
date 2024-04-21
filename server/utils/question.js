@@ -95,13 +95,17 @@ const filterQuestionsBySearch = (qlist, search) => {
             // if search term is empty, return all questions
             return qlist;
         }
-        const searchTags = search.match(/\[([^\]]+)\]/g) || [];
-        const searchKeywords = search.replace(/\[([^\]]+)\]/g, " ").match(/\b\w+\b/g) || [];
+
+        const lowerCaseSearch = search.toLowerCase();
+        const searchTags = lowerCaseSearch.match(/\[([^\]]+)\]/g) || [];
+        const searchKeywords = lowerCaseSearch.replace(/\[([^\]]+)\]/g, " ").match(/\b\w+\b/g) || [];
 
         // filter the list of questions based on the search term
         const filteredQuestions = qlist.filter(question => {
+            const titleLower = question.title.toLowerCase();
+            const textLower = question.text.toLowerCase();
             const hasKeyword = searchKeywords.some(keyword =>
-                                                       question.title.includes(keyword) || question.text.includes(keyword)
+                                                       titleLower.includes(keyword) || textLower.includes(keyword)
             );
 
             const hasTag = searchTags.some(tag =>
