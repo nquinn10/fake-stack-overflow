@@ -16,4 +16,9 @@ const register = async (userData) => {
     return response.data;
 };
 
-export { login, register };
+const getUserProfileSummary = async () => {
+    const response = await api.get(`${USER_API_URL}/profile`);
+    return response.data;
+};
+
+export { login, register, getUserProfileSummary };
