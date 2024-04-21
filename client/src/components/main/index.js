@@ -9,6 +9,7 @@ import NewAnswer from "./newAnswer";
 import Login from "../auth/login";
 import Register from "../auth/register";
 import PostModerationPage from "./postMod";
+import UserProfilePage from "./userProfilePage";
 
 const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, handlePostMod, page, setPage }) => {
     //const [page, setPage] = useState("home");
@@ -116,6 +117,11 @@ const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, handlePo
         case "postMod": {
             selected = "";
             content = <PostModerationPage showPostMod={handlePostMod} />;
+            break;
+        }
+        case "profile": {
+            selected = "p";  // Assuming 'p' indicates profile in your sidebar
+            content = <UserProfilePage user={user} />;
             break;
         }
         default:

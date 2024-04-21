@@ -257,7 +257,8 @@ describe('POST /user/register', () => {
             .send(mockReqBody);
 
         expect(response.status).toBe(201);
-        expect(response.text).toBe('User registered successfully');
+        const responseJson = JSON.parse(response.text);
+        expect(responseJson.message).toBe('User registered successfully');
         expect(User.findOne).toHaveBeenCalledWith({ email: "janedixon@example.com" });
     });
 
@@ -291,7 +292,8 @@ describe('POST /user/register', () => {
             .send(mockReqBody);
 
         expect(response.status).toBe(400);
-        expect(response.text).toBe('User already exists');
+        const responseJson = JSON.parse(response.text);
+        expect(responseJson.message).toBe('User already exists');
         expect(User.findOne).toHaveBeenCalledWith({ email: "existing@email.com" });
     });
 });

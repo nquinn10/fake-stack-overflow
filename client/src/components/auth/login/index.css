@@ -1,18 +1,4 @@
-.login-container {
-    padding: 20px;
-    margin-top: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.login-form input {
-    margin: 10px;
-    padding: 10px;
-    width: 200px;
-}
-
-.login-form button {
-    padding: 10px 20px;
-    cursor: pointer;
+.input_error {
+    color: red;
+    margin-bottom: 20px;
 }

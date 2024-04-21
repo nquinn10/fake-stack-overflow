@@ -1,33 +1,67 @@
 import React, { useState } from 'react';
+import Form from '../../main/baseComponents/form';
+import Input from '../../main/baseComponents/input';
 import './index.css';
+import { login } from '../../../services/userService';
 
 const Login = ({ onLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [loginError, setLoginError] = useState('');
 
-    const handleSubmit = (event) => {
+    const validateInputs = () => {
+        let isValid = true;
+        setEmailError('');
+        setPasswordError('');
+        setLoginError('');
+
+        if (!email) {
+            setEmailError('Email cannot be empty');
+            isValid = false;
+        }
+        if (!password) {
+            setPasswordError('Password cannot be empty');
+            isValid = false;
+        }
+        return isValid;
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        onLogin( email, password );
+        if (validateInputs()) {
+            try {
+                const userData = await login(email, password); // Call the login service
+                if (userData) {
+                    onLogin(userData); // Pass user data to the parent component
+                } else {
+                    setLoginError('Invalid email or password'); // Set login error message
+                }
+            } catch (error) {
+                setLoginError(error.response.data); // Set generic error message
+            }
+        }
     };
 
     return (
-        <div className="login-container">
-            <form onSubmit={handleSubmit} className="login-form">
-                <input
-                    type="text"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="Email"
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="Password"
-                />
-                <button type="submit">Login</button>
-            </form>
-        </div>
+        <Form>
+            <Input
+                title="Email"
+                val={email}
+                setState={setEmail}
+                err={emailError}
+            />
+            <Input
+                title="Password"
+                val={password}
+                setState={setPassword}
+                type="password"
+                err={passwordError}
+            />
+            {loginError && <div className="input_error">{loginError}</div>}
+            <button onClick={handleSubmit}>Login</button>
+        </Form>
     );
 };
 

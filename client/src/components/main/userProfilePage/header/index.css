@@ -1,0 +1,47 @@
+.profileHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f3f3f3;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.profileDisplayName {
+    flex-basis: 25%; /* Adjust based on your layout preference */
+    font-weight: bold;
+    font-size: 24px;
+    color: #333;
+    padding-right: 20px; /* Ensures space between this and the next column */
+}
+
+.profileDetails {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Takes the remaining space */
+    align-items: flex-start; /* Aligns items to the start */
+}
+
+.profileRow {
+    display: flex;
+    justify-content: flex-start; /* Aligns content at the start of the flexbox */
+    width: 100%;
+}
+
+.profileItem {
+    margin-right: 20px; /* Spacing between items */
+    margin-bottom: 10px; /* Spacing between rows */
+    flex: 1; /* Allows each item to grow evenly */
+    min-width: 0; /* Helps with overflow issues */
+    white-space: nowrap; /* Prevents wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds an ellipsis if the text is too long */
+}
+
+.profileItemFull {
+    width: 100%; /* Full width for the 'About me' section */
+    margin-bottom: 10px; /* Spacing from the last row */
+    white-space: normal; /* Allows wrapping */
+}

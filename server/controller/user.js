@@ -20,7 +20,7 @@ const userRegistration = async (req, res) => {
         // check if user already exists
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
-            return res.status(400).send('User already exists');
+            return res.status(400).json({ message: 'User already exists' });
         }
 
         // create new user if user doesn't exist
@@ -38,13 +38,15 @@ const userRegistration = async (req, res) => {
 
         // save new user
         await newUser.save();
-        req.session.userId = newUser._id;  // Start a new session after registering
+
+        // Set session userId
+        req.session.userId = newUser._id;
         
         // send a success response
-        res.status(201).send('User registered successfully');
+        res.status(201).json({ message: 'User registered successfully', display_name: newUser.display_name });
     } catch (error) {
         console.error(error);
-        res.status(500).send('An error occurred, user not registered');
+        res.status(500).json({ message: 'An error occurred, user not registered' });
     }
 };
 
@@ -54,7 +56,7 @@ const userLogin = async (req, res) => {
     try {
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.status(404).send('User not found');
+            return res.status(404).send('User not found. Please register.');
         }
 
         // console.log(user); // check user object
@@ -62,9 +64,8 @@ const userLogin = async (req, res) => {
             // store session with userID
             req.session.userId = user._id;
             res.json({ message: "Logged in successfully!", display_name: user.display_name });
-            //res.send("Logged in successfully!");
         } else {
-            res.status(401).send("Invalid credentials");
+            res.status(401).send("Invalid password. Please try again.");
         }
     } catch (error) {
         console.error(error); // Log the error for debugging purposes
