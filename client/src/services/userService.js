@@ -7,13 +7,13 @@ const USER_API_URL = `${REACT_APP_API_URL}/user`;
 // and how they should be called, and with which parameters if necessary
 
 const login = async (email, password) => {
-    try {
-        const response = await api.post(`${USER_API_URL}/login`, { email, password });
-        return response.data;
-    } catch (error) {
-        console.error('Login error:', error);
-        throw error;
-    }
+    const response = await api.post(`${USER_API_URL}/login`, { email, password });
+    return response.data;
 };
 
-export { login };
+const register = async (userData) => {
+    const response = await api.post(`${USER_API_URL}/register`, userData);
+    return response.data;
+};
+
+export { login, register };

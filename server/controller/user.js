@@ -38,7 +38,6 @@ const userRegistration = async (req, res) => {
 
         // save new user
         await newUser.save();
-        req.session.userId = newUser._id;  // Start a new session after registering
         
         // send a success response
         res.status(201).send('User registered successfully');
