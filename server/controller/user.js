@@ -117,7 +117,7 @@ const getUserQuestions = async (req, res) => {
             .populate('tags', 'name');
 
         if (!userQuestions.length) {
-            return res.status(404).send("No questions found.");
+            return res.status(200).json([]);
         }
 
         res.json(userQuestions);
@@ -147,7 +147,7 @@ const getUserAnsweredQuestions = async (req, res) => {
                       });
 
         if (!userAnswers.length) {
-            return res.status(404).send("No answered questions found.");
+            return res.status(200).json([]);
         }
 
         // Extract the necessary data into a new array to structure it neatly
