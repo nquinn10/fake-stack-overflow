@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from "react";
 import Header from "./header";
 import Main from "./main";
-import { login } from "../services/userService";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -19,14 +18,14 @@ export default function FakeStackOverflow() {
         setMainTitle(title);
     };
 
-    const handleLogin = async (email, password) => {
-        try {
-            const userData = await login(email, password);
+    const handleLogin = async (userData) => {
+        if (userData) {
             setUser(userData);
             toast.success('Login successful!', { autoClose: 2000 });
-            setPage('home')
-        } catch (error) {
-            alert('Login failed: ' + error.message);
+            setPage('home');
+        } else {
+            // Display error message or handle invalid credentials
+            alert('Login failed: Invalid email or password');
         }
     };
 
@@ -50,7 +49,7 @@ export default function FakeStackOverflow() {
                     setQuesitonPage={setQuesitonPage}
                     user={user}
                     logout={handleLogout}
-                    showLogin={handleShowLogin} // Pass functions to handle login and register
+                    showLogin={handleShowLogin}
                     showRegister={handleShowRegister}/>
                 <Main
                     user={user}
