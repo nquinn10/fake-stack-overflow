@@ -57,11 +57,11 @@
 }
 
 .resetButton {
-    background-color: #4CAF50; /* Green */
+    background-color: cornflowerblue; /* Green */
     color: white;
 }
 
 .deleteButton {
-    background-color: #f44336; /* Red */
+    background-color: gray; /* Red */
     color: white;
 }
