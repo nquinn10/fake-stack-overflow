@@ -78,7 +78,7 @@ const PostModerationPage = () => {
         <div>
             <PostModHeader
             qCount={ flaggedQuestions && flaggedQuestions.length } 
-            ansCount={ flaggedAnswers && flaggedAnswers.length }
+            title="Flagged Questions"
         />
         <div>
             {flaggedQuestions.length > 0 ? (
@@ -94,6 +94,11 @@ const PostModerationPage = () => {
                 <div> No flagged questions to review. </div>
             )}
         </div>
+        <PostModHeader
+                ansCount={flaggedAnswers.length}
+                title="Flagged Answers"
+        />
+        <div>
         {flaggedAnswers.length > 0 ? (
                 flaggedAnswers.map(answer => (
                 <FlaggedAnswers
@@ -106,6 +111,7 @@ const PostModerationPage = () => {
             ) : (
                 <div> No flagged answers to review. </div>
             )}
+        </div>
         </div>
     );
 };

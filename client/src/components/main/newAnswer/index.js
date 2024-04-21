@@ -38,7 +38,6 @@ const NewAnswer = ({ qid, handleAnswer }) => {
     };
     return (
         <Form>
-
             <Textarea
                 title={"Answer Text"}
                 id={"answerTextInput"}
