@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./index.css";
 
 import PostModHeader from "./header";
 import { getFlaggedQuestions, getFlaggedAnswers, resetQuestion, resetAnswer, deleteQuestion, deleteAnswer } from "../../../services/postModerationService";
@@ -8,20 +9,34 @@ import FlaggedAnswers from "./answers";
 const PostModerationPage = () => {
     const [flaggedQuestions, setFlaggedQuestions] = useState([]);
     const [flaggedAnswers, setFlaggedAnswers] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
-            const fetchedFlaggedQuestions = await getFlaggedQuestions();
-            console.log("fetched flagged questions: ", fetchedFlaggedQuestions);
-            setFlaggedQuestions(fetchedFlaggedQuestions);
-
-            const fetchedFlaggedAnswers = await getFlaggedAnswers();
-            console.log("fetched flagged answers: ", fetchedFlaggedAnswers);
-            setFlaggedAnswers(fetchedFlaggedAnswers);
-        };
-
+            try {
+                const fetchedFlaggedQuestions = await getFlaggedQuestions();
+                if (fetchedFlaggedQuestions.error) {
+                    setError(fetchedFlaggedQuestions.error);
+                } else {
+                    setFlaggedQuestions(fetchedFlaggedQuestions || []);
+                }
+                
+                
+                const fetchedFlaggedAnswers = await getFlaggedAnswers();
+                console.log("fetched flagged answers: ", fetchedFlaggedAnswers);
+                setFlaggedAnswers(fetchedFlaggedAnswers || []);
+                
+            } catch (error) {
+                setError(error.message);
+            }
+        }
         fetchData();
     }, []);
+
+    if (error) {
+        return  <div className="errorMessage">Oops! You don&apos;t have access to this page.<br></br><br></br>Administrators only.</div>
+
+    }
 
     const handleResetQuestion = async (qid) => {
         try {

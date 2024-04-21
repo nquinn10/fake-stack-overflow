@@ -8,10 +8,7 @@ const getFlaggedQuestions = async () => {
         const response = await api.get(`${POSTMOD_API_URL}/flaggedQuestions`);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 403) {
-            throw new Error('Access denied. You do not have the necessary permissions to view flagged questions.');
-        }
-        throw new Error('Failed to fetch flagged questions due to an unexpected error.');
+       return { data: null, error: error.response?.data || 'An unexpected error occurred' };
     }
 }
 
@@ -21,10 +18,7 @@ const getFlaggedAnswers = async () => {
         const response = await api.get(`${POSTMOD_API_URL}/flaggedAnswers`);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 403) {
-            throw new Error('Access denied. You do not have the necessary permissions to view flagged answers.');
-        }
-        throw new Error('Failed to fetch flagged answers due to an unexpected error.');
+        return { data: null, error: error.response?.data || 'An unexpected error occurred' };
     }
 }
 
@@ -33,12 +27,7 @@ const resetQuestion = async (qid) => {
         const response = await api.put(`${POSTMOD_API_URL}/resetQuestion/${qid}`);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 404) {
-            throw new Error('Question not found');
-        } else if (error.response && error.response.status === 500) {
-            throw new Error('Internal server error');
-        }
-        throw error;
+        return { error: error.response?.data || 'An unexpected error occurred' };
     }
 }
 
@@ -47,14 +36,7 @@ const deleteQuestion = async (qid) => {
         const response = await api.delete(`${POSTMOD_API_URL}/deleteQuestion/${qid}`);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 404) {
-            throw new Error('Question not found');
-        } else if (error.response && error.response.status === 403) {
-            throw new Error('This question is not flagged for deletion');
-        } else if (error.response && error.response.status === 500) {
-            throw new Error('Internal server error');
-        }
-        throw error;
+        return { error: error.response?.data || 'An unexpected error occurred' };
     }
 }
 
@@ -63,12 +45,7 @@ const resetAnswer = async (aid) => {
         const response = await api.put(`${POSTMOD_API_URL}/resetAnswer/${aid}`);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 404) {
-            throw new Error('Answer not found');
-        } else if (error.response && error.response.status === 500) {
-            throw new Error('Internal server error');
-        }
-        throw error;
+        return { error: error.response?.data || 'An unexpected error occurred' };
     }
 }
 
@@ -77,17 +54,9 @@ const deleteAnswer = async (aid) => {
         const response = await api.delete(`${POSTMOD_API_URL}/deleteAnswer/${aid}`);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 404) {
-            throw new Error('Answer not found');
-        } else if (error.response && error.response.status === 403) {
-            throw new Error('This answer is not flagged for deletion');
-        } else if (error.response && error.response.status === 500) {
-            throw new Error('Internal server error');
-        }
-        throw error;
+        return { error: error.response?.data || 'An unexpected error occurred' };
     }
 }
-
 
 
 

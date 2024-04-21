@@ -1,10 +1,12 @@
 import "./index.css";
 
-const FlaggedAnswers = ({ answer }) => {
+const FlaggedAnswers = ({ answer, onReset, onDelete }) => {
     return (
         <div className="flaggedAs">
-            <div> {answer.text} </div>
-            <div> {answer.vote_count} votes </div>
+            <div className="aText"> {answer.text} </div>
+            <div className="aVote"> {answer.vote_count} votes </div>
+            <button className="resetButton" onClick={() => onReset(answer._id)}>Reset</button>
+            <button className="deleteButton" onClick={() => onDelete(answer._id)}>Delete</button>
         </div>
     );
 };
