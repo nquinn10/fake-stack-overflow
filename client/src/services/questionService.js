@@ -25,4 +25,11 @@ const addQuestion = async (q) => {
     return res.data;
 };
 
-export { getQuestionsByFilter, getQuestionById, addQuestion };
+// To edit Questions
+const editQuestion = async (qid, q) => {
+    const res = await api.put(`${QUESTION_API_URL}/editQuestion/${qid}`, q);
+
+    return res.data;
+};
+
+export { getQuestionsByFilter, getQuestionById, addQuestion, editQuestion};
