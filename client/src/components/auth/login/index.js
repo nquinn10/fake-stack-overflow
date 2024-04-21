@@ -48,19 +48,21 @@ const Login = ({ onLogin }) => {
         <Form>
             <Input
                 title="Email"
+                id={"loginEmailInput"}
                 val={email}
                 setState={setEmail}
                 err={emailError}
             />
             <Input
                 title="Password"
+                id={"loginPasswordInput"}
                 val={password}
                 setState={setPassword}
                 type="password"
                 err={passwordError}
             />
             {loginError && <div className="input_error">{loginError}</div>}
-            <button onClick={handleSubmit}>Login</button>
+            <button id={'loginButton'} onClick={handleSubmit}>Login</button>
         </Form>
     );
 };

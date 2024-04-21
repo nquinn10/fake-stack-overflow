@@ -41,9 +41,9 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
             <div className="icons">
                 {user ? (
                     <>
-                        <FaRegUser className="icon" onClick={showProfile} />
-                        <FiFlag className="icon" onClick={handleShowPostMod} />
-                        <FaSignOutAlt className="icon" onClick={logout} />
+                        <FaRegUser id={"userProfileButton"} className="icon" onClick={showProfile} />
+                        <FiFlag className="icon" id={"postModerationButton"} onClick={handleShowPostMod} />
+                        <FaSignOutAlt className="icon" id={"logoutButton"} onClick={logout} />
                     </>
                 ) : (
                      <div className="auth-buttons">
