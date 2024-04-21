@@ -5,7 +5,7 @@ import {FaRegUser, FaSignInAlt, FaSignOutAlt, FaUserPlus} from "react-icons/fa";
 import { FiFlag } from "react-icons/fi";
 
 
-const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister }) => {
+const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister, showProfile }) => {
     const [val, setVal] = useState(search);
 
     const handleShowLogin = () => {
@@ -37,7 +37,7 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
             <div className="icons">
                 {user ? (
                     <>
-                        <FaRegUser className="icon" />
+                        <FaRegUser className="icon" onClick={showProfile} />
                         <FiFlag className="icon" />
                         <FaSignOutAlt className="icon" onClick={logout} />
                     </>

@@ -42,6 +42,10 @@ export default function FakeStackOverflow() {
         setPage("register"); // Show register page
     };
 
+    const handleShowProfile = () => {
+        setPage("profile");
+    };
+
 
     return (
         <>
@@ -50,7 +54,8 @@ export default function FakeStackOverflow() {
                     user={user}
                     logout={handleLogout}
                     showLogin={handleShowLogin}
-                    showRegister={handleShowRegister}/>
+                    showRegister={handleShowRegister}
+                    showProfile={handleShowProfile}/>
                 <Main
                     user={user}
                     search={search}

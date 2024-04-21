@@ -8,6 +8,7 @@ import NewQuestion from "./newQuestion";
 import NewAnswer from "./newAnswer";
 import Login from "../auth/login";
 import Register from "../auth/register";
+import UserProfilePage from "./userProfilePage";
 
 const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, page, setPage }) => {
     //const [page, setPage] = useState("home");
@@ -110,6 +111,11 @@ const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, page, se
         case "register": {
             selected = "";
             content = <Register onRegister={handleLogin} />;
+            break;
+        }
+        case "profile": {
+            selected = "p";  // Assuming 'p' indicates profile in your sidebar
+            content = <UserProfilePage user={user} />;
             break;
         }
         default:
