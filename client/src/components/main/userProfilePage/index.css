@@ -33,5 +33,10 @@
 
 .profileContent {
     display: flex;
-    flex-grow: 1;
+    flex-direction: row; /* Assuming a row-based flex layout */
+    width: 100%;
+}
+
+.profileBody {
+    flex-grow: 1; /* Takes up the remaining space */
 }

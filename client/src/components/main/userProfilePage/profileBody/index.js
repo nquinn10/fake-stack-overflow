@@ -1,4 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import {
+    getUserAnsweredQuestions, getUserAnswerVotes,
+    getUserQuestions, getUserQuestionVotes,
+    getUserTags
+} from "../../../../services/userService";
+import Question from "../../questionPage/question";
+import "../../questionPage/question/index.css";
+import "../../questionPage/index.css";
+import ProfileHeader from "./profileBodyHeader";
 
 const ProfileBody = ({ activeTab, user }) => {
     const [content, setContent] = useState([]);
@@ -6,31 +15,61 @@ const ProfileBody = ({ activeTab, user }) => {
     useEffect(() => {
         const fetchData = async () => {
             switch (activeTab) {
-                case 'questions':
-                    setContent(await getUserQuestions(user.id));
+                case 'questions': {
+                    const questions = await getUserQuestions(); // Scoped within the block
+                    setContent(questions);
                     break;
-                case 'answers':
-                    setContent(await getUserAnsweredQuestions(user.id));
+                }
+                case 'answers': {
+                    const answers = await getUserAnsweredQuestions(); // Scoped within the block
+                    setContent(answers);
                     break;
-                case 'tags':
-                    setContent(await getUserTags(user.id));
+                }
+                case 'tags': {
+                    const tags = await getUserTags(); // Scoped within the block
+                    setContent(tags);
                     break;
-                case 'votes':
-                    setContent(await getUserQuestionVotes(user.id));
+                }
+                case 'question_votes': {
+                    const votes = await getUserQuestionVotes(user.id); // Scoped within the block
+                    setContent(votes);
                     break;
+                }
+                case 'answer_votes': {
+                    const votes = await getUserAnswerVotes(user.id); // Scoped within the block
+                    setContent(votes);
+                    break;
+                }
                 default:
                     setContent([]);
             }
         };
 
-        fetchData();
-    }, [activeTab, user.id]);
+        fetchData().catch(console.error);
+    }, [activeTab]);
 
     return (
         <div className="profileBody">
-            {content.map(item => (
-                <div key={item.id}>{item.title || item.name}</div>
-            ))}
+            {activeTab === 'questions' && (
+                <>
+                    <ProfileHeader
+                        titleText="My Questions"
+                        itemCount={content.length}
+                    />
+                    <div className="question_list">
+                        {content.map((q, idx) => (
+                            <Question
+                                q={q}
+                                key={idx}
+                                clickTag={() => {}}
+                                handleAnswer={() => {}}
+                            />
+                        ))}
+                        {!content.length && <div>No Questions Found</div>}
+                    </div>
+                </>
+            )}
+            {/* Render other types of content for different tabs similarly */}
         </div>
     );
 };
