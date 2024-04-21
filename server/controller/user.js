@@ -38,9 +38,12 @@ const userRegistration = async (req, res) => {
 
         // save new user
         await newUser.save();
+
+        // Set session userId
+        req.session.userId = newUser._id;
         
         // send a success response
-        res.status(201).send('User registered successfully');
+        res.status(201).json({ message: 'User registered successfully', display_name: newUser.display_name });
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred, user not registered');
@@ -61,7 +64,6 @@ const userLogin = async (req, res) => {
             // store session with userID
             req.session.userId = user._id;
             res.json({ message: "Logged in successfully!", display_name: user.display_name });
-            //res.send("Logged in successfully!");
         } else {
             res.status(401).send("Invalid credentials");
         }
