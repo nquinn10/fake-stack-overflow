@@ -10,31 +10,47 @@ import Question from "./question";
 import EditQuestionForm from "./editQuestionForm";
 import {deleteQuestion} from "../../../../services/questionService";
 import UserAnswer from "./answer";
+import EditAnswerForm from "./editAnswerForm";
 
 const ProfileBody = ({ activeTab, user }) => {
     const [content, setContent] = useState([]);
     //const [editingQuestionId, setEditingQuestionId] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [questionToEdit, setQuestionToEdit] = useState(null);
+    //const [isEditing, setIsEditing] = useState(false);
+    //const [questionToEdit, setQuestionToEdit] = useState(null);
+    const [isEditingQuestion, setIsEditingQuestion] = useState(false);
+    const [isEditingAnswer, setIsEditingAnswer] = useState(false);
+    const [itemToEdit, setItemToEdit] = useState(null);
 
-    const handleEditClick = (question) => {
-        setIsEditing(true);
-        setQuestionToEdit(question);
+    const handleEditClick = (item) => {
+        if (activeTab === 'questions') {
+            setIsEditingQuestion(true);
+            setIsEditingAnswer(false);
+        } else if (activeTab === 'answers') {
+            setIsEditingAnswer(true);
+            setIsEditingQuestion(false);
+        }
+        setItemToEdit(item);
     };
 
     const handleSave = async () => {
-        console.log("Active tab at save:", activeTab);
-        setIsEditing(false);
-        console.log(activeTab);
-        setQuestionToEdit(null);
-        const updatedQuestions = await getUserQuestions();
-        setContent(updatedQuestions);
+        if (activeTab === 'questions') {
+            setIsEditingQuestion(false);
+            setItemToEdit(null);
+            const updatedQuestions = await getUserQuestions();
+            setContent(updatedQuestions);
+        } else if (activeTab === 'answers') {
+            setIsEditingAnswer(false)
+            setItemToEdit(null);
+            const updatedAnswers = await getUserAnsweredQuestions();
+            setContent(updatedAnswers);
+        }
 
     };
 
     const handleCancel = () => {
-        setIsEditing(false);
-        setQuestionToEdit(null);
+        setIsEditingQuestion(false);
+        setIsEditingAnswer(false);
+        setItemToEdit(null);
     };
 
     const handleDelete = async (questionId) => {
@@ -48,8 +64,9 @@ const ProfileBody = ({ activeTab, user }) => {
     };
 
     const handleEditAnswer = (answer) => {
-        // Set up logic to edit the answer
-        console.log("Edit Answer", answer);
+        setIsEditingAnswer(true);
+        setIsEditingQuestion(false);
+        setItemToEdit(answer);
     };
 
     const handleDeleteAnswer = async (answerId) => {
@@ -92,10 +109,20 @@ const ProfileBody = ({ activeTab, user }) => {
         fetchData().catch(console.error);
     }, [activeTab]);
 
-    if (isEditing) {
+    if (isEditingQuestion) {
         return (
             <EditQuestionForm
-                question={questionToEdit}
+                question={itemToEdit}
+                onSave={handleSave}
+                onCancel={handleCancel}
+            />
+        );
+    }
+
+    if (isEditingAnswer) {
+        return (
+            <EditAnswerForm
+                answer={itemToEdit}
                 onSave={handleSave}
                 onCancel={handleCancel}
             />
