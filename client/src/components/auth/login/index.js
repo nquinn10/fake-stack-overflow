@@ -13,6 +13,10 @@ const Login = ({ onLogin }) => {
 
     const validateInputs = () => {
         let isValid = true;
+        setEmailError('');
+        setPasswordError('');
+        setLoginError('');
+
         if (!email) {
             setEmailError('Email cannot be empty');
             isValid = false;
@@ -35,7 +39,7 @@ const Login = ({ onLogin }) => {
                     setLoginError('Invalid email or password'); // Set login error message
                 }
             } catch (error) {
-                setLoginError('An error occurred during login'); // Set generic error message
+                setLoginError(error.response.data); // Set generic error message
             }
         }
     };
