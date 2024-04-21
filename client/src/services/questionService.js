@@ -32,4 +32,14 @@ const editQuestion = async (qid, q) => {
     return res.data;
 };
 
-export { getQuestionsByFilter, getQuestionById, addQuestion, editQuestion};
+// To delete Questions
+const deleteQuestion = async (qid) => {
+    try {
+        const response = await api.delete(`${QUESTION_API_URL}/deleteQuestion/${qid}`);
+        return response.data;
+    } catch (error) {
+        return { error: error.response?.data || 'An unexpected error occurred' };
+    }
+}
+
+export { getQuestionsByFilter, getQuestionById, addQuestion, editQuestion, deleteQuestion};

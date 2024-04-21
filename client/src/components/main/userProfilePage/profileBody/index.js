@@ -8,6 +8,7 @@ import ProfileHeader from "./profileBodyHeader";
 
 import Question from "./question";
 import EditQuestionForm from "./editQuestionForm";
+import {deleteQuestion} from "../../../../services/questionService";
 
 const ProfileBody = ({ activeTab, user }) => {
     const [content, setContent] = useState([]);
@@ -33,6 +34,16 @@ const ProfileBody = ({ activeTab, user }) => {
     const handleCancel = () => {
         setIsEditing(false);
         setQuestionToEdit(null);
+    };
+
+    const handleDelete = async (questionId) => {
+        const result = await deleteQuestion(questionId);
+        if (!result.error) {
+            const updatedQuestions = await getUserQuestions();
+            setContent(updatedQuestions);
+        } else {
+            console.error('Failed to delete the question:', result.error);
+        }
     };
 
     useEffect(() => {
@@ -93,10 +104,7 @@ const ProfileBody = ({ activeTab, user }) => {
                                 key={question._id}  // Use the question ID for a unique key
                                 q={question}
                                 onEdit={handleEditClick}
-                                onDelete={(questionId) => {
-                                    // Implement the logic to handle delete, such as showing a confirmation
-                                    console.log('Deleting question', questionId);
-                                }}
+                                onDelete={handleDelete}
                             />
                         ))}
                         {!content.length && <div className="no-questions">No Questions Found</div>}
