@@ -8,9 +8,9 @@
 
 .questionStatsContainer {
     display: flex;
-    flex-direction: column; /* Stacks children vertically */
-    align-items: flex-start; /* Aligns children to the start (left) */
-    margin-right: 40px; /* Provides spacing between this container and the text */
+    flex-direction: column; 
+    align-items: flex-start; 
+    margin-right: 40px; 
 }
 
 .voteContainerQuestion {
@@ -22,13 +22,13 @@
 
 .voteIcon {
     cursor: pointer;
-    color: cornflowerblue; /* Default icon color */
+    color: cornflowerblue; 
     transition: color 0.3s;
 }
 
 .voteIcon.upvote:hover,
 .voteIcon.downvote:hover {
-    color: #000000; /* Change color on hover */
+    color: #000000; 
 }
 
 .voteIcon.upvote {
