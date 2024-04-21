@@ -5,7 +5,7 @@ import {FaRegUser, FaSignInAlt, FaSignOutAlt, FaUserPlus} from "react-icons/fa";
 import { FiFlag } from "react-icons/fi";
 
 
-const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister, showProfile }) => {
+const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister, showProfile, showPostMod }) => {
     const [val, setVal] = useState(search);
 
     const handleShowLogin = () => {
@@ -14,6 +14,10 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
 
     const handleShowRegister = () => {
         showRegister(); // Call the function passed from FakeStackOverflow
+    };
+
+    const handleShowPostMod = () => {
+        showPostMod();
     };
 
     return (
@@ -38,7 +42,7 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
                 {user ? (
                     <>
                         <FaRegUser className="icon" onClick={showProfile} />
-                        <FiFlag className="icon" />
+                        <FiFlag className="icon" onClick={handleShowPostMod} />
                         <FaSignOutAlt className="icon" onClick={logout} />
                     </>
                 ) : (

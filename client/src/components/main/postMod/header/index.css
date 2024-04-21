@@ -1,0 +1,19 @@
+/* Styles for the Post Moderation Header */
+
+/* Container styling */
+#postModHeader {
+    display: flex; /* Use flexbox to align child elements */
+    justify-content: space-between; /* Space between elements */
+    align-items: center; /* Vertically center elements */
+    padding: 10px 20px; /* Padding around the entire header */
+    background-color: #f5f5f5; /* Light grey background */
+    border-bottom: 2px solid #e1e1e1; /* Bottom border for a subtle separation */
+    margin-bottom: 20px; /* Space below the header */
+}
+
+.bold_title {
+    font-size: 20px; /* Size of the text */
+    font-weight: bold; /* Make the font bold */
+    color: #333; /* Dark grey color for text */
+}
+

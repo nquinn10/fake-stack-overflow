@@ -2,6 +2,13 @@ import { getMetaData } from "../../../../tool";
 import "./index.css";
 
 const Question = ({ q, clickTag, handleAnswer }) => {
+     
+    const truncateText = (text, maxLength = 98) => {
+        return text.length > maxLength ? text.substring(0, maxLength) + '    ... see more' : text;
+    };
+
+    const textPreview = truncateText(q.text);
+    
     return (
         <div
             className="question right_padding"
@@ -16,6 +23,7 @@ const Question = ({ q, clickTag, handleAnswer }) => {
             </div>
             <div className="question_mid">
                 <div className="postTitle">{q.title}</div>
+                <div className="postText">{textPreview}</div>
                 <div className="question_tags">
                     {q.tags.map((tag, idx) => {
                         return (
