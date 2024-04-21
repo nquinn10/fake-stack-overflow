@@ -11,6 +11,7 @@ import EditQuestionForm from "./editQuestionForm";
 import {deleteQuestion} from "../../../../services/questionService";
 import UserAnswer from "./answer";
 import EditAnswerForm from "./editAnswerForm";
+import {deleteAnswer} from "../../../../services/answerService";
 
 const ProfileBody = ({ activeTab, user }) => {
     const [content, setContent] = useState([]);
@@ -70,8 +71,13 @@ const ProfileBody = ({ activeTab, user }) => {
     };
 
     const handleDeleteAnswer = async (answerId) => {
-        // Set up logic to delete the answer
-        console.log("Delete Answer", answerId);
+        const result = await deleteAnswer(answerId);
+        if (!result.error) {
+            const updatedAnswers = await getUserAnsweredQuestions();
+            setContent(updatedAnswers);
+        } else {
+            console.error('Failed to delete the question:', result.error);
+        }
     };
 
     useEffect(() => {
