@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 // Component for the Question's Body
 const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
     const [voteCount, setVoteCount] = useState(initialVote);
-    const [activeVote, setActiveVote] = useState(null);
+    const [activeVote, setActiveVote] = useState('');
 
 
     // Update vote count when initialVote changes
@@ -22,7 +22,7 @@ const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
 
     const handleVote = async (voteType) => {
         const response = await castVote(qid, voteType, 'Question');
-        if (response.vote_count !== undefined) {
+        if (response && response.vote_count !== undefined) {
             setVoteCount(response.vote_count);
             setActiveVote(voteType);
         } else if (response.error) {
