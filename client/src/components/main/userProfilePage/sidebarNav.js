@@ -30,11 +30,18 @@ const SidebarNav = ({ onChangeTab, selected }) => {
                 Tags
             </div>
             <div
-                id="menu_vote"
-                className={`menu_button ${selected === 'votes' ? 'menu_selected' : ''}`}
+                id="menu_question_vote"
+                className={`menu_button ${selected === 'question_votes' ? 'menu_selected' : ''}`}
                 onClick={() => handleTabClick('votes')}
             >
-                Votes
+                Question Votes
+            </div>
+            <div
+                id="menu_answer_vote"
+                className={`menu_button ${selected === 'answer_votes' ? 'menu_selected' : ''}`}
+                onClick={() => handleTabClick('votes')}
+            >
+                Answer Votes
             </div>
         </div>
     );
