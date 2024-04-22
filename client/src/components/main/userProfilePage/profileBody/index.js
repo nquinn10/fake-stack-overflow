@@ -12,8 +12,9 @@ import {deleteQuestion} from "../../../../services/questionService";
 import UserAnswer from "./answer";
 import EditAnswerForm from "./editAnswerForm";
 import {deleteAnswer} from "../../../../services/answerService";
+import QuestionVotes from "./questionVotes";
 
-const ProfileBody = ({ activeTab, user }) => {
+const ProfileBody = ({ activeTab }) => {
     const [content, setContent] = useState([]);
     const [isEditingQuestion, setIsEditingQuestion] = useState(false);
     const [isEditingAnswer, setIsEditingAnswer] = useState(false);
@@ -77,29 +78,42 @@ const ProfileBody = ({ activeTab, user }) => {
         }
     };
 
+    const fetchVotes = async (voteType) => {
+        const data = await getUserQuestionVotes(`${voteType}`);
+        setContent(data);
+    };
+
+    const handleUpvoteClick = () => {
+        fetchVotes('upvote');
+    };
+
+    const handleDownvoteClick = () => {
+        fetchVotes('downvote');
+    };
+
     useEffect(() => {
         console.log("Fetching data for tab:", activeTab);
         const fetchData = async () => {
             let data = [];
             switch (activeTab) {
                 case 'questions': {
-                    data = await getUserQuestions(); // Scoped within the block
+                    data = await getUserQuestions();
                     break;
                 }
                 case 'answers': {
-                    data = await getUserAnsweredQuestions(); // Scoped within the block
+                    data = await getUserAnsweredQuestions();
                     break;
                 }
                 case 'tags': {
-                    data = await getUserTags(); // Scoped within the block
+                    data = await getUserTags();
                     break;
                 }
                 case 'question_votes': {
-                    data = await getUserQuestionVotes(user.id); // Scoped within the block
+                    data = await getUserQuestionVotes();
                     break;
                 }
                 case 'answer_votes': {
-                    data = await getUserAnswerVotes(user.id); // Scoped within the block
+                    data = await getUserAnswerVotes();
                     break;
                 }
                 default:
@@ -139,6 +153,7 @@ const ProfileBody = ({ activeTab, user }) => {
                     <ProfileHeader
                         titleText="My Questions"
                         itemCount={content.length}
+                        activeTab={"questions"}
                     />
                     <div className="question_list">
                         {content.map((question) => (
@@ -158,6 +173,7 @@ const ProfileBody = ({ activeTab, user }) => {
                     <ProfileHeader
                         titleText="My Answers"
                         itemCount={content.length}
+                        activeTab={"answers"}
                     />
                     {content && content.length > 0 ? (
                         <div className="answer_list">
@@ -173,6 +189,26 @@ const ProfileBody = ({ activeTab, user }) => {
                     ) : (
                          <div>No Answers Found</div>
                      )}
+                </>
+            )}
+            {activeTab === 'question_votes' && (
+                <>
+                    <ProfileHeader
+                        titleText="My Question Votes"
+                        itemCount={content.length}
+                        activeTab={"question_votes"}
+                        onUpvoteClick={handleUpvoteClick}
+                        onDownvoteClick={handleDownvoteClick}
+                    />
+                    <div className="question_list">
+                        {content.map((vote) => (
+                            <QuestionVotes
+                                key={vote._id}
+                                q={vote.referenceId}
+                            />
+                        ))}
+                        {!content.length && <div className="no-questions">No Questions Votes Found</div>}
+                    </div>
                 </>
             )}
         </div>
