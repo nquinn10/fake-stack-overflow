@@ -43,6 +43,13 @@ const SidebarNav = ({ onChangeTab, selected }) => {
             >
                 Answer Votes
             </div>
+            <div
+                id="menu_proile_edit"
+                className={`menu_button ${selected === 'edit_profile' ? 'menu_selected' : ''}`}
+                onClick={() => handleTabClick('edit_profile')}
+            >
+                Edit Profile
+            </div>
         </div>
     );
 };

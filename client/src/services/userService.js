@@ -43,5 +43,10 @@ const getUserAnswerVotes = async (voteType = "") => {
     return response.data;
 };
 
+const updateUserProfile = async (userData) => {
+    const response = await api.patch(`${USER_API_URL}/profile`, userData);
+    return response.data;
+};
 
-export { login, register, getUserProfileSummary, getUserQuestions, getUserAnsweredQuestions, getUserTags, getUserQuestionVotes, getUserAnswerVotes };
+
+export { login, register, getUserProfileSummary, getUserQuestions, getUserAnsweredQuestions, getUserTags, getUserQuestionVotes, getUserAnswerVotes, updateUserProfile };
