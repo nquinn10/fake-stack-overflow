@@ -32,7 +32,7 @@ const UserAnswer = ({ item, onEditAnswer, onDeleteAnswer }) => {
                 </div>
                 <div className="question_mid">
                     <div className="postTitle">Answer</div>  {/* Optionally style differently if needed */}
-                    <div className="postText">{answer.text}</div>
+                    <div id={"answer_postText"} className="postText">{answer.text}</div>
                 </div>
                 <div className="lastActivity">
                     <div className="question_controls">
