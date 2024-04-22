@@ -4,16 +4,18 @@ import ProfileBody from './profileBody';
 import SidebarNav from './sidebarNav';
 import './index.css';
 import {getUserProfileSummary} from "../../../services/userService";
+import EditProfileForm from "./editProfileForm";
 
-const UserProfilePage = ({ user }) => {
+const UserProfilePage = () => {
     const [activeTab, setActiveTab] = useState('questions');
     const [profileSummary, setProfileSummary] = useState({});
+    const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
         // Simulating fetching profile summary
         const fetchProfileSummary = async () => {
             // Implement the fetch logic here, or call userProfileSummary if this part of server-side code
-            const response = await getUserProfileSummary(); // Example endpoint
+            const response = await getUserProfileSummary();
             if (response) {
                 setProfileSummary(response);
             }
@@ -24,14 +26,37 @@ const UserProfilePage = ({ user }) => {
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
+        if (tab !== 'edit_profile') {
+            setEditMode(false);
+        } else {
+            setEditMode(true);
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        const response = await getUserProfileSummary();
+        console.log("Profile Summary:", response);
+        if (response) {
+            setProfileSummary(response);
+        }
+        setEditMode(false); // Exit edit mode after saving
+        setActiveTab('questions');
+    };
+
+    const handleCancel = () => {
+        setEditMode(false);
+        setActiveTab('questions');  // Or any other default tab you see fit
     };
 
     return (
         <div className="userProfilePage">
-            <Header profileSummary={profileSummary} />
+            <Header profileSummary={profileSummary}/>
             <div className="profileContent">
                 <SidebarNav onChangeTab={handleTabChange} selected={activeTab} />
-                <ProfileBody activeTab={activeTab} user={user} />
+                {editMode ?
+                 <EditProfileForm profile={profileSummary} onSave={handleSaveProfile} onCancel={handleCancel}  /> :
+                 <ProfileBody activeTab={activeTab} profileSummary={profileSummary} />
+                }
             </div>
         </div>
     );

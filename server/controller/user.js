@@ -117,7 +117,7 @@ const getUserQuestions = async (req, res) => {
             .populate('tags', 'name');
 
         if (!userQuestions.length) {
-            return res.status(404).send("No questions found.");
+            return res.status(200).json([]);
         }
 
         res.json(userQuestions);
@@ -147,7 +147,7 @@ const getUserAnsweredQuestions = async (req, res) => {
                       });
 
         if (!userAnswers.length) {
-            return res.status(404).send("No answered questions found.");
+            return res.status(200).json([]);
         }
 
         // Extract the necessary data into a new array to structure it neatly
@@ -184,20 +184,27 @@ const getUserTags = async (req, res) => {
                       })
 
         if (!userQuestions.length) {
-            return res.status(404).send("No questions or tags found.");
+            return res.status(200).json([]);
         }
 
-        // Extract unique tag names to avoid duplicates if the same tag is used in multiple questions
-        const tagSet = new Set();
+        // Create a map to store the count of questions for each tag
+        const tagMap = new Map();
+
         userQuestions.forEach(question => {
             question.tags.forEach(tag => {
-                tagSet.add(tag.name);
+                if (tagMap.has(tag.name)) {
+                    tagMap.set(tag.name, tagMap.get(tag.name) + 1);
+                } else {
+                    tagMap.set(tag.name, 1);
+                }
             });
         });
 
-        const uniqueTags = Array.from(tagSet);
+        // Convert the map to an array of objects where each object has 'name' and 'count'
+        const tagsWithCount = Array.from(tagMap, ([name, count]) => ({ name, count }));
 
-        res.json(uniqueTags);  // Send the unique tags back to the client
+        res.json(tagsWithCount);  // Send the tags with their counts back to the client
+
     } catch (error) {
         console.error(error);
         res.status(500).send("An error occurred while fetching the tags.");
@@ -239,7 +246,7 @@ const getUserQuestionVotes = async (req, res) => {
             .select('voteType createdAt referenceId');
 
         if (!votes.length) {
-            return res.status(404).send("No question votes found.");
+            return res.status(200).json([]);
         }
 
         res.json(votes);
@@ -279,7 +286,7 @@ const getUserAnswerVotes = async (req, res) => {
             .select('voteType createdAt referenceId');
 
         if (!votes.length) {
-            return res.status(404).send("No answer votes found.");
+            return res.status(200).json([]);
         }
 
         res.json(votes);

@@ -119,8 +119,18 @@ describe('PUT /editAnswer/:aid', () => {
 
         expect(response.status).toBe(200);
         expect(response.body.text).toBe('New Text');
-    }); 
+    });
 
+    it('should return 404 if answer ID is invalid', async () => {
+        const invalidId = 'invalid-id-format';
+
+        const response = await supertest(server)
+            .put(`/answer/editAnswer/${invalidId}`)
+            .send({ text: 'New text' });
+
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe('Answer not found');
+    });
 });
 
 // ******************************* Test Delete Answer ***********************************
