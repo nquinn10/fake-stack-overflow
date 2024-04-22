@@ -24,7 +24,14 @@ const Register = ({ onRegister }) => {
 
     const validateInputs = () => {
         let isValid = true;
-        let newErrors = {...errors};
+        let newErrors = {
+            email: '',
+            password: '',
+            firstName: '',
+            lastName: '',
+            displayName: '',
+            login: ''
+        };
         if (!email) {
             newErrors.email = 'Email cannot be empty';
             isValid = false;
@@ -45,7 +52,6 @@ const Register = ({ onRegister }) => {
             newErrors.displayName = 'Display name cannot be empty';
             isValid = false;
         }
-
         setErrors(newErrors);
         return isValid;
     };
@@ -126,13 +132,15 @@ const Register = ({ onRegister }) => {
                 hint="Tell us about yourself"
                 id="aboutMe"
                 val={aboutMe}
-                setState={setAboutMe} />
+                setState={setAboutMe}
+                mandatory={false}/>
             <Input
                 title="Location"
                 hint="Where are you from?"
                 id="location"
                 val={location}
-                setState={setLocation} />
+                setState={setLocation}
+                mandatory={false}/>
             {errors.login && <div className="input_error">{errors.login}</div>}
             <button id={"registerButton"} onClick={handleSubmit}>Register</button>
 
