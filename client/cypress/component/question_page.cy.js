@@ -59,7 +59,10 @@ it('Rendering Question Body', () => {
     let question = {
         _id: '1212',
         title: 'Sample Question Title',
-        text: 'Sample Question Text',
+        text: 'Sample Question Text greater than 98 characters. '
+              + 'Sample Question Text greater than 98 characters. '
+              + 'Sample Question Text greater than 98 characters.'
+              + 'Sample Question Text greater than 98 characters.',
         asked_by: {
             display_name: 'fakeUserName'
         },
@@ -69,8 +72,13 @@ it('Rendering Question Body', () => {
         tags: tags,
         vote_count: 10
     };
-    cy.log('Answers array:', JSON.stringify(answers));
-    cy.log('Question :', JSON.stringify(question));
+
+    // checking to make sure question text is truncated appropriately
+    const truncateText = (text, maxLength = 98) => {
+        return text.length > maxLength ? text.substring(0, maxLength) + '    ... see more' : text;
+    };
+
+    let textPreview = truncateText(question.text);
 
     const handleAnswerSpy = cy.spy().as('handleAnswerSpy')
     const clickTagSpy =  cy.spy().as('clickTagSpy')
@@ -87,7 +95,7 @@ it('Rendering Question Body', () => {
 
 
     cy.get('.postTitle').contains(question.title)
-    cy.get('.postText').contains(question.text)
+    cy.get('.postText').should('contain', '... see more').and('have.text', textPreview);
     cy.get('.postStats').contains(answers.length + ' answers')
     cy.get('.postStats').contains(question.views + ' views')
     cy.get('.postStats').contains(question.vote_count + ' votes')
