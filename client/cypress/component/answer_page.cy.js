@@ -1,6 +1,5 @@
 import AnswerHeader from "../../src/components/main/answerPage/header";
 import QuestionBody from "../../src/components/main/answerPage/questionBody";
-import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 
 // Answer Page - Header Tests
@@ -195,41 +194,37 @@ it('handles downvote interaction', () => {
 
 })
 
-// it('toast message when error response', () => {
-//     const questionBody = 'Sample Question Body'
-//     const views = '150'
-//     const askedBy = 'testUser'
-//     const date = new Date().toLocaleString()
-//     const initialVote = 10;
-//     const qid = '123';
-//
-//     // Mock the castVote API call
-//     const apiEndpoint = 'http://localhost:8000/vote/vote';
-//
-//     cy.intercept('POST', apiEndpoint, {
-//         statusCode: 403,  // Simulating an error response
-//         body: { error: "Insufficient reputation to cast a vote." }
-//     }).as('castVoteError');
-//
-//     cy.mount(
-//         <div>
-//             <toast />
-//             <QuestionBody
-//                 text={questionBody}
-//                 views={views}
-//                 askby={askedBy}
-//                 meta={date}
-//                 initialVote={initialVote}
-//                 qid={qid}
-//             />
-//         </div>
-//     );
-//
-//     // Simulate upvote
-//     cy.get('#upVoteQ').click();
-//     cy.wait('@castVoteError');
-//     cy.get('.Toastify__toast-body').contains('Insufficient reputation to cast a vote.').should('be.visible');
-// })
+it('toast message when error response', () => {
+    const questionBody = 'Sample Question Body'
+    const views = '150'
+    const askedBy = 'testUser'
+    const date = new Date().toLocaleString()
+    const initialVote = 10;
+    const qid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+    cy.spy(toast, 'error').as('toastError');
+
+    cy.intercept('POST', apiEndpoint, {
+        statusCode: 403,  // Simulating an error response
+        body: { error: "Insufficient reputation to cast a vote." }
+    }).as('castVoteError');
+
+    cy.mount(<QuestionBody
+        text={questionBody}
+        views={views}
+        askby={askedBy}
+        meta={date}
+        initialVote={initialVote}
+        qid={qid}
+    />)
+
+    // Simulate upvote
+    cy.get('#upVoteQ').click();
+    cy.wait('@castVoteError');
+    cy.get('@toastError').should('have.been.calledWith', "You do not have enough reputation points to vote.");
+})
 
 // Answer Page - Answer component
 // it('Component should have a answer text ,answered by and answered date', () => {
