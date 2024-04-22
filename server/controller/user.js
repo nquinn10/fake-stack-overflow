@@ -184,7 +184,7 @@ const getUserTags = async (req, res) => {
                       })
 
         if (!userQuestions.length) {
-            return res.status(404).send("No questions or tags found.");
+            return res.status(200).json([]);
         }
 
         // Extract unique tag names to avoid duplicates if the same tag is used in multiple questions
@@ -239,7 +239,7 @@ const getUserQuestionVotes = async (req, res) => {
             .select('voteType createdAt referenceId');
 
         if (!votes.length) {
-            return res.status(404).send("No question votes found.");
+            return res.status(200).json([]);
         }
 
         res.json(votes);
@@ -279,7 +279,7 @@ const getUserAnswerVotes = async (req, res) => {
             .select('voteType createdAt referenceId');
 
         if (!votes.length) {
-            return res.status(404).send("No answer votes found.");
+            return res.status(200).json([]);
         }
 
         res.json(votes);
