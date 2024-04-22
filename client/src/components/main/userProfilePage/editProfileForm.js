@@ -91,13 +91,15 @@ const EditProfileForm = ({profile, onSave, onCancel}) => {
                 hint="Tell us about yourself"
                 id="aboutMe"
                 val={aboutMe}
-                setState={setAboutMe} />
+                setState={setAboutMe}
+                mandatory={false}/>
             <Input
                 title="Location"
                 hint="Where are you from?"
                 id="location"
                 val={location}
-                setState={setLocation} />
+                setState={setLocation}
+                mandatory={false}/>
             {errors.login && <div className="input_error">{errors.login}</div>}
             <div className="btn_indicator_container">
                 <button

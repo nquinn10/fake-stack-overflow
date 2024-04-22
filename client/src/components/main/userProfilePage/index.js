@@ -16,7 +16,6 @@ const UserProfilePage = () => {
         const fetchProfileSummary = async () => {
             // Implement the fetch logic here, or call userProfileSummary if this part of server-side code
             const response = await getUserProfileSummary();
-            console.log("Profile Summary:", response);
             if (response) {
                 setProfileSummary(response);
             }
@@ -35,12 +34,18 @@ const UserProfilePage = () => {
     };
 
     const handleSaveProfile = async () => {
-        const response = await getUserProfileSummary(); // Example endpoint
+        const response = await getUserProfileSummary();
+        console.log("Profile Summary:", response);
         if (response) {
             setProfileSummary(response);
         }
         setEditMode(false); // Exit edit mode after saving
         setActiveTab('questions');
+    };
+
+    const handleCancel = () => {
+        setEditMode(false);
+        setActiveTab('questions');  // Or any other default tab you see fit
     };
 
     return (
@@ -49,7 +54,7 @@ const UserProfilePage = () => {
             <div className="profileContent">
                 <SidebarNav onChangeTab={handleTabChange} selected={activeTab} />
                 {editMode ?
-                 <EditProfileForm profile={profileSummary} onSave={handleSaveProfile} onCancel={() => setEditMode(false)} /> :
+                 <EditProfileForm profile={profileSummary} onSave={handleSaveProfile} onCancel={handleCancel}  /> :
                  <ProfileBody activeTab={activeTab} profileSummary={profileSummary} />
                 }
             </div>
