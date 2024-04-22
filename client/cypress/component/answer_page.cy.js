@@ -194,7 +194,7 @@ it('handles downvote interaction', () => {
 
 })
 
-it('toast message when error response', () => {
+it('toast message when 403 error', () => {
     const questionBody = 'Sample Question Body'
     const views = '150'
     const askedBy = 'testUser'
