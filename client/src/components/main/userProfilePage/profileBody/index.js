@@ -14,6 +14,7 @@ import EditAnswerForm from "./editAnswerForm";
 import {deleteAnswer} from "../../../../services/answerService";
 import QuestionVotes from "./questionVotes";
 import AnswerVotes from "./answerVotes";
+import Tag from "./tag";
 
 const ProfileBody = ({ activeTab }) => {
     const [content, setContent] = useState([]);
@@ -235,6 +236,21 @@ const ProfileBody = ({ activeTab }) => {
                         ))}
                         {!content.length && <div className="no-questions">No Answer Votes Found</div>}
                     </div>
+                </>
+            )}
+            {activeTab === 'tags' && (
+                <>
+                    <ProfileHeader
+                        titleText="My Tags"
+                        itemCount={content.length}
+                        activeTab={activeTab}
+                    />
+                    <div className="tag_list right_padding">
+                        {content.map((t, idx) => (
+                            <Tag key={idx} t={t} />
+                        ))}
+                    </div>
+                    {!content.length && <div>No Tags Found</div>}
                 </>
             )}
         </div>
