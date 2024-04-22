@@ -544,7 +544,11 @@ describe('GET /my-tags', () => {
 
         expect(Question.find).toHaveBeenCalledWith({ asked_by: 'validUserId' });
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(['JavaScript', 'Node.js', 'Python']);
+        expect(response.body).toEqual([
+                                          { name: 'JavaScript', count: 2 },  // JavaScript appears in both questions
+                                          { name: 'Node.js', count: 1 },
+                                          { name: 'Python', count: 1 }
+                                      ]);
     });
 
     it('should return empty array when no questions or tags are found', async () => {

@@ -205,17 +205,6 @@ const getUserTags = async (req, res) => {
 
         res.json(tagsWithCount);  // Send the tags with their counts back to the client
 
-        // // Extract unique tag names to avoid duplicates if the same tag is used in multiple questions
-        // const tagSet = new Set();
-        // userQuestions.forEach(question => {
-        //     question.tags.forEach(tag => {
-        //         tagSet.add(tag.name);
-        //     });
-        // });
-        //
-        // const uniqueTags = Array.from(tagSet);
-        //
-        // res.json(uniqueTags);  // Send the unique tags back to the client
     } catch (error) {
         console.error(error);
         res.status(500).send("An error occurred while fetching the tags.");
