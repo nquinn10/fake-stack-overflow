@@ -37,4 +37,20 @@ describe('User Login', () => {
         cy.contains("All Questions"); // navigate to home page after successful login 
     })
 
+    it("Shows error if email left empty", () => {
+        cy.visit('http://localhost:3000');
+        cy.contains('Login').click();
+        cy.get('#loginPasswordInput').type('ABCD876');
+        cy.get('#loginButton').click();
+        cy.contains('Email cannot be empty');
+    })
+
+    it("Shows error if password left empty", () => {
+        cy.visit('http://localhost:3000');
+        cy.contains('Login').click();
+        cy.get('#loginEmailInput').type('betty@yahoo.com');
+        cy.get('#loginButton').click();
+        cy.contains('Password cannot be empty');
+    })
+
 })

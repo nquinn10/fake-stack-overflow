@@ -119,7 +119,8 @@ const Register = ({ onRegister }) => {
                 hint="Choose a display name"
                 id="displayName"
                 val={displayName}
-                setState={setDisplayName} />
+                setState={setDisplayName}
+                err={errors.displayName} />
             <Textarea
                 title="About Me"
                 hint="Tell us about yourself"
@@ -133,7 +134,7 @@ const Register = ({ onRegister }) => {
                 val={location}
                 setState={setLocation} />
             {errors.login && <div className="input_error">{errors.login}</div>}
-            <button onClick={handleSubmit}>Register</button>
+            <button id={"registerButton"} onClick={handleSubmit}>Register</button>
 
         </Form>
     );
