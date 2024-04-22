@@ -3,7 +3,7 @@ import "./index.css";
 
 const QuestionVotes = ({ q }) => {
 
-    if (!q) {
+    if (!q || !q.tags) {
         console.error("Question data is invalid or incomplete:", q);
         return <div>Invalid question data</div>;
     }

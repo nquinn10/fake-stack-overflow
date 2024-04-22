@@ -13,6 +13,7 @@ import UserAnswer from "./answer";
 import EditAnswerForm from "./editAnswerForm";
 import {deleteAnswer} from "../../../../services/answerService";
 import QuestionVotes from "./questionVotes";
+import AnswerVotes from "./answerVotes";
 
 const ProfileBody = ({ activeTab }) => {
     const [content, setContent] = useState([]);
@@ -79,8 +80,13 @@ const ProfileBody = ({ activeTab }) => {
     };
 
     const fetchVotes = async (voteType) => {
-        const data = await getUserQuestionVotes(`${voteType}`);
-        setContent(data);
+        if (activeTab === 'question_votes') {
+            const data = await getUserQuestionVotes(`${voteType}`);
+            setContent(data);
+        } else if (activeTab === 'answer_votes') {
+            const data = await getUserAnswerVotes(`${voteType}`);
+            setContent(data);
+        }
     };
 
     const handleUpvoteClick = () => {
@@ -208,6 +214,26 @@ const ProfileBody = ({ activeTab }) => {
                             />
                         ))}
                         {!content.length && <div className="no-questions">No Questions Votes Found</div>}
+                    </div>
+                </>
+            )}
+            {activeTab === 'answer_votes' && (
+                <>
+                    <ProfileHeader
+                        titleText="My Answer Votes"
+                        itemCount={content.length}
+                        activeTab={"answer_votes"}
+                        onUpvoteClick={handleUpvoteClick}
+                        onDownvoteClick={handleDownvoteClick}
+                    />
+                    <div className="question_list">
+                        {content.map((vote) => (
+                            <AnswerVotes
+                                key={vote._id}
+                                a={vote.referenceId}
+                            />
+                        ))}
+                        {!content.length && <div className="no-questions">No Answer Votes Found</div>}
                     </div>
                 </>
             )}
