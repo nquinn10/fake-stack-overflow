@@ -119,7 +119,8 @@ const Register = ({ onRegister }) => {
                 hint="Choose a display name"
                 id="displayName"
                 val={displayName}
-                setState={setDisplayName} />
+                setState={setDisplayName}
+                err={errors.displayName}/>
             <Textarea
                 title="About Me"
                 hint="Tell us about yourself"
