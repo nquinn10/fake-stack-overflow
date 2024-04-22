@@ -32,14 +32,14 @@ const SidebarNav = ({ onChangeTab, selected }) => {
             <div
                 id="menu_question_vote"
                 className={`menu_button ${selected === 'question_votes' ? 'menu_selected' : ''}`}
-                onClick={() => handleTabClick('votes')}
+                onClick={() => handleTabClick('question_votes')}
             >
                 Question Votes
             </div>
             <div
                 id="menu_answer_vote"
                 className={`menu_button ${selected === 'answer_votes' ? 'menu_selected' : ''}`}
-                onClick={() => handleTabClick('votes')}
+                onClick={() => handleTabClick('answer_votes')}
             >
                 Answer Votes
             </div>
