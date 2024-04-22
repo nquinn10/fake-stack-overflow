@@ -5,7 +5,7 @@ import SidebarNav from './sidebarNav';
 import './index.css';
 import {getUserProfileSummary} from "../../../services/userService";
 
-const UserProfilePage = ({ user }) => {
+const UserProfilePage = () => {
     const [activeTab, setActiveTab] = useState('questions');
     const [profileSummary, setProfileSummary] = useState({});
 
@@ -31,7 +31,7 @@ const UserProfilePage = ({ user }) => {
             <Header profileSummary={profileSummary} />
             <div className="profileContent">
                 <SidebarNav onChangeTab={handleTabChange} selected={activeTab} />
-                <ProfileBody activeTab={activeTab} user={user} />
+                <ProfileBody activeTab={activeTab} />
             </div>
         </div>
     );

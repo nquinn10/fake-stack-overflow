@@ -121,7 +121,7 @@ const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, handlePo
         }
         case "profile": {
             selected = "p";  // Assuming 'p' indicates profile in your sidebar
-            content = <UserProfilePage user={user} />;
+            content = <UserProfilePage />;
             break;
         }
         default:
