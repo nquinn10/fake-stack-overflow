@@ -15,9 +15,6 @@ import {deleteAnswer} from "../../../../services/answerService";
 
 const ProfileBody = ({ activeTab, user }) => {
     const [content, setContent] = useState([]);
-    //const [editingQuestionId, setEditingQuestionId] = useState(null);
-    //const [isEditing, setIsEditing] = useState(false);
-    //const [questionToEdit, setQuestionToEdit] = useState(null);
     const [isEditingQuestion, setIsEditingQuestion] = useState(false);
     const [isEditingAnswer, setIsEditingAnswer] = useState(false);
     const [itemToEdit, setItemToEdit] = useState(null);
