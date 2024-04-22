@@ -34,9 +34,9 @@ const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
         <div id="questionBody" className="questionBody right_padding">
             <div className="questionStatsContainer">
                 <div className="voteContainerQuestion">
-                    <BiSolidUpArrow className={`bold_title voteIcon upvote ${activeVote === 'upvote' ? 'active' : ''}`} onClick={() => handleVote('upvote')} />
-                    <div className="bold_title answer_question_vote">{voteCount}</div>
-                    <BiSolidDownArrow className={`bold_title voteIcon downvote ${activeVote === 'downvote' ? 'active' : ''}`} onClick={() => handleVote('downvote')}/>
+                    <BiSolidUpArrow id={"upVoteQ"} className={`bold_title voteIcon upvote ${activeVote === 'upvote' ? 'active' : ''}`} onClick={() => handleVote('upvote')} />
+                    <div id={"vote_count"} className="bold_title answer_question_vote">{voteCount}</div>
+                    <BiSolidDownArrow id={"downVoteQ"} className={`bold_title voteIcon downvote ${activeVote === 'downvote' ? 'active' : ''}`} onClick={() => handleVote('downvote')}/>
                 </div>
                 <div className="bold_title answer_question_view">{views} views</div>
             </div>

@@ -6,3 +6,4 @@ describe('<fakeStackOverflow />', () => {
     cy.mount(<fakeStackOverflow />)
   })
 })
+
