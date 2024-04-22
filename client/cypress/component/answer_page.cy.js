@@ -2,6 +2,7 @@ import AnswerHeader from "../../src/components/main/answerPage/header";
 import QuestionBody from "../../src/components/main/answerPage/questionBody";
 import { toast } from 'react-toastify';
 import Answer from "../../src/components/main/answerPage/answer";
+import AnswerPage from "../../src/components/main/answerPage";
 
 // Answer Page - Header Tests
 it('Answer Header component shows question title, answer count and onclick function', () => {
@@ -462,59 +463,84 @@ it('toast message when 403 error', () => {
 
 
 
-// Anwer Page  - Main Component
-// it('Render a Answer Page Component and verify all details', () => {
-//     const handleNewQuestion = cy.spy().as('handleNewQuestionSpy')
-//     const handleNewAnswer = cy.spy().as('handleNewAnswerSpy')
-//     const answers = []
-//     for(let index= 1; index <= 2; index++){
-//         let newanswer = {
-//             aid: index,
-//             text: 'Sample Answer Text '+index,
-//             ansBy: 'sampleanswereduser'+index,
-//             ansDate: new Date(),
-//         };
-//         answers.push(new AnswerObj(newanswer))
-//     }
-//
-//     let question = {
-//         title: 'Sample Question Title',
-//         text: 'Sample Question Text',
-//         askedBy: 'vanshitatilwani',
-//         askDate: new Date(),
-//         views : 150,
-//         ansIds : answers.map(answer => answer.aid)
-//     };
-//
-//     cy.mount(<AnswerPage
-//         question={new Question(question)}
-//         ans={answers}
-//         handleNewQuestion={handleNewQuestion}
-//         handleNewAnswer={handleNewAnswer}
-//     />)
-//
-//     cy.get('.bold_title').contains(answers.length + " answers")
-//     cy.get('.answer_question_title').contains(question.title)
-//     cy.get('#answersHeader > .bluebtn').click()
-//     cy.get('@handleNewQuestionSpy').should('have.been.called');
-//
-//     cy.get('.answer_question_text > div').contains(question.text)
-//     cy.get('.answer_question_view').contains(question.views + ' views')
-//     cy.get('.answer_question_right > .question_author').contains(question.askedBy)
-//
-//     cy.get('.answerText')
-//         .eq(0)
-//         .find('div')
-//         .should('have.text', answers[0].text);
-//     cy.get('.answerAuthor > .answer_author').eq(0).should('have.text', answers[0].ansBy)
-//
-//     cy.get('.answerText')
-//         .eq(1)
-//         .find('div')
-//         .should('have.text', answers[1].text);
-//     cy.get('.answerAuthor > .answer_author').eq(0).should('have.text', answers[0].ansBy)
-//
-//     cy.get('.ansButton').click();
-//     cy.get('@handleNewAnswerSpy').should('have.been.called');
-//
-// })
+// Answer Page  - Main Component
+it('Render a Answer Page Component and verify all details', () => {
+    const handleNewQuestion = cy.spy().as('handleNewQuestionSpy')
+    const handleNewAnswer = cy.spy().as('handleNewAnswerSpy')
+    const qid = 'sampleQID123';
+    const answers = [
+        { aid: '1', text: 'Sample Answer Text 1', asked_by: {display_name: 'sampleanswereduser1'}, ans_date_time: new Date(), vote_count: 10 },
+        { aid: '2', text: 'Sample Answer Text 2', asked_by: {display_name: 'sampleanswereduser2'}, ans_date_time: new Date(), vote_count: 0 }
+    ];
+
+    let question = {
+        qid: 'sampleId',
+        title: 'Sample Question Title',
+        text: 'Sample Question Text',
+        asked_by: {
+            display_name: 'fakeUserName'
+        },
+        ask_date_time: new Date(),
+        views : 150,
+        answers : [
+            { aid: '1', text: 'Sample Answer Text 1', ans_by: {display_name: 'sampleanswereduser1'}, ans_date_time: new Date().toISOString(), vote_count: 10 },
+            { aid: '2', text: 'Sample Answer Text 2', ans_by: {display_name: 'sampleanswereduser2'}, ans_date_time: new Date().toISOString(), vote_count: 0 }
+        ],
+        vote_count: 10
+    };
+
+    const apiEndpoint = 'http://localhost:8000/question/getQuestionById';
+
+    cy.intercept('GET', `${apiEndpoint}/${qid}`, {
+        statusCode: 200,
+        body: {
+            _id: qid,
+            title: 'Sample Question Title',
+            text: 'Sample Question Text',
+            asked_by: {
+                display_name: 'fakeUserName'
+            },
+            ask_date_time: new Date().toISOString(),
+            views: 150,
+            answers: [
+                { aid: '1', text: 'Sample Answer Text 1', ans_by: {display_name: 'sampleanswereduser1'}, ans_date_time: new Date().toISOString(), vote_count: 10 },
+                { aid: '2', text: 'Sample Answer Text 2', ans_by: {display_name: 'sampleanswereduser2'}, ans_date_time: new Date().toISOString(), vote_count: 0 }
+            ],
+            vote_count: 10
+        }
+    }).as('fetchQuestion');
+
+    cy.mount(<AnswerPage
+        qid={qid}
+        handleNewQuestion={handleNewQuestion}
+        handleNewAnswer={handleNewAnswer}
+    />)
+
+    // Wait for the data fetch to complete
+    cy.wait('@fetchQuestion');
+
+    cy.get('.bold_title').contains(answers.length + " answers")
+    cy.get('.answer_question_title').contains(question.title)
+    cy.get('#answersHeader > .bluebtn').click()
+    cy.get('@handleNewQuestionSpy').should('have.been.called');
+
+    cy.get('.answer_question_text > div').contains(question.text)
+    cy.get('.answer_question_view').contains(question.views + ' views')
+    cy.get('.answer_question_right > .question_author').contains(question.asked_by.display_name)
+
+    cy.get('.answerText')
+        .eq(0)
+        .find('div')
+        .should('have.text', answers[0].text);
+    cy.get('.answerAuthor > .answer_author').eq(0).should('have.text', answers[0].asked_by.display_name)
+
+    cy.get('.answerText')
+        .eq(1)
+        .find('div')
+        .should('have.text', answers[1].text);
+    cy.get('.answerAuthor > .answer_author').eq(0).should('have.text', answers[0].asked_by.display_name)
+
+    cy.get('.ansButton').click();
+    cy.get('@handleNewAnswerSpy').should('have.been.called');
+
+})
