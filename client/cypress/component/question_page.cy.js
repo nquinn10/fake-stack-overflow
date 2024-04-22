@@ -87,6 +87,7 @@ it('Rendering Question Body', () => {
 
 
     cy.get('.postTitle').contains(question.title)
+    cy.get('.postText').contains(question.text)
     cy.get('.postStats').contains(answers.length + ' answers')
     cy.get('.postStats').contains(question.views + ' views')
     cy.get('.postStats').contains(question.vote_count + ' votes')
