@@ -5,14 +5,28 @@ import {editAnswer} from "../../../../services/answerService";
 
 const EditAnswerForm = ({ answer, onSave, onCancel }) => {
     const [text, setText] = useState(answer.text);
+    const [textError, setTextError] = useState('');
+
+    const validateInputs = () => {
+        let isValid = true;
+        setTextError('');
+
+        if (!text) {
+            setTextError('Answer text cannot be empty');
+            isValid = false;
+        }
+        return isValid;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            await editAnswer(answer._id, { text });
-            onSave();
-        } catch (error) {
-            console.error('Failed to save the question:', error);
+        if (validateInputs()) {
+            try {
+                await editAnswer(answer._id, { text });
+                onSave();
+            } catch (error) {
+                console.error('Failed to save the question:', error);
+            }
         }
     };
 
@@ -24,6 +38,7 @@ const EditAnswerForm = ({ answer, onSave, onCancel }) => {
                 id={"formTextInput"}
                 val={text}
                 setState={setText}
+                err={textError}
             />
             <div className="btn_indicator_container">
                 <button
