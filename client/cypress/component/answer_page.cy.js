@@ -226,6 +226,38 @@ it('toast message when 403 error', () => {
     cy.get('@toastError').should('have.been.calledWith', "You do not have enough reputation points to vote.");
 })
 
+it('toast message when 403 error', () => {
+    const questionBody = 'Sample Question Body'
+    const views = '150'
+    const askedBy = 'testUser'
+    const date = new Date().toLocaleString()
+    const initialVote = 10;
+    const qid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+    cy.spy(toast, 'error').as('toastError');
+
+    cy.intercept('POST', apiEndpoint, {
+        statusCode: 409,  // Simulating an error response
+        body: { error: "You have already cast this vote." }
+    }).as('castVoteError');
+
+    cy.mount(<QuestionBody
+        text={questionBody}
+        views={views}
+        askby={askedBy}
+        meta={date}
+        initialVote={initialVote}
+        qid={qid}
+    />)
+
+    // Simulate upvote
+    cy.get('#upVoteQ').click();
+    cy.wait('@castVoteError');
+    cy.get('@toastError').should('have.been.calledWith', "You have already cast this vote.");
+})
+
 // Answer Page - Answer component
 // it('Component should have a answer text ,answered by and answered date', () => {
 //     const answerText = 'Sample Answer Text'
