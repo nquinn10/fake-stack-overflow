@@ -1,6 +1,7 @@
 import AnswerHeader from "../../src/components/main/answerPage/header";
 import QuestionBody from "../../src/components/main/answerPage/questionBody";
 import { toast } from 'react-toastify';
+import Answer from "../../src/components/main/answerPage/answer";
 
 // Answer Page - Header Tests
 it('Answer Header component shows question title, answer count and onclick function', () => {
@@ -44,7 +45,7 @@ it('Component should have a question body which shows question text, views, aske
 
 })
 
-it('handles upvote and then downvote interactions', () => {
+it('handles upvote and then downvote interactions on question', () => {
     const questionBody = 'Sample Question Body'
     const views = '150'
     const askedBy = 'testUser'
@@ -58,16 +59,15 @@ it('handles upvote and then downvote interactions', () => {
     const apiEndpoint = 'http://localhost:8000/vote/vote';
 
     cy.intercept('POST', apiEndpoint, (req) => {
-        // Check what voteType is being requested and manipulate the response accordingly
         if (req.body.voteType === 'upvote') {
             req.reply({
                           statusCode: 201,
-                          body: { vote_count: currentVoteCount + 1 } // Ensure this matches the expected response structure
+                          body: { vote_count: currentVoteCount + 1 }
                       });
         } else if (req.body.voteType === 'downvote') {
             req.reply({
                           statusCode: 201,
-                          body: { vote_count: currentVoteCount - 2 } // Handle downvote case
+                          body: { vote_count: currentVoteCount - 2 }
                       });
         }
     }).as('castVote');
@@ -100,7 +100,7 @@ it('handles upvote and then downvote interactions', () => {
 
 })
 
-it('handles upvote interaction', () => {
+it('handles upvote interaction on question', () => {
     const questionBody = 'Sample Question Body'
     const views = '150'
     const askedBy = 'testUser'
@@ -147,7 +147,7 @@ it('handles upvote interaction', () => {
 
 })
 
-it('handles downvote interaction', () => {
+it('handles downvote interaction on question', () => {
     const questionBody = 'Sample Question Body'
     const views = '150'
     const askedBy = 'testUser'
@@ -259,22 +259,208 @@ it('toast message when 403 error', () => {
 })
 
 // Answer Page - Answer component
-// it('Component should have a answer text ,answered by and answered date', () => {
-//     const answerText = 'Sample Answer Text'
-//     const answeredBy = 'joydeepmitra'
-//     const date = new Date().toLocaleString()
-//     cy.mount(<Answer
-//         text={answerText}
-//         ansBy={answeredBy}
-//         meta={date}
-//     />)
-//
-//     cy.get('.answerText').contains(answerText)
-//     cy.get('.answerAuthor > .answer_author').contains(answeredBy)
-//     cy.get('.answerAuthor > .answer_question_meta').contains(date)
-//
-//
-// })
+it('Component should have a answer text ,answered by, answered date, and vote count', () => {
+    const answerText = 'Sample Answer Text'
+    const answeredBy = 'joydeepmitra'
+    const date = new Date().toLocaleString()
+    const initialVote = 5;
+    const aid = '123';
+    cy.mount(<Answer
+        text={answerText}
+        ansBy={answeredBy}
+        meta={date}
+        initialVote={initialVote}
+        aid={aid}
+    />)
+
+    cy.get('.answerText').contains(answerText)
+    cy.get('.answerAuthor > .answer_author').contains(answeredBy)
+    cy.get('.answerAuthor > .answer_question_meta').contains(date)
+    cy.get('#vote_countA').should('have.text', initialVote)
+
+})
+
+it('handles upvote and then downvote interactions on answer', () => {
+    const answerText = 'Sample Answer Text'
+    const answeredBy = 'joydeepmitra'
+    const date = new Date().toLocaleString()
+    const initialVote = 5;
+    const aid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+
+    cy.intercept('POST', apiEndpoint, (req) => {
+        if (req.body.voteType === 'upvote') {
+            req.reply({
+                          statusCode: 201,
+                          body: { vote_count: initialVote + 1 }
+                      });
+        } else if (req.body.voteType === 'downvote') {
+            req.reply({
+                          statusCode: 201,
+                          body: { vote_count: initialVote - 2 }
+                      });
+        }
+    }).as('castVote');
+
+    cy.mount(<Answer
+        text={answerText}
+        ansBy={answeredBy}
+        meta={date}
+        initialVote={initialVote}
+        aid={aid}
+    />)
+
+    cy.get('.answerText').contains(answerText)
+    cy.get('.answerAuthor > .answer_author').contains(answeredBy)
+    cy.get('.answerAuthor > .answer_question_meta').contains(date)
+    cy.get('#vote_countA').should('have.text', initialVote)
+
+    // Simulate upvote
+    cy.get('#upVoteA').click();
+    cy.get('#upVoteA').should('have.class', 'active');
+    cy.wait('@castVote')
+    cy.get('#vote_countA').should('have.text', (initialVote + 1).toString());
+    // Simulate downvote
+    cy.get('#downVoteA').click();
+    cy.get('#downVoteA').should('have.class', 'active');
+    cy.wait('@castVote');
+    cy.get('#vote_countA').should('have.text', (initialVote - 2).toString()); // since it changed from upvote to downvote
+
+})
+
+it('handles upvote interaction on answer', () => {
+    const answerText = 'Sample Answer Text'
+    const answeredBy = 'joydeepmitra'
+    const date = new Date().toLocaleString()
+    const initialVote = 5;
+    const aid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+
+    cy.intercept('POST', apiEndpoint, (req) => {
+        if (req.body.voteType === 'upvote') {
+            req.reply({
+                          statusCode: 201,
+                          body: { vote_count: initialVote + 1 }
+                      });
+        }
+    }).as('castVote');
+
+    cy.mount(<Answer
+        text={answerText}
+        ansBy={answeredBy}
+        meta={date}
+        initialVote={initialVote}
+        aid={aid}
+    />)
+
+    // Simulate upvote
+    cy.get('#upVoteA').click();
+    cy.get('#upVoteA').should('have.class', 'active');
+    cy.get('#downVoteA').should('not.have.class', 'active');
+    cy.wait('@castVote')
+    cy.get('#vote_countA').should('have.text', (initialVote + 1).toString());
+})
+
+it('handles downvote interaction on answer', () => {
+    const answerText = 'Sample Answer Text'
+    const answeredBy = 'joydeepmitra'
+    const date = new Date().toLocaleString()
+    const initialVote = 5;
+    const aid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+
+    cy.intercept('POST', apiEndpoint, (req) => {
+        if (req.body.voteType === 'downvote') {
+            req.reply({
+                          statusCode: 201,
+                          body: { vote_count: initialVote - 1 }
+                      });
+        }
+    }).as('castVote');
+
+    cy.mount(<Answer
+        text={answerText}
+        ansBy={answeredBy}
+        meta={date}
+        initialVote={initialVote}
+        aid={aid}
+    />)
+
+    // Simulate upvote
+    cy.get('#downVoteA').click();
+    cy.get('#downVoteA').should('have.class', 'active');
+    cy.get('#upVoteA').should('not.have.class', 'active');
+    cy.wait('@castVote')
+    cy.get('#vote_countA').should('have.text', (initialVote - 1).toString());
+})
+
+it('toast message when 403 error', () => {
+    const answerText = 'Sample Answer Text'
+    const answeredBy = 'joydeepmitra'
+    const date = new Date().toLocaleString()
+    const initialVote = 5;
+    const aid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+    cy.spy(toast, 'error').as('toastError');
+
+    cy.intercept('POST', apiEndpoint, {
+        statusCode: 403,  // Simulating an error response
+        body: { error: "Insufficient reputation to cast a vote." }
+    }).as('castVoteError');
+
+    cy.mount(<Answer
+        text={answerText}
+        ansBy={answeredBy}
+        meta={date}
+        initialVote={initialVote}
+        aid={aid}
+    />)
+
+    // Simulate upvote
+    cy.get('#downVoteA').click();
+    cy.wait('@castVoteError');
+    cy.get('@toastError').should('have.been.calledWith', "You do not have enough reputation points to vote.");
+})
+
+it('toast message when 403 error', () => {
+    const answerText = 'Sample Answer Text'
+    const answeredBy = 'joydeepmitra'
+    const date = new Date().toLocaleString()
+    const initialVote = 5;
+    const aid = '123';
+
+    // Mock the castVote API call
+    const apiEndpoint = 'http://localhost:8000/vote/vote';
+    cy.spy(toast, 'error').as('toastError');
+
+    cy.intercept('POST', apiEndpoint, {
+        statusCode: 409,  // Simulating an error response
+        body: { error: "You have already cast this vote." }
+    }).as('castVoteError');
+
+    cy.mount(<Answer
+        text={answerText}
+        ansBy={answeredBy}
+        meta={date}
+        initialVote={initialVote}
+        aid={aid}
+    />)
+
+    // Simulate upvote
+    cy.get('#downVoteA').click();
+    cy.wait('@castVoteError');
+    cy.get('@toastError').should('have.been.calledWith', "You have already cast this vote.");
+})
+
+
 
 // Anwer Page  - Main Component
 // it('Render a Answer Page Component and verify all details', () => {
