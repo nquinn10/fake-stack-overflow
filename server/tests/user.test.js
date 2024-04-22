@@ -194,7 +194,7 @@ describe('POST /user/login', () => {
 
         // Asserting the response
         expect(response.status).toBe(401);
-        expect(response.text).toBe('Invalid credentials');
+        expect(response.text).toBe('Invalid password. Please try again.');
     });
 
     // negative test case - user email not found
@@ -215,7 +215,7 @@ describe('POST /user/login', () => {
 
         // Asserting the response
         expect(response.status).toBe(404);
-        expect(response.text).toBe('User not found');
+        expect(response.text).toBe('User not found. Please register.');
     });
 });
 
