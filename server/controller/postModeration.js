@@ -1,9 +1,7 @@
 const express = require("express");
-const mongoose = require("mongoose");
 
 const Question = require('../models/questions');
 const Answer = require('../models/answers');
-const Vote = require('../models/votes');
 
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 const { adminRequired } = require("../utils/adminMiddleware");

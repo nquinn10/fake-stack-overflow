@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 const bcrypt = require('bcryptjs'); // password hashing algorithm
 

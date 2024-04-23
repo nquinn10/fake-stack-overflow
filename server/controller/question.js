@@ -1,7 +1,6 @@
 const express = require("express");
 const Question = require("../models/questions");
 const Answer = require("../models/answers");
-const User = require("../models/users");
 const { addTag, getQuestionsByOrder, filterQuestionsBySearch } = require('../utils/question');
 const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
 

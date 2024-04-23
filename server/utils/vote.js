@@ -1,7 +1,7 @@
 // all vote utility functions: update vote_count and trigger flag accordingly, as well as increment author's reputation score
 const User = require('../models/users');
 
-const updateVoteCountAndFlag = async (Model, referenceId, voteChange, onModel) => {
+const updateVoteCountAndFlag = async (Model, referenceId, voteChange) => {
     const updateItem = await Model.findByIdAndUpdate(referenceId, { $inc: { vote_count: voteChange } }, { new: true });
 
     if (updateItem.vote_count <= -15) {

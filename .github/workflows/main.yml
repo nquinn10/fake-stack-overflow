@@ -1,4 +1,4 @@
-# Test workflow
+# Final Workflow
 on:
   pull_request:
     branches:
@@ -39,9 +39,6 @@ jobs:
         run: npm start &
         working-directory: client/
 
-      # - name: Install Cypress
-      #   run: npm install cypress --save-dev
-
       - name: Run component tests
         run: npx cypress run --component
         working-directory: client/
@@ -50,38 +47,11 @@ jobs:
         run: npx cypress run cypress/e2e/
         working-directory: client/
 
-      # - name: Run Cypress Component tests
-      #   uses: cypress-io/github-action@v5
-      #   with:
-      #     component: true
-      #     project: ./client
-      #     start: npm run start --prefix client, npm run start --prefix server
-      #     wait-on: 'http://localhost:3000,http://localhost:8000'
-      #     browser: chrome
-          
-      
-      # - name: Run Cypress end-to-end tests
-      #   uses: cypress-io/github-action@v5
-      #   with: 
-      #     project: ./client
-      #     start: npm run start --prefix client, npm run start --prefix server
-      #     wait-on: 'http://localhost:3000,http://localhost:8000'
-      #     browser: chrome
-
       - name: Kill the node server process
         run: kill $(lsof -t -i:8000) || true
   
       - name: Stop the client process
         run: kill $(lsof -t -i:3000) || true
-
-      # - name: Run Cypress tests
-      #   uses: cypress-io/github-action@v5
-      #   with:
-      #     project: ./client
-      #     start: npm run start --prefix client, npm run start --prefix server
-      #     wait-on: 'http://localhost:3000,http://localhost:8000'
-      #     browser: chrome
-      #     timeout: 400
 
   jest_tests:
     runs-on: [self-hosted, macOS, X64]
