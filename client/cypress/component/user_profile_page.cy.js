@@ -7,6 +7,7 @@ import QuestionVotes from "../../src/components/main/userProfilePage/profileBody
 import AnswerVotes from "../../src/components/main/userProfilePage/profileBody/answerVotes";
 import EditQuestionForm
     from "../../src/components/main/userProfilePage/profileBody/editQuestionForm";
+import EditAnswerForm from "../../src/components/main/userProfilePage/profileBody/editAnswerForm";
 
 // User Profile - Header Component
 describe('User Profile Page Header Component', () => {
@@ -295,5 +296,55 @@ describe('User Profile Body - Edit Question Component', () => {
         cy.get('@onCancelSpy').should('have.been.calledOnce');
     });
 });
+
+// User Profile Body - Edit Answer Component
+
+describe('EditAnswerForm Component', () => {
+    const answer = {
+        _id: '456',
+        text: "Original answer text."
+    };
+
+    beforeEach(() => {
+        // Mount the component before each test
+        cy.mount(<EditAnswerForm answer={answer} onSave={cy.spy()} onCancel={cy.spy()} />);
+    });
+
+    it('initializes form with existing answer data', () => {
+        cy.get('#formTextInput').should('have.value', answer.text);
+    });
+
+    it('validates form input and displays error message', () => {
+        cy.get('#formTextInput').clear();
+        cy.get('.form_postBtn').contains('Save').click();
+        cy.get('.input_error').should('contain', 'Answer text cannot be empty');
+    });
+
+    it('submits updated answer and calls onSave callback', () => {
+        const onSave = cy.spy().as('onSaveSpy');
+        cy.mount(<EditAnswerForm answer={answer} onSave={onSave} onCancel={cy.spy()} />);
+        // Mock API call for editing an answer
+        cy.intercept('PUT', `**/editAnswer/${answer._id}`, {
+            statusCode: 200,
+            body: { message: "Answer updated successfully" }
+        }).as('editAnswer');
+
+        const updatedText = "Updated answer text.";
+        cy.get('#formTextInput').clear().type(updatedText);
+        cy.get('.form_postBtn').contains('Save').click();
+        cy.wait('@editAnswer').its('request.body').should('deep.include', {
+            text: updatedText
+        });
+        cy.get('@onSaveSpy').should('have.been.calledOnce');
+    });
+
+    it('calls onCancel when cancel button is clicked', () => {
+        const onCancel = cy.spy().as('onCancelSpy');
+        cy.mount(<EditAnswerForm answer={answer} onSave={cy.spy()} onCancel={onCancel} />);
+        cy.get('.form_postBtn').contains('Cancel').click();
+        cy.get('@onCancelSpy').should('have.been.calledOnce');
+    });
+});
+
 
 
