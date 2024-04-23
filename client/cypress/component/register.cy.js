@@ -36,7 +36,6 @@ it('validates inputs are required', () => {
 });
 
 it('shows custom error message on form submission failure', () => {
-    // Assuming you'd mock a failure response for the registration API call
     cy.intercept('POST', 'http://localhost:8000/user/register', {
         statusCode: 400,
         body: { message: 'User already exists. Please log in.' }
@@ -53,7 +52,6 @@ it('shows custom error message on form submission failure', () => {
 });
 
 it('triggers onRegister callback when registration is successful', () => {
-    // Assuming a success response for the registration
     cy.intercept('POST', 'http://localhost:8000/user/register', {
         statusCode: 200,
         body: { message: 'User registered successfully', display_name: 'JohnDoe' }
