@@ -8,6 +8,7 @@ import AnswerVotes from "../../src/components/main/userProfilePage/profileBody/a
 import EditQuestionForm
     from "../../src/components/main/userProfilePage/profileBody/editQuestionForm";
 import EditAnswerForm from "../../src/components/main/userProfilePage/profileBody/editAnswerForm";
+import ProfileBody from "../../src/components/main/userProfilePage/profileBody";
 
 // User Profile - Header Component
 describe('User Profile Page Header Component', () => {
@@ -345,6 +346,133 @@ describe('EditAnswerForm Component', () => {
         cy.get('@onCancelSpy').should('have.been.calledOnce');
     });
 });
+
+// User Profile Body
+
+describe('ProfileBody Component', () => {
+    const tabs = ['questions', 'answers', 'tags', 'question_votes', 'answer_votes'];
+    const mockData = {
+        questions: [{ _id: '1', title: 'What is React?', text: 'A JavaScript library for building user interfaces', tags: [] }],
+        answers: [{ _id: '2', text: 'Answer to What is React?' }],
+        tags: [{ name: 'react', count: 10 }],
+        question_votes: [
+            {
+                _id: "662738644824a8733c0efb70",
+                referenceId: {
+                    _id: "662738644824a8733c0efb50",
+                    title: "Programmatically navigate using React router",
+                    text: "the alert shows the proper index for the li clicked...",
+                    asked_by: {
+                        _id: "662738634824a8733c0efb38",
+                        display_name: "betty_j"
+                    },
+                    ask_date_time: "2022-01-20T08:00:00.000Z",
+                    views: 10,
+                    tags: [
+                        { _id: "662738644824a8733c0efb42", name: "react" },
+                        { _id: "662738644824a8733c0efb44", name: "javascript" }
+                    ],
+                    vote_count: 1
+                },
+                voteType: "upvote",
+                createdAt: "2024-04-23T04:26:12.163Z"
+            }
+        ],
+        answer_votes: [
+            {
+                _id: "662738644824a8733c0efb74",
+                referenceId: {
+                    _id: "662738644824a8733c0efb5a",
+                    text: "React Router is mostly a wrapper around the history library. history handles interaction with the browser's window.history for you with its browser and hash histories. It also provides a memory history which is useful for environments that don't have a global history. This is particularly useful in mobile app development (react-native) and unit testing with Node.",
+                    ans_by: {
+                        _id: "662738634824a8733c0efb38",
+                        display_name: "betty_j"
+                    },
+                    ans_date_time: "2023-11-20T08:24:42.000Z",
+                    vote_count: 1
+                },
+                voteType: "upvote",
+                createdAt: "2024-04-23T04:26:12.164Z"
+            }
+        ]
+    };
+    // mocking for my-questions
+    const question = {
+        _id: '1',
+        title: "What is React?",
+        text: "I'm learning about React. Can someone explain what it is?",
+        answers: [{ text: "Answer 1" }, { text: "Answer 2" }],
+        views: 150,
+        vote_count: 10,
+        tags: [{ name: "javascript" }, { name: "react" }],
+        ask_date_time: '2020-01-01T12:00:00Z'
+    };
+    // mocking for my-answers
+    const answer = {
+        _id: 'a1',
+        text: "Dependency Injection is a design pattern where an object receives other objects it depends on.",
+        vote_count: 15
+    };
+
+    const item = {
+        question: question,
+        answer: answer
+    };
+
+
+    beforeEach(() => {
+        cy.intercept('GET', '**/my-questions', { statusCode: 200, body: [question] }).as('getUserQuestions');
+        cy.intercept('GET', '**/my-answers', { statusCode: 200, body: [item] }).as('getUserAnswers');
+        cy.intercept('GET', '**/my-tags', { statusCode: 200, body: [mockData.tags] }).as('getUserTags');
+        // Dynamic intercept for votes based on query parameter
+        cy.intercept('GET', '**/my-question-votes*', (req) => {
+            let filteredVotes = mockData.question_votes;
+            req.reply({
+                          statusCode: 200,
+                          body: filteredVotes
+                      });
+        }).as('getUserQuestion_votes');
+        cy.intercept('GET', '**/my-answer-votes*', (req) => {
+            let filteredVotes = mockData.answer_votes;
+            req.reply({
+                          statusCode: 200,
+                          body: filteredVotes
+                      });
+        }).as('getUserAnswer_votes');
+    });
+
+    tabs.forEach(tab => {
+        it(`renders content for the ${tab} tab correctly`, () => {
+            cy.mount(<ProfileBody activeTab={tab} />);
+            cy.wait(`@getUser${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+            cy.get('.profileBody').should('be.visible');
+        });
+    });
+
+    // it('handles edit and delete operations for questions', () => {
+    //     cy.mount(<ProfileBody activeTab="questions" />);
+    //     cy.wait('@getUserQuestions');
+    //     // Simulate clicking an edit button
+    //     cy.get('button').contains('Edit').click();
+    //     // Assuming there's a way to identify the edit form
+    //     cy.get('form').should('be.visible');
+    //     // Test delete functionality
+    //     cy.intercept('DELETE', '**/deleteQuestion/**', { statusCode: 204 }).as('deleteQuestion');
+    //     cy.get('button').contains('Delete').click();
+    //     cy.wait('@deleteQuestion');
+    //     cy.get('.no-questions').should('contain', 'No Questions Found');
+    // });
+    //
+    // it('cancels editing an answer correctly', () => {
+    //     cy.mount(<ProfileBody activeTab="answers" />);
+    //     cy.wait('@getUserAnsweredQuestions');
+    //     cy.get('button').contains('Edit').click();
+    //     cy.get('button').contains('Cancel').click();
+    //     cy.get('.answer_list').should('be.visible');
+    // });
+});
+
+
 
 
 
