@@ -13,7 +13,6 @@ const UserAnswer = ({ item, onEditAnswer, onDeleteAnswer }) => {
 
     return (
         <div className="user-answer-container">
-            {/* Question Section */}
             <div className="question right_padding">
                 <div className="postStats">
                     <div>{question.views} views</div>
@@ -25,19 +24,17 @@ const UserAnswer = ({ item, onEditAnswer, onDeleteAnswer }) => {
                 </div>
             </div>
 
-            {/* Answer Section */}
-            <div className="answer right_padding">  {/* Use similar class for consistency */}
+            <div className="answer right_padding">  
                 <div className="postStats">
-                    {/* Optionally add answer specific stats if available */}
                 </div>
                 <div className="question_mid">
-                    <div className="postTitle">Answer</div>  {/* Optionally style differently if needed */}
-                    <div className="postText">{answer.text}</div>
+                    <div className="postTitle">Answer</div> 
+                    <div id={"answer_postText"} className="postText">{answer.text}</div>
                 </div>
                 <div className="lastActivity">
                     <div className="question_controls">
-                        <button onClick={() => onEditAnswer(answer)}>Edit</button>
-                        <button onClick={() => onDeleteAnswer(answer._id)}>Delete</button>
+                        <button id={"answerEditBtn"} onClick={() => onEditAnswer(answer)}>Edit</button>
+                        <button id={"answerDeleteBtn"} onClick={() => onDeleteAnswer(answer._id)}>Delete</button>
                     </div>
                 </div>
             </div>

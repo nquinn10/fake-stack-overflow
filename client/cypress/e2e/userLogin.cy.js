@@ -53,4 +53,17 @@ describe('User Login', () => {
         cy.contains('Password cannot be empty');
     })
 
+    it('Successfully logs user out', () => {
+        cy.visit('http://localhost:3000');
+        cy.contains('Login').click();
+        cy.get('#loginEmailInput').type('betty@yahoo.com');
+        cy.get('#loginPasswordInput').type('ABCD876');
+        cy.get('#loginButton').click();
+        cy.contains("All Questions"); // successfully logs user in
+        cy.get("#logoutButton").click(); // click log out button
+        cy.contains("All Questions"); // stays on home page
+        cy.contains("Ask a Question").click(); // won't let user ask question after they log out, should prompt them to sign back in
+        cy.contains("Email*"); // log in form prompt means they were successfully logged out
+    })
+
 })

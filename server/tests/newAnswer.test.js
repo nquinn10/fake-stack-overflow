@@ -92,4 +92,15 @@ describe("POST /addAnswer", () => {
             { new: true }
         );
     });
+
+    it('should return error not found if question does not exist', async () => {
+        Question.findById.mockResolvedValue(null);
+
+        const response = await supertest(server)
+            .post('/answer/addAnswer')
+            .send({ qid: 'nonexistant', ans: { text: "Answer text" }});
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Internal server error");
+    })
 });

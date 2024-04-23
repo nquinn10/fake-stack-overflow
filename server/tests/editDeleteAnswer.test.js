@@ -131,6 +131,19 @@ describe('PUT /editAnswer/:aid', () => {
         expect(response.status).toBe(404);
         expect(response.body.error).toBe('Answer not found');
     });
+
+    it('should handle runtime errors while updating answer', async () => {
+        const mockAnswer = { _id: 'aid', ans_by: 'validUserId' };
+        Answer.findById.mockResolvedValue(mockAnswer);
+        
+        Answer.findByIdAndUpdate.mockRejectedValue(new Error("Database failure"));
+
+        const response = await supertest(server)
+            .put('/answer/editAnswer/aid')
+            .send({ text: 'Updated text' });
+
+        expect(response.status).toBe(500);
+    })
 });
 
 // ******************************* Test Delete Answer ***********************************
@@ -199,4 +212,16 @@ describe('DELETE /deleteAnswer/:aid', () => {
             { $pull: { answers: '661dc096d916cd1c9d51655a' } }  // Command to pull the answer from the question
         );
     });
+
+    it('should handle runtime errors while deleting answer', async () => {
+        const mockAnswer = { _id: 'aid', ans_by: 'validUserId' };
+        Answer.findById.mockResolvedValue(mockAnswer);
+        
+        Answer.findByIdAndDelete.mockRejectedValue(new Error("Database failure"));
+
+        const response = await supertest(server)
+            .delete('/answer/deleteAnswer/aid');
+
+        expect(response.status).toBe(500);
+    })
 });
