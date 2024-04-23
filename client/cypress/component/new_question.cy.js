@@ -1,5 +1,4 @@
 import NewQuestion from "../../src/components/main/newQuestion";
-import {addQuestion} from "../../src/services/questionService";
 
 // New Question Component
 it('mounts', () => {
