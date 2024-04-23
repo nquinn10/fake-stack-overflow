@@ -12,7 +12,6 @@ import PostModerationPage from "./postMod";
 import UserProfilePage from "./userProfilePage";
 
 const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, handlePostMod, page, setPage }) => {
-    //const [page, setPage] = useState("home");
     const [questionOrder, setQuestionOrder] = useState("newest");
     const [qid, setQid] = useState("");
     let selected = "";
