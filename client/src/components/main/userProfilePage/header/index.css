@@ -10,38 +10,38 @@
 }
 
 .profileDisplayName {
-    flex-basis: 25%; /* Adjust based on your layout preference */
+    flex-basis: 25%;
     font-weight: bold;
     font-size: 24px;
     color: #333;
-    padding-right: 20px; /* Ensures space between this and the next column */
+    padding-right: 20px;
 }
 
 .profileDetails {
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Takes the remaining space */
-    align-items: flex-start; /* Aligns items to the start */
+    flex-grow: 1;
+    align-items: flex-start;
 }
 
 .profileRow {
     display: flex;
-    justify-content: flex-start; /* Aligns content at the start of the flexbox */
+    justify-content: flex-start;
     width: 100%;
 }
 
 .profileItem {
-    margin-right: 20px; /* Spacing between items */
-    margin-bottom: 10px; /* Spacing between rows */
-    flex: 1; /* Allows each item to grow evenly */
-    min-width: 0; /* Helps with overflow issues */
-    white-space: nowrap; /* Prevents wrapping */
+    margin-right: 20px;
+    margin-bottom: 10px;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Adds an ellipsis if the text is too long */
+    text-overflow: ellipsis;
 }
 
 .profileItemFull {
-    width: 100%; /* Full width for the 'About me' section */
-    margin-bottom: 10px; /* Spacing from the last row */
-    white-space: normal; /* Allows wrapping */
+    width: 100%;
+    margin-bottom: 10px;
+    white-space: normal;
 }

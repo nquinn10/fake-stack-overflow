@@ -55,7 +55,7 @@ const EditProfileForm = ({profile, onSave, onCancel}) => {
                 await updateUserProfile(userData);
                 onSave();
             } catch (error) {
-                let errorMessage = "An unexpected error occurred";  // Default error message
+                let errorMessage = "An unexpected error occurred";
                 setErrors(prevErrors => ({ ...prevErrors, save: errorMessage }));
             }
         }

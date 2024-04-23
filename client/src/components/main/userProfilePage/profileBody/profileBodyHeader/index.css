@@ -3,8 +3,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #f4f4f4; /* Light gray background */
-    border-bottom: 1px solid #ddd; /* Add a subtle border */
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #ddd;
 }
 
 .profileTitle {

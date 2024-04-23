@@ -19,7 +19,6 @@ it('Rendering Order Button', () => {
 it('Rendering Question Header', () => {
     const title = 'Sample Title'
     const count = 1
-    // const newQuestionButton = 'Add a new question'
     const handleNewQuestionSpy = cy.spy().as('handleNewQuestionSpy')
     const setQuestionOrderSpy = cy.spy().as('setQuestionOrderSpy')
 
@@ -32,9 +31,6 @@ it('Rendering Question Header', () => {
     cy.get('.bold_title').contains(title)
     cy.get('.bluebtn').click()
     cy.get('@handleNewQuestionSpy').should('have.been.called');
-    // cy.get('@consoleLogSpy').then(consoleLogSpy => {
-    //   expect(consoleLogSpy).to.have.been.calledWith(newQuestionButton);
-    // });
     cy.get('#question_count').contains(count + ' questions')
     cy.get('.btns .btn').eq(0).should('have.text', 'Newest');
     cy.get('.btns .btn').eq(1).should('have.text', 'Active');

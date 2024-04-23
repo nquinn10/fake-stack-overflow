@@ -119,7 +119,7 @@ it('handles upvote interaction on question', () => {
         if (req.body.voteType === 'upvote') {
             req.reply({
                           statusCode: 201,
-                          body: { vote_count: currentVoteCount + 1 } // Ensure this matches the expected response structure
+                          body: { vote_count: currentVoteCount + 1 }
                       });
         }
     }).as('castVote');
@@ -166,7 +166,7 @@ it('handles downvote interaction on question', () => {
         if (req.body.voteType === 'downvote') {
             req.reply({
                           statusCode: 201,
-                          body: { vote_count: currentVoteCount - 1 } // Ensure this matches the expected response structure
+                          body: { vote_count: currentVoteCount - 1 }
                       });
         }
     }).as('castVote');

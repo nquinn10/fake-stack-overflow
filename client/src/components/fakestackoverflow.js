@@ -57,7 +57,7 @@ export default function FakeStackOverflow() {
                     setQuesitonPage={setQuesitonPage}
                     user={user}
                     logout={handleLogout}
-                    showLogin={handleShowLogin} // Pass functions to handle login and register
+                    showLogin={handleShowLogin}
                     showRegister={handleShowRegister}
                     showPostMod={handleShowPostMod}
                     showProfile={handleShowProfile}/>

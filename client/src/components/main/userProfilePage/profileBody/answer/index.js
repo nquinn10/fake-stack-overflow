@@ -1,7 +1,5 @@
 import React from 'react';
 import "./index.css";
-//import {getMetaData} from "../../../../../tool";
-// const UserAnswer = ({ item, onEditAnswer, onDeleteAnswer }) => {
 const UserAnswer = ({ item, onEditAnswer, onDeleteAnswer }) => {
 
     const { question, answer } = item;

@@ -165,7 +165,7 @@ const ProfileBody = ({ activeTab }) => {
                     <div className="question_list">
                         {content.map((question) => (
                             <Question
-                                key={question._id}  // Use the question ID for a unique key
+                                key={question._id}
                                 q={question}
                                 onEdit={handleEditClick}
                                 onDelete={handleDelete}

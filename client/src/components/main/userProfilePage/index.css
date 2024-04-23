@@ -34,10 +34,10 @@
 
 .profileContent {
     display: flex;
-    flex-direction: row; /* Assuming a row-based flex layout */
+    flex-direction: row;
     width: 100%;
 }
 
 .profileBody {
-    flex-grow: 1; /* Takes up the remaining space */
+    flex-grow: 1;
 }

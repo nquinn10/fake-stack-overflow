@@ -12,9 +12,7 @@ const UserProfilePage = () => {
     const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
-        // Simulating fetching profile summary
         const fetchProfileSummary = async () => {
-            // Implement the fetch logic here, or call userProfileSummary if this part of server-side code
             const response = await getUserProfileSummary();
             if (response) {
                 setProfileSummary(response);
@@ -45,7 +43,7 @@ const UserProfilePage = () => {
 
     const handleCancel = () => {
         setEditMode(false);
-        setActiveTab('questions');  // Or any other default tab you see fit
+        setActiveTab('questions');
     };
 
     return (
