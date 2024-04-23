@@ -10,6 +10,7 @@ import EditQuestionForm
 import EditAnswerForm from "../../src/components/main/userProfilePage/profileBody/editAnswerForm";
 import ProfileBody from "../../src/components/main/userProfilePage/profileBody";
 import EditProfileForm from "../../src/components/main/userProfilePage/editProfileForm";
+import UserProfilePage from "../../src/components/main/userProfilePage";
 
 // User Profile - Header Component
 describe('User Profile Page Header Component', () => {
@@ -534,7 +535,10 @@ describe('User Profile Body', () => {
 
 });
 
-describe('EditProfileForm Component', () => {
+
+// User Profile - Edit Profile Component
+
+describe('User Profile - Edit Profile Component', () => {
     const profile = {
         first_name: 'John',
         last_name: 'Doe',
@@ -603,6 +607,73 @@ describe('EditProfileForm Component', () => {
         cy.get('@onCancelSpy').should('have.been.calledOnce');
     });
 });
+
+
+// User Profile Component - Outermost Component
+describe('User Profile Component - Outermost Component ', () => {
+    beforeEach(() => {
+        // Mock the API call for fetching profile summary
+        cy.intercept('GET', '**/profile', {
+            statusCode: 200,
+            body: { first_name: 'John',
+                    last_name: 'Doe',
+                    email: 'john@email.com',
+                    display_name: 'JD',
+                    about_me: 'I am John',
+                    location: 'Miami',
+                    reputation: '85'}
+        }).as('getProfileSummary');
+
+        // Mount the component
+        cy.mount(<UserProfilePage />);
+    });
+
+    it('fetches and displays user profile summary on load', () => {
+        cy.wait('@getProfileSummary');
+        cy.get('.profileHeader').should('contain', 'John');
+    });
+
+    it('switches to edit mode when the edit profile tab is selected', () => {
+        cy.get('.sideBarNav').contains('Edit Profile').click();
+        cy.get('.form').should('exist');
+    });
+
+    it('saves and exits edit mode when save is clicked', () => {
+        // Assume that the profile summary is updated and needs to be fetched again
+        cy.intercept('PATCH', '**/profile', {
+            statusCode: 200,
+            body: { first_name: 'John',
+                last_name: 'Doe',
+                email: 'john@email.com',
+                display_name: 'JD',
+                about_me: 'Edited profile',
+                location: 'Miami',
+                reputation: '85' }
+        }).as('updateProfileSummary');
+
+        cy.intercept('GET', '**/profile', {
+            statusCode: 200,
+            body: { first_name: 'John',
+                last_name: 'Doe',
+                email: 'john@email.com',
+                display_name: 'JD',
+                about_me: 'Edited profile',
+                location: 'Miami',
+                reputation: '85' }
+        }).as('updatedProfileSummary');
+
+        cy.get('.sideBarNav').contains('Edit Profile').click();
+        cy.get('.form button').contains('Save').click();
+
+        // Check if the updated profile is fetched again and edit mode is exited
+        cy.wait('@updateProfileSummary');
+        cy.wait('@updatedProfileSummary');
+        cy.get('.profileBody').should('exist');
+        cy.get('.profileHeader').should('contain', 'Edited profile');
+    });
+
+});
+
 
 
 
