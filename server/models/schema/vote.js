@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const {Schema} = require("mongoose");
 
 // Schema for vote
-
 const voteSchema = new mongoose.Schema({
     user: {
         type: Schema.Types.ObjectId,
@@ -28,7 +27,7 @@ const voteSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-}, { collection: "Vote" }); // The timestamps option adds createdAt and updatedAt fields
+}, { collection: "Vote" }); 
     
 // Creating an index to ensure a user can only vote once per question or answer
 voteSchema.index({ user: 1, referenceId: 1, onModel: 1 }, { unique: true });
