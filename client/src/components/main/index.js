@@ -120,7 +120,7 @@ const Main = ({ user, search = "", title, setQuesitonPage, handleLogin, handlePo
             break;
         }
         case "profile": {
-            selected = "p";  // Assuming 'p' indicates profile in your sidebar
+            selected = "p";
             content = <UserProfilePage />;
             break;
         }
