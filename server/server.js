@@ -25,13 +25,13 @@ const sessionStore = MongoStore.create({ mongoUrl: MONGO_URL });
 
 // Configure session middleware
 app.use(session({
-    secret: 'your_secret_key', // replace this with a secret key in our production environment
+    secret: 'your_secret_key', // replace this with a secret key in true production environment
     resave: false,
     saveUninitialized: true,
     store: sessionStore,
     cookie: {
         secure: false, // Set to false if not using HTTPS
-        maxAge: 1000 * 60 * 60 * 24, // 24 hours
+        maxAge: 1000 * 60 * 60 * 24, 
         httpOnly: true,
         sameSite: true
     }
