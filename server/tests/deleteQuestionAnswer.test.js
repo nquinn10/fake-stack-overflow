@@ -4,8 +4,6 @@ const { server } = require("../server");
 const Answer = require('../models/answers');
 const Question = require("../models/questions");
 
-
-
 // Mock connect-mongo used for MongoDB session storage in express-session
 jest.mock('connect-mongo', () => ({
     create: () => ({
@@ -105,7 +103,7 @@ describe('DELETE /deleteAnswer/:aid', () => {
             ans_by: 'validUserId',
             question: 'questionId'
         });
-        // simulate successful deletion of answer from question
+  
         Question.findByIdAndUpdate.mockResolvedValue(true);
         // simulate successful deletion answer
         Answer.findByIdAndDelete.mockResolvedValue(true);
@@ -117,8 +115,8 @@ describe('DELETE /deleteAnswer/:aid', () => {
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Answer has been deleted');
         expect(Question.findByIdAndUpdate).toHaveBeenCalledWith(
-            'questionId',  // The ID of the question from the answer
-            { $pull: { answers: '661dc096d916cd1c9d51655a' } }  // Command to pull the answer from the question
+            'questionId', 
+            { $pull: { answers: '661dc096d916cd1c9d51655a' } }  
         );
     });
 
@@ -139,7 +137,7 @@ describe('DELETE /deleteAnswer/:aid', () => {
 
 describe('DELETE /deleteQuestion/:qid', () => {
     beforeEach(() => {
-        // Reset mocks and spies before each test
+        // Reset mocks before each test
         jest.clearAllMocks();
         Question.findById.mockReset();
         Question.findByIdAndDelete.mockReset();

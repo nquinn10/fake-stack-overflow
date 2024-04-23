@@ -1,4 +1,3 @@
-// unit tests for post moderation functionality
 const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { server } = require("../server");
@@ -7,8 +6,6 @@ const User = require('../models/users');
 const Answer = require('../models/answers');
 const Question = require('../models/questions');
 
-
-// Mocking the models
 jest.mock('connect-mongo', () => ({
     create: () => ({
         get: jest.fn(),
@@ -64,13 +61,13 @@ const mockFlaggedQuestions =
 // Assuming the endpoint setup and other required imports are correct
 describe('GET all content flagged for review', () => {
     beforeEach(() => {
-        jest.clearAllMocks();  // Clear mocks in between tests to avoid state leakage
+        jest.clearAllMocks(); 
         Question.find.mockClear();
     });
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Ensure server is closed after tests
+            await server.close(); 
         }
         await mongoose.disconnect();
     });
@@ -84,7 +81,6 @@ describe('GET all content flagged for review', () => {
             flag: true
         };
 
-        // chaining mocks (flaggedQuestions calls both .populate and .select)
         const selectMock = jest.fn().mockResolvedValue(mockFlaggedQ);
         const populateMock = jest.fn(() => ({ select: selectMock }));
         Question.find.mockImplementation(() => ({ populate: populateMock }));
@@ -110,7 +106,6 @@ describe('GET all content flagged for review', () => {
             }
         ];
     
-        // Setup chaining mocks for double populate
         const selectMock = jest.fn().mockResolvedValue(mockFlaggedAnswers);
         const populateQuestionMock = jest.fn(() => ({ select: selectMock }));
         const populateAnsByMock = jest.fn(() => ({ populate: populateQuestionMock }));
@@ -127,7 +122,6 @@ describe('GET all content flagged for review', () => {
     });
 
     it('should return an empty array when no questions are flagged for review', async () => {
-        // Setup chaining mocks for .populate and .select that resolves to an empty array
         const selectMock = jest.fn().mockResolvedValue([]);
         const populateMock = jest.fn(() => ({ select: selectMock }));
         Question.find.mockImplementation(() => ({ populate: populateMock }));
@@ -188,15 +182,14 @@ describe('GET all content flagged for review', () => {
 
 describe('PUT /resetQuestion/:qid', () => {
     beforeEach(() => {
-        // Clear all mocks before each test
         jest.clearAllMocks();
     });
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
-        await mongoose.disconnect(); // Ensure no mongoose handles are left open
+        await mongoose.disconnect();
     });
 
     it('should reset a question flag and vote count', async () => {
@@ -208,7 +201,7 @@ describe('PUT /resetQuestion/:qid', () => {
             flag: false
         };
     
-        // Mock the method and simulate a successful response
+
         Question.findByIdAndUpdate.mockResolvedValue(mockUpdatedQuestion);
     
         const response = await supertest(server).put('/postModeration/resetQuestion/123');
@@ -254,15 +247,14 @@ describe('PUT /resetQuestion/:qid', () => {
 
 describe('PUT /resetAnswer/:aid', () => {
     beforeEach(() => {
-        // Clear all mocks before each test
         jest.clearAllMocks();
     });
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
-        await mongoose.disconnect(); // Ensure no mongoose handles are left open
+        await mongoose.disconnect(); 
     });
 
     it('should reset a question flag and vote count', async () => {
@@ -272,8 +264,7 @@ describe('PUT /resetAnswer/:aid', () => {
             vote_count: 0,
             flag: false
         };
-    
-        // Mock the method and simulate a successful response
+
         Answer.findByIdAndUpdate.mockResolvedValue(mockUpdatedAnswer);
     
         const response = await supertest(server).put('/postModeration/resetAnswer/123');
@@ -322,7 +313,6 @@ describe('PUT /resetAnswer/:aid', () => {
 
 describe('DELETE /deleteQuestion/:qid', () => {
     beforeEach(() => {
-        // reset all mocks before each test
         jest.clearAllMocks();
         Question.findById.mockReset();
         Question.findByIdAndDelete.mockReset();
@@ -331,9 +321,9 @@ describe('DELETE /deleteQuestion/:qid', () => {
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close();  
         }
-        await mongoose.disconnect(); // Ensure no mongoose handles are left open
+        await mongoose.disconnect(); 
     });
 
     // Test question not found

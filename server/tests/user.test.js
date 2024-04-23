@@ -17,11 +17,6 @@ jest.mock('../models/users');
 jest.mock("../models/questions");
 jest.mock("../models/answers");
 jest.mock('../models/votes');
-// jest.mock('../models/questions', () => ({
-//     find: jest.fn().mockReturnThis(),
-//     populate: jest.fn().mockReturnThis(),
-//     select: jest.fn().mockReturnThis()
-// }));
 
 jest.mock('express-session', () => {
     return () => (req, res, next) => {
@@ -126,14 +121,13 @@ describe('POST /user/login', () => {
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Ensure server is closed after tests
+            await server.close(); 
         }
         await mongoose.disconnect();
     });
 
     // positive test case
     it('should log in successfully with correct credentials', async () => {
-        // Mocking the request body
         const password = "pass1";
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -149,15 +143,12 @@ describe('POST /user/login', () => {
             password: hashedPassword
         };
 
-        // Mocking User.findOne()
         User.findOne.mockResolvedValueOnce(mockUser);
 
-        // Making the request
         const response = await supertest(server)
             .post('/user/login')
             .send(mockReqBody);
 
-        // Assert response
         expect(User.findOne).toHaveBeenCalledWith({ email: "user1" });
         expect(response.status).toBe(200);
         const responseJson = JSON.parse(response.text);
@@ -167,7 +158,6 @@ describe('POST /user/login', () => {
 
     // negative test case - invalid user password
     it('should fail to log in with incorrect credentials', async () => {
-         // Mocking the request body
          const correctPassword = "pass2";
          const incorrectPassword = "pass1";
          const hashedPassword = await bcrypt.hash(correctPassword, 10);
@@ -183,23 +173,18 @@ describe('POST /user/login', () => {
             password: hashedPassword // wrong password, should fail
         };
 
-        // Mocking User.findOne()
         User.findOne.mockResolvedValueOnce(mockUser2);
 
-        // Making the request
         const response = await supertest(server)
             .post('/user/login')
             .send(mockReqBody);
 
-
-        // Asserting the response
         expect(response.status).toBe(401);
         expect(response.text).toBe('Invalid password. Please try again.');
     });
 
     // negative test case - user email not found
     it('should fail to log in when the user email does not exist', async () => {
-        // Mocking the request body
         const mockReqBody = {
             email: "nonexistent@example.com",
             password: "password"
@@ -208,12 +193,10 @@ describe('POST /user/login', () => {
         // Mocking User.findOne() to simulate no user found
         User.findOne.mockResolvedValueOnce(null);
 
-        // Making the request
         const response = await supertest(server)
             .post('/user/login')
             .send(mockReqBody);
 
-        // Asserting the response
         expect(response.status).toBe(404);
         expect(response.text).toBe('User not found. Please register.');
     });
@@ -228,7 +211,7 @@ describe('POST /user/register', () => {
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Ensure server is closed after tests
+            await server.close();
         }
         await mongoose.disconnect();
     });
@@ -308,7 +291,7 @@ describe('GET /user/profile', () => {
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Ensure server is closed after tests
+            await server.close(); 
         }
         await mongoose.disconnect();
     });
@@ -360,13 +343,12 @@ describe('GET /user/profile', () => {
 // ***************************** test getUserQuestions *************************************
 describe('GET /my-questions', () => {
     beforeEach(() => {
-        // Clear all mocks before each test
         jest.clearAllMocks();
     });
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Ensure server is closed after tests
+            await server.close(); 
         }
         await mongoose.disconnect();
     });
@@ -447,7 +429,7 @@ describe('GET /user/my-answered-questions', () => {
 
     afterEach(async () => {
         if (server && server.close) {
-            await server.close();  // Ensure server is closed after tests
+            await server.close(); 
         }
         await mongoose.disconnect();
     });
@@ -639,7 +621,7 @@ describe('GET /user/my-question-votes', () => {
         // Mock Vote.find method
         Vote.find.mockImplementation(() => ({
             populate: jest.fn().mockImplementationOnce(() => ({
-                populate: jest.fn().mockReturnThis(), // For nested population
+                populate: jest.fn().mockReturnThis(), 
                 select: jest.fn().mockResolvedValueOnce([])
             })),
             select: jest.fn().mockReturnThis()
@@ -783,10 +765,9 @@ describe('PATCH /profile', () => {
             location: "USA"
         };
 
-        // Simulate the existing user
         User.findById.mockResolvedValue({
                                             _id: mockUserId,
-                                            first_name: "James", // original data
+                                            first_name: "James",
                                             last_name: "Doe",
                                             display_name: "JamesDoe",
                                             about_me: "Developer",

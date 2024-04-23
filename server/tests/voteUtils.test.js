@@ -19,12 +19,12 @@ describe('Question flag updates with vote_count', () => {
         Question.findByIdAndUpdate.mockResolvedValue({
             vote_count: -15,
             flag: true,
-            save: mockSave  // Use mockSave as the save method
+            save: mockSave 
         });
     });
 
     afterEach(async () => {
-        await mongoose.disconnect();  // Disconnect from the database
+        await mongoose.disconnect(); 
     });
 
     it('should flag a question when vote count reaches -15', async () => {
@@ -58,12 +58,12 @@ describe('Answer flag updates with vote_count', () => {
         Answer.findByIdAndUpdate.mockResolvedValue({
             vote_count: -15,
             flag: true,
-            save: mockSave  // Similarly for Answer
+            save: mockSave 
         });
     });
 
     afterEach(async () => {
-        await mongoose.disconnect();  // Disconnect from the database
+        await mongoose.disconnect();
     });
 
     it('should flag an answer when vote count reaches -15', async () => {
@@ -101,11 +101,10 @@ describe('Reputation updates on voting', () => {
             _id: 'authorId',
             reputation: 100,
             save: jest.fn(async function() {
-                return this; // Simulate saving and returning the updated object
+                return this;
             })
         };
 
-        // Mock findById to return a cloned version of mockUser to simulate database behavior
         User.findById = jest.fn().mockImplementation(id => {
             if (id === 'authorId') {
                 return Promise.resolve(mockUser);
@@ -115,12 +114,12 @@ describe('Reputation updates on voting', () => {
     });
 
     afterEach(async () => {
-        await mongoose.disconnect();  // Disconnect from the database
+        await mongoose.disconnect();  
     });
 
     it('should increase the poster reputation by 10 on upvote on answer', async () => {
-        const item = { asked_by: 'authorId' }; // Simulate answer object
-        await updateUserReputation(item, 1, true); // true for upvote
+        const item = { asked_by: 'authorId' }; 
+        await updateUserReputation(item, 1, true); 
 
         expect(mockUser.save).toHaveBeenCalled();
         expect(mockUser.reputation).toBe(110); // Check if the reputation is updated correctly
@@ -148,7 +147,6 @@ describe('Reputation non-negative constraint', () => {
             })
         };
 
-        // Mock findById to simulate fetching the user from the database
         User.findById = jest.fn().mockImplementation(id => {
             if (id === 'authorId') {
                 return Promise.resolve(mockUser);
@@ -158,7 +156,7 @@ describe('Reputation non-negative constraint', () => {
     });
 
     afterEach(async () => {
-        await mongoose.disconnect();  // Disconnect from the database
+        await mongoose.disconnect(); 
     });
 
     it('should not allow reputation to fall below 1 on downvote', async () => {

@@ -1,5 +1,3 @@
-// Unit tests for addAnswer in contoller/answer.js
-
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 const Answer = require("../models/answers");
@@ -41,13 +39,12 @@ describe("POST /addAnswer", () => {
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
         await mongoose.disconnect()
     });
 
     it("should add a new answer to the question", async () => {
-        // Mocking the request body
         const mockReqBody = {
             qid: "dummyQuestionId",
             ans: {
@@ -60,10 +57,8 @@ describe("POST /addAnswer", () => {
             text: "This is a test answer",
             question: "dummyQuestionId"
         }
-        // Mock the create method of the Answer model
-        Answer.create.mockResolvedValueOnce(mockAnswer);
 
-        // Mocking the Question.findOneAndUpdate method
+        Answer.create.mockResolvedValueOnce(mockAnswer);
         Question.findOneAndUpdate = jest.fn().mockResolvedValueOnce({
                                                                         _id: "dummyQuestionId",
                                                                         answers: ["dummyAnswerId"]
@@ -74,18 +69,15 @@ describe("POST /addAnswer", () => {
             .post("/answer/addAnswer")
             .send(mockReqBody);
 
-        // Asserting the response
+
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockAnswer);
-
-        // Verifying that Answer.create method was called with the correct arguments
         expect(Answer.create).toHaveBeenCalledWith({
                                                        text: "This is a test answer",
                                                        ans_by: "validUserId",
                                                        question: "dummyQuestionId"
                                                    });
 
-        // Verifying that Question.findOneAndUpdate method was called with the correct arguments
         expect(Question.findOneAndUpdate).toHaveBeenCalledWith(
             { _id: "dummyQuestionId" },
             { $push: { answers: { $each: ["dummyAnswerId"], $position: 0 } } },

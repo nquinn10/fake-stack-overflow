@@ -1,5 +1,3 @@
-// Unit tests for getTagsWithQuestionNumber in controller/tags.js
-
 const supertest = require("supertest")
 
 const Tag = require('../models/tags');
@@ -25,12 +23,10 @@ jest.mock('express-session', () => {
     };
 });
 
-// Mock data for tags
 const mockTags = [
     { name: 'tag1' },
     { name: 'tag2' },
     { name: 'tag3' },
-    // Add more mock tags if needed
 ];
 
 const mockQuestions = [
@@ -44,13 +40,12 @@ describe('GET /getTagsWithQuestionNumber', () => {
     })
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close();  
         }
         await mongoose.disconnect()
     });
 
     it('should return tags with question numbers', async () => {
-        // Mocking Tag.find() and Question.find()
         Tag.find = jest.fn().mockResolvedValueOnce(mockTags);
 
         Question.find = jest.fn().mockImplementation(() => ({ populate: jest.fn().mockResolvedValueOnce(mockQuestions)}));

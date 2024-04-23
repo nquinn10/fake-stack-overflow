@@ -40,18 +40,16 @@ jest.mock('../utils/authMiddleware', () => ({
 describe('Unauthorized Access to /user/ endpoints ', () => {
 
     beforeAll(async () => {
-        // Resetting mocks can clear any previously set return values before each test suite runs
         jest.resetAllMocks();
     });
 
     afterEach(async () => {
-        // Ensure the server is closed after tests to prevent resource leaking
         if (server && server.close) {
             await server.close();
         }
-        // Disconnect from mongoose
         await mongoose.disconnect();
     });
+
     // ***************************** test get /user/profile endpoint *************************************
 
     it('should return 401 unauthorized if no userId in session', async () => {
@@ -61,6 +59,7 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
         expect(response.status).toBe(401);
         expect(response.text).toContain("Unauthorized access. Please log in.");
     });
+
     // ***************************** test /user/my-questions endpoint *************************************
 
     it('should return 401 unauthorized if no userId in session', async () => {
@@ -70,6 +69,7 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
         expect(response.status).toBe(401);
         expect(response.text).toContain("Unauthorized access. Please log in.");
     });
+
     // ***************************** test /user/my-answers endpoint *************************************
 
     it('should return 401 unauthorized if no userId in session', async () => {
@@ -89,6 +89,7 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
         expect(response.status).toBe(401);
         expect(response.text).toContain("Unauthorized access. Please log in.");
     });
+
     // ***************************** test /user/my-question-votes endpoint *************************************
 
     it('should return 401 unauthorized if no userId in session', async () => {
@@ -98,6 +99,7 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
         expect(response.status).toBe(401);
         expect(response.text).toContain("Unauthorized access. Please log in.");
     });
+
     // ***************************** test /user/my-answer-votes endpoint *************************************
 
     it('should return 401 unauthorized if no userId in session', async () => {
@@ -119,10 +121,9 @@ describe('Unauthorized Access to /user/ endpoints ', () => {
             location: "USA"
         };
 
-        // Simulate the existing user
         User.findById.mockResolvedValue({
                                             _id: 'validUserId',
-                                            first_name: "James", // original data
+                                            first_name: "James", 
                                             last_name: "Doe",
                                             display_name: "JamesDoe",
                                             about_me: "Developer",

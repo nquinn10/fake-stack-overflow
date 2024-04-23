@@ -43,7 +43,6 @@ jest.mock('../utils/authMiddleware', () => ({
 }));
 
 
-
 // ******************************* Test Edit Question *************************************
 describe('PUT /editQuestion/:qid', () => {
     beforeEach(() => { 
@@ -53,7 +52,7 @@ describe('PUT /editQuestion/:qid', () => {
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
         await mongoose.disconnect()
     });
@@ -97,7 +96,7 @@ describe('PUT /editQuestion/:qid', () => {
                                                 asked_by: 'validUserId',
                                                 title: 'Original Title',
                                                 text: 'Original Text',
-                                                tags: ['507f191e810c19729de860ea', '65e9a5c2b26199dbcc3e6dc8']// Existing tag IDs
+                                                tags: ['507f191e810c19729de860ea', '65e9a5c2b26199dbcc3e6dc8']
                                             });
         addTag.mockResolvedValueOnce(mockTags);
         Question.findByIdAndUpdate.mockResolvedValue({
@@ -105,7 +104,7 @@ describe('PUT /editQuestion/:qid', () => {
                                                          asked_by: 'validUserId',
                                                          title: 'New Title',
                                                          text: 'Updated Text',
-                                                         tags: ['mocked_id_for_tag1', 'mocked_id_for_tag2', 'mocked_id_for_tag3'] // These are the mock IDs returned by addTag
+                                                         tags: ['mocked_id_for_tag1', 'mocked_id_for_tag2', 'mocked_id_for_tag3'] 
                                                      });
 
         const response = await supertest(server)
@@ -133,11 +132,9 @@ describe('PUT /editAnswer/:aid', () => {
     });
 
     afterEach(async () => {
-        // Ensure the server is closed after tests to prevent resource leaking
         if (server && server.close) {
             await server.close();
         }
-        // Disconnect from mongoose
         await mongoose.disconnect();
     });
 
