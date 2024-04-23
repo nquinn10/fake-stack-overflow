@@ -376,6 +376,27 @@ describe('ProfileBody Component', () => {
                 },
                 voteType: "upvote",
                 createdAt: "2024-04-23T04:26:12.163Z"
+            },
+            {
+                _id: "662738644824a8733c0efb72",
+                referenceId: {
+                    _id: "662738644824a8733c0efb50",
+                    title: "Test dowvote question",
+                    text: "this is a test question...",
+                    asked_by: {
+                        _id: "662738634824a8733c0efb38",
+                        display_name: "betty_j"
+                    },
+                    ask_date_time: "2023-11-20T08:24:42.000Z",
+                    views: 10,
+                    tags: [
+                        { _id: "662738644824a8733c0efb42", name: "python" },
+                        { _id: "662738644824a8733c0efb44", name: "node" }
+                    ],
+                    vote_count: 1
+                },
+                voteType: "downvote",
+                createdAt: "2024-04-23T04:26:12.164Z"
             }
         ],
         answer_votes: [
@@ -385,14 +406,44 @@ describe('ProfileBody Component', () => {
                     _id: "662738644824a8733c0efb5a",
                     text: "React Router is mostly a wrapper around the history library. history handles interaction with the browser's window.history for you with its browser and hash histories. It also provides a memory history which is useful for environments that don't have a global history. This is particularly useful in mobile app development (react-native) and unit testing with Node.",
                     ans_by: {
-                        _id: "662738634824a8733c0efb38",
-                        display_name: "betty_j"
+                        _id: "662738d34824a8733cgefb96",
+                        display_name: "john_d"
                     },
                     ans_date_time: "2023-11-20T08:24:42.000Z",
                     vote_count: 1
                 },
                 voteType: "upvote",
                 createdAt: "2024-04-23T04:26:12.164Z"
+            },
+            {
+                _id: "662738644824a8733c0efb74",
+                referenceId: {
+                    _id: "662738644824a8733c0efb5a",
+                    text: "This is a test answer for downvote",
+                    ans_by: {
+                        _id: "662738d34824a8733cgefb96",
+                        display_name: "john_d"
+                    },
+                    ans_date_time: "2022-01-20T08:00:00.000Z",
+                    vote_count: 1
+                },
+                voteType: "upvote",
+                createdAt: "2024-04-23T04:26:12.164Z"
+            },
+            {
+                _id: "662738644824a8733c0efb76",
+                referenceId: {
+                    _id: "662738644824a8733c0efb5c",
+                    text: "Node.js operates on a non-blocking I/O model which makes it particularly well-suited for data-intensive real-time applications that run across distributed devices.",
+                    ans_by: {
+                        _id: "662738634824a8733c0efb39",
+                        display_name: "alice_k"
+                    },
+                    ans_date_time: "2023-10-15T13:45:00.000Z",
+                    vote_count: 3
+                },
+                voteType: "downvote",
+                createdAt: "2024-04-23T04:30:22.000Z"
             }
         ]
     };
@@ -426,14 +477,15 @@ describe('ProfileBody Component', () => {
         cy.intercept('GET', '**/my-tags', { statusCode: 200, body: [mockData.tags] }).as('getUserTags');
         // Dynamic intercept for votes based on query parameter
         cy.intercept('GET', '**/my-question-votes*', (req) => {
-            let filteredVotes = mockData.question_votes;
+            let filteredVotes = req.query.voteType ? mockData.question_votes.filter(vote => vote.voteType === req.query.voteType) : mockData.question_votes;
+            console.log('Filtered Votes:', filteredVotes);
             req.reply({
                           statusCode: 200,
                           body: filteredVotes
                       });
         }).as('getUserQuestion_votes');
         cy.intercept('GET', '**/my-answer-votes*', (req) => {
-            let filteredVotes = mockData.answer_votes;
+            let filteredVotes = req.query.voteType ? mockData.answer_votes.filter(vote => vote.voteType === req.query.voteType): mockData.answer_votes;
             req.reply({
                           statusCode: 200,
                           body: filteredVotes
@@ -448,6 +500,37 @@ describe('ProfileBody Component', () => {
             cy.get('.profileBody').should('be.visible');
         });
     });
+
+    it('toggles between upvotes and downvotes correctly in question votes', () => {
+        cy.mount(<ProfileBody activeTab="question_votes" />);
+        cy.wait('@getUserQuestion_votes');
+
+        // Initially check for all votes
+        cy.get('.question_list').children().should('have.length', 2);
+
+        // Click on the downvotes button
+        cy.get('.voteButtons button').contains('Downvotes').click();
+        cy.wait('@getUserQuestion_votes');
+
+        // Check the content updates to show downvotes
+        cy.get('.question_list').children().should('have.length', 1);
+    });
+
+    it('toggles between upvotes and downvotes correctly in answer votes', () => {
+        cy.mount(<ProfileBody activeTab="answer_votes" />);
+        cy.wait('@getUserAnswer_votes');
+
+        // Initially check for all votes
+        cy.get('.question_list').children().should('have.length', 3);
+
+        // Click on the downvotes button
+        cy.get('.voteButtons button').contains('Upvotes').click();
+        cy.wait('@getUserAnswer_votes');
+
+        // Check the content updates to show upvotes
+        cy.get('.question_list').children().should('have.length', 2);
+    });
+
 
 });
 
