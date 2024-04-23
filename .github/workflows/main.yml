@@ -42,13 +42,21 @@ jobs:
       # - name: Install Cypress
       #   run: npm install cypress --save-dev
 
-      - name: Run e2e tests
-        run: npx cypress run cypress/component/
-        working-directory: client/
+      # - name: Run component tests
+      #   run: npx cypress run cypress/component/
+      #   working-directory: client/
 
-      - name: Run e2e tests
-        run: npx cypress run cypress/e2e/
-        working-directory: client/
+      # - name: Run e2e tests
+      #   run: npx cypress run cypress/e2e/
+      #   working-directory: client/
+
+      - name: Run Cypress Component tests
+        uses: cypress-io/github-action@v5
+        with:
+          component: true
+      
+      - name: Run Cypress end-to-end tests
+        uses: cypress-io/github-action@v5
 
       - name: Kill the node server process
         run: kill $(lsof -t -i:8000) || true
