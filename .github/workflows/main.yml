@@ -35,30 +35,29 @@ jobs:
         run: npm install 
         working-directory: client/
   
-      # - name: Start the Client
-      #   run: npm start &
-      #   working-directory: client/
+      - name: Start the Client
+        run: npm start &
+        working-directory: client/
 
-      - name: Install Cypress
-        run: npm install cypress --save-dev
+      # - name: Install Cypress
+      #   run: npm install cypress --save-dev
 
-      # - name: Run component tests
-      #   run: npx cypress run cypress/component/
-      #   working-directory: client/
-
-      # - name: Run e2e tests
-      #   run: npx cypress run cypress/e2e/
-      #   working-directory: client/
-
-      - name: Run Cypress Component tests
-        uses: cypress-io/github-action@v5
-        with:
-          component: true
-          project: ./client
-          start: npm run start --prefix client, npm run start --prefix server
-          wait-on: 'http://localhost:3000,http://localhost:8000'
-          browser: chrome
+      - name: Run component tests
+        run: npx cypress run --component
+        working-directory: client/
           
+      - name: Run e2e tests
+        run: npx cypress run cypress/e2e/
+        working-directory: client/
+
+      # - name: Run Cypress Component tests
+      #   uses: cypress-io/github-action@v5
+      #   with:
+      #     component: true
+      #     project: ./client
+      #     start: npm run start --prefix client, npm run start --prefix server
+      #     wait-on: 'http://localhost:3000,http://localhost:8000'
+      #     browser: chrome
           
       
       - name: Run Cypress end-to-end tests
