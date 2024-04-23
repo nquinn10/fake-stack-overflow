@@ -21,9 +21,6 @@ it('search bar shows search text entered by user', () => {
         setQuesitonPage={setQuesitonPageSpy}/>)
     cy.get('#searchBar').should('have.value', searchQuery)
     cy.get('#searchBar').type('{selectall}{backspace}Search change')
-    // cy.get('#searchBar').should('have.attr', 'placeholder');
-    // cy.get('#searchBar').clear()
-    // cy.get('#searchBar').type('Search change')
     cy.get('#searchBar').should('have.value', 'Search change')
 })
 
