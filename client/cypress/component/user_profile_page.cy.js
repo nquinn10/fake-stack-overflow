@@ -9,6 +9,7 @@ import EditQuestionForm
     from "../../src/components/main/userProfilePage/profileBody/editQuestionForm";
 import EditAnswerForm from "../../src/components/main/userProfilePage/profileBody/editAnswerForm";
 import ProfileBody from "../../src/components/main/userProfilePage/profileBody";
+import EditProfileForm from "../../src/components/main/userProfilePage/editProfileForm";
 
 // User Profile - Header Component
 describe('User Profile Page Header Component', () => {
@@ -349,7 +350,7 @@ describe('EditAnswerForm Component', () => {
 
 // User Profile Body
 
-describe('ProfileBody Component', () => {
+describe('User Profile Body', () => {
     const tabs = ['questions', 'answers', 'tags', 'question_votes', 'answer_votes'];
     const mockData = {
         questions: [{ _id: '1', title: 'What is React?', text: 'A JavaScript library for building user interfaces', tags: [] }],
@@ -523,7 +524,7 @@ describe('ProfileBody Component', () => {
         // Initially check for all votes
         cy.get('.question_list').children().should('have.length', 3);
 
-        // Click on the downvotes button
+        // Click on the upvotes button
         cy.get('.voteButtons button').contains('Upvotes').click();
         cy.wait('@getUserAnswer_votes');
 
@@ -531,8 +532,78 @@ describe('ProfileBody Component', () => {
         cy.get('.question_list').children().should('have.length', 2);
     });
 
-
 });
+
+describe('EditProfileForm Component', () => {
+    const profile = {
+        first_name: 'John',
+        last_name: 'Doe',
+        display_name: 'johndoe123',
+        about_me: 'Software developer',
+        location: 'New York'
+    };
+
+    beforeEach(() => {
+        // Start each test with mounting the component
+        cy.mount(<EditProfileForm profile={profile} onSave={cy.spy()} onCancel={cy.spy()} />);
+
+        // Mock the API call for updating the user profile
+        cy.intercept('PATCH', '**/profile', (req) => {
+            req.reply({
+                          statusCode: 200
+                      });
+        }).as('updateProfile');
+    });
+
+    it('renders with initial profile values', () => {
+        cy.get('#firstName').should('have.value', profile.first_name);
+        cy.get('#lastName').should('have.value', profile.last_name);
+        cy.get('#displayName').should('have.value', profile.display_name);
+        cy.get('#aboutMe').should('have.value', profile.about_me);
+        cy.get('#location').should('have.value', profile.location);
+    });
+
+    it('validates required fields and displays error messages', () => {
+        cy.get('#firstName').clear();
+        cy.get('#lastName').clear();
+        cy.get('#displayName').clear();
+        cy.get('.form_postBtn').contains('Save').click();
+
+        cy.get('.input_error').should('contain', 'First name cannot be empty');
+        cy.get('.input_error').should('contain', 'Last name cannot be empty');
+        cy.get('.input_error').should('contain', 'Display name cannot be empty');
+    });
+
+    it('submits valid data and calls onSave', () => {
+        const onSave = cy.spy().as('onSaveSpy');
+        cy.mount(<EditProfileForm profile={profile} onSave={onSave} onCancel={cy.spy()} />);
+        // Fill in the form with new data
+        cy.get('#firstName').clear().type('Jane');
+        cy.get('#lastName').clear().type('Smith');
+        cy.get('#displayName').clear().type('janesmith456');
+
+        // Click save
+        cy.get('.form_postBtn').contains('Save').click();
+
+        // Check if API was called
+        cy.wait('@updateProfile').its('request.body').should('deep.include', {
+            first_name: 'Jane',
+            last_name: 'Smith',
+            display_name: 'janesmith456'
+        });
+
+        // onSave should be called after a successful API call
+        cy.get('@onSaveSpy').should('have.been.calledOnce');
+    });
+
+    it('calls onCancel when cancel button is clicked', () => {
+        const onCancel = cy.spy().as('onCancelSpy');
+        cy.mount(<EditProfileForm profile={profile} onSave={cy.spy()} onCancel={onCancel} />);
+        cy.get('.form_postBtn').contains('Cancel').click();
+        cy.get('@onCancelSpy').should('have.been.calledOnce');
+    });
+});
+
 
 
 
