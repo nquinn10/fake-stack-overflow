@@ -39,7 +39,7 @@ const Login = ({ onLogin }) => {
                     setLoginError('Invalid email or password'); // Set login error message
                 }
             } catch (error) {
-                setLoginError(error.response.data); // Set generic error message
+                setLoginError(error.response.data);
             }
         }
     };

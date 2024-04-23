@@ -74,7 +74,7 @@ const Register = ({ onRegister }) => {
                     onRegister(result.display_name);
                 }
             } catch (error) {
-                let errorMessage = "An unexpected error occurred";  // Default error message
+                let errorMessage = "An unexpected error occurred";
                 if (error.response) {
                     switch (error.response.status) {
                         case 400:

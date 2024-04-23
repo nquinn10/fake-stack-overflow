@@ -1,6 +1,5 @@
 import "./index.css";
 import { useState } from "react";
-// import icons for postModeration (flag) and user (user)
 import {FaRegUser, FaSignInAlt, FaSignOutAlt, FaUserPlus} from "react-icons/fa";
 import { FiFlag } from "react-icons/fi";
 
@@ -9,11 +8,11 @@ const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister
     const [val, setVal] = useState(search);
 
     const handleShowLogin = () => {
-        showLogin(); // Call the function passed from FakeStackOverflow
+        showLogin();
     };
 
     const handleShowRegister = () => {
-        showRegister(); // Call the function passed from FakeStackOverflow
+        showRegister();
     };
 
     const handleShowPostMod = () => {
