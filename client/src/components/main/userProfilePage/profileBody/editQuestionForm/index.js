@@ -52,7 +52,7 @@ const EditQuestionForm = ({ question, onSave, onCancel }) => {
                     }
                 });
                 await editQuestion(question._id, updatedQuestionData);
-                onSave(); // Use the onSave prop to handle the updated question in the parent component
+                onSave();
             } catch (error) {
                 console.error('Failed to save the question:', error);
             }
