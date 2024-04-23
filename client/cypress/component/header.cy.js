@@ -50,3 +50,25 @@ it('shows user icons when user is logged in', () => {
     cy.get('#logoutButton').click()
     cy.get('@logout').should('have.been.calledOnce')
 })
+
+it('displays login and register buttons when user is not signed in', () => {
+    const showLogin = cy.spy().as('showLogin');
+    const showRegister = cy.spy().as('showRegister');
+
+    cy.mount(<Header
+        search=""
+        setQuestionPage={cy.spy()}
+        showLogin={showLogin}
+        showRegister={showRegister}
+        showProfile={cy.spy()}
+        showPostMod={cy.spy()}
+        logout={cy.spy()}
+        user={null}  // explicitly setting user to null to represent logged out state
+    />);
+
+    cy.get('.auth-buttons button').should('have.length', 2); // Expecting two buttons
+    cy.contains('button', 'Login').should('be.visible').click();
+    cy.get('@showLogin').should('have.been.calledOnce');
+    cy.contains('button', 'Register').should('be.visible').click();
+    cy.get('@showRegister').should('have.been.calledOnce');
+});
