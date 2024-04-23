@@ -449,27 +449,6 @@ describe('ProfileBody Component', () => {
         });
     });
 
-    // it('handles edit and delete operations for questions', () => {
-    //     cy.mount(<ProfileBody activeTab="questions" />);
-    //     cy.wait('@getUserQuestions');
-    //     // Simulate clicking an edit button
-    //     cy.get('button').contains('Edit').click();
-    //     // Assuming there's a way to identify the edit form
-    //     cy.get('form').should('be.visible');
-    //     // Test delete functionality
-    //     cy.intercept('DELETE', '**/deleteQuestion/**', { statusCode: 204 }).as('deleteQuestion');
-    //     cy.get('button').contains('Delete').click();
-    //     cy.wait('@deleteQuestion');
-    //     cy.get('.no-questions').should('contain', 'No Questions Found');
-    // });
-    //
-    // it('cancels editing an answer correctly', () => {
-    //     cy.mount(<ProfileBody activeTab="answers" />);
-    //     cy.wait('@getUserAnsweredQuestions');
-    //     cy.get('button').contains('Edit').click();
-    //     cy.get('button').contains('Cancel').click();
-    //     cy.get('.answer_list').should('be.visible');
-    // });
 });
 
 
