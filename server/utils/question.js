@@ -1,6 +1,5 @@
 const Tag = require("../models/tags");
 const Question = require("../models/questions");
-//const Answer = require("../models/answers");
 
 const addTag = async (tname) => {
     try {
@@ -36,11 +35,11 @@ const getQuestionsByOrder = async (order) => {
                 .exec();
             questions.sort((a, b) => {
                 if (a.ask_date_time > b.ask_date_time) {
-                    return -1; // Return -1 if a's ask date is greater than b's ask date
+                    return -1;
                 } else if (a.ask_date_time < b.ask_date_time) {
-                    return 1; // Return 1 if a's ask date is less than b's ask date
+                    return 1; 
                 } else {
-                    return 0; // Return 0 if ask dates are equal
+                    return 0; 
                 }
             });
         } else if (order === 'active') {
