@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Vote = require('../models/votes');  // Ensure you have a model for Vote
-const Question = require('../models/questions');  // Assuming model file names
+const Vote = require('../models/votes'); 
+const Question = require('../models/questions'); 
 const Answer = require('../models/answers');
 const { authRequired } = require("../utils/authMiddleware");
 const User = require('../models/users');
@@ -33,7 +33,7 @@ const castVote = async (req, res) => {
             return res.status(404).send(`${onModel} not found.`);
         }
 
-        // Check for an existing vote
+        // Check for an existing vote (don't let user cast the same vote twice)
         const existingVote = await Vote.findOne({ user: userId, referenceId, onModel });
         let voteChange = voteType === 'upvote' ? 1 : -1;
         const isUpvote = voteType === 'upvote';
@@ -71,7 +71,6 @@ const castVote = async (req, res) => {
     }
 };
 
-// define routes
 router.post('/vote', authRequired, castVote);
 
 module.exports = router;

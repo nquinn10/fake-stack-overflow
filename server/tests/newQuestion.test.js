@@ -1,4 +1,3 @@
-// unit tests for functions in controller/question.js
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
 
@@ -87,11 +86,11 @@ const mockPopulatedQuestion = {
     answers: [
         {
             ...ans2,
-            ans_by: { display_name: 'answer2_user' }  // Mock nested data structure
+            ans_by: { display_name: 'answer2_user' } 
         }
     ],
     views: 100,
-    asked_by: { display_name: 'validUserId' }  // Mock nested data structure
+    asked_by: { display_name: 'validUserId' }
 };
 
 describe('GET /getQuestion', () => {
@@ -101,7 +100,7 @@ describe('GET /getQuestion', () => {
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
         await mongoose.disconnect()
     });
@@ -115,7 +114,7 @@ describe('GET /getQuestion', () => {
 
         getQuestionsByOrder.mockResolvedValueOnce(mockQuestions);
         filterQuestionsBySearch.mockReturnValueOnce(mockQuestions);
-        // Making the request
+
         const response = await supertest(server)
             .get('/question/getQuestion')
             .query(mockReqQuery);
@@ -129,34 +128,31 @@ describe('GET /getQuestion', () => {
 describe('GET /getQuestionById/:qid', () => {
 
     beforeEach(() => {
-        Question.findOneAndUpdate = jest.fn().mockReturnThis();  // Return the mock itself to allow chaining
-        Question.populate = jest.fn().mockReturnThis();  // Return the mock itself to allow chaining
+        Question.findOneAndUpdate = jest.fn().mockReturnThis(); 
+        Question.populate = jest.fn().mockReturnThis();  
     })
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close();  
         }
         await mongoose.disconnect()
     });
 
     it('should return a question by id and increment its views by 1', async () => {
 
-        // Mock request parameters
+    
         const mockReqParams = {
             qid: '65e9b5a995b6c7045a30d823',
         };
 
-        // Provide mock question data
         Question.findOneAndUpdate.mockImplementationOnce(() => ({
             populate: () => ({ populate: () => Promise.resolve(mockPopulatedQuestion) })
         }));
 
-        // Making the request
         const response = await supertest(server)
             .get(`/question/getQuestionById/${mockReqParams.qid}`);
 
-        // Asserting the response
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockPopulatedQuestion);
         expect(Question.findOneAndUpdate).toHaveBeenCalledWith(
@@ -175,7 +171,7 @@ describe('GET /getQuestionById/:qid', () => {
     });
 
     it('should return 404 if the question does not exist', async () => {
-        const nonexistentId = '66202d26f7ed0f8e05e7996b'; // Valid format but nonexistent
+        const nonexistentId = '66202d26f7ed0f8e05e7996b'; 
         Question.findOneAndUpdate.mockImplementationOnce(() => ({
             populate: () => ({ populate: () => Promise.resolve(null) })
         }));
@@ -194,14 +190,12 @@ describe('POST /addQuestion', () => {
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
         await mongoose.disconnect()
     });
 
     it('should add a new question', async () => {
-        // Mock request body
-
         const mockTags = [tag1, tag2];
 
         const mockQuestion = {
@@ -215,12 +209,10 @@ describe('POST /addQuestion', () => {
         addTag.mockResolvedValueOnce(mockTags);
         Question.create.mockResolvedValueOnce(mockQuestion);
 
-        // Making the request
         const response = await supertest(server)
             .post('/question/addQuestion')
             .send(mockQuestion);
 
-        // Asserting the response
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockQuestion);
         expect(addTag).toHaveBeenCalledTimes(mockTags.length);

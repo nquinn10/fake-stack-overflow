@@ -55,30 +55,27 @@ describe('PUT /vote', () => {
         // Mock for User.findById for voting user and author of post
         User.findById.mockImplementation(userId => {
             if (userId === 'validUserId') {
-                // Return an object with a mocked save method
                 return Promise.resolve({
                                            _id: userId,
                                            reputation: 20,
-                                           save: jest.fn() // Mock the save function to resolve to itself
+                                           save: jest.fn() 
                                        });
             } else if (userId === 'authorId') {
                 // Mock for the author's user object
                 return Promise.resolve({
                                            _id: userId,
-                                           reputation: 100, // Starting reputation
-                                           save: jest.fn() // Mock the save function to resolve to itself
+                                           reputation: 100,
+                                           save: jest.fn() 
                                        });
             }
             return Promise.resolve(null);
         });
 
-        // Ensure Model.findById resolves for an existing item
         Question.findById.mockResolvedValue({ _id: 'validQuestionId', vote_count: 5, asked_by: 'authorId' });
         Answer.findById.mockResolvedValue({ _id: 'validAnswerId', vote_count: 3, ans_by: 'authorId' });
 
         Vote.findOne.mockResolvedValue(null);
 
-        // Setup mock for updateVoteCountAndFlag and updateUserReputation
         require('../utils/vote').updateVoteCountAndFlag.mockResolvedValue({ _id: 'validAnswerId', vote_count: 4 });
         require('../utils/vote').updateUserReputation.mockResolvedValue();
 
@@ -86,9 +83,9 @@ describe('PUT /vote', () => {
 
     afterEach(async() => {
         if (server && server.close) {
-            await server.close();  // Safely close the server
+            await server.close(); 
         }
-        await mongoose.disconnect(); // Ensure no mongoose handles are left open
+        await mongoose.disconnect(); 
     });
 
     it('should successfully cast a vote if user has enough reputation points', async () => {
@@ -98,7 +95,6 @@ describe('PUT /vote', () => {
             vote_count: 4,
             ans_by: 'authorId'
         };
-        // Mock updateVoteCountAndFlag to return the expected item
         require('../utils/vote').updateVoteCountAndFlag.mockResolvedValue(expectedUpdatedItem);
 
         const response = await supertest(server).post('/vote/vote').send({
@@ -115,12 +111,10 @@ describe('PUT /vote', () => {
         expect(require('../utils/vote').updateUserReputation).toHaveBeenCalledWith(
             expect.objectContaining({ _id: 'validAnswerId', ans_by: 'authorId' }), 1, true
         );
-        // Check if the response body matches the expected updated item
         expect(response.body).toEqual(expectedUpdatedItem);
     });
 
     it('should fail to cast vote if user has too few reputation points', async () => {
-        // Adjust the mocked user reputation to below the threshold
         User.findById.mockResolvedValue({ _id: 'validUserId', reputation: 10 });
 
         const response = await supertest(server).post('/vote/vote').send({
@@ -134,7 +128,6 @@ describe('PUT /vote', () => {
     });
 
     it('should fail to cast vote if answer/question object non-existent', async () => {
-        // Ensure the question does not exist
         Question.findById.mockResolvedValue(null);
 
         const response = await supertest(server).post('/vote/vote').send({
@@ -185,7 +178,6 @@ describe('PUT /vote', () => {
                                                             onModel: 'Question'
                                                         });
 
-        // Assume updateUserReputation is called correctly and alters the database as expected
         expect(mockUser.save).toHaveBeenCalled();
         expect(mockUser.reputation).toBe(110);
         expect(require('../utils/vote').updateUserReputation).toHaveBeenCalled();

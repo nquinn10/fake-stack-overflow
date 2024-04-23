@@ -42,7 +42,7 @@ User.findById.mockImplementation(userId => {
     if (userId === "validUserId") {
         return Promise.resolve({ _id: userId, is_moderator: false }); // User without admin privilege
     }
-    return Promise.resolve(null); // No user found
+    return Promise.resolve(null);
 }); 
 
 const mockFlaggedQuestion = {
@@ -65,16 +65,13 @@ const mockFlaggedAnswer = {
 describe('Unauthorized access to /postModeration/ endpoints', () => {
    
     beforeEach(async () => {
-        // Resetting mocks can clear any previously set return values before each test suite runs
         jest.resetAllMocks();
     });
 
     afterEach(async () => {
-        // Ensure the server is closed after tests to prevent resource leaking
         if (server && server.close) {
             await server.close();
         }
-        // Disconnect from mongoose
         await mongoose.disconnect();
     });
 

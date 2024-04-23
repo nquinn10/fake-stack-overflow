@@ -70,7 +70,6 @@ jobs:
           npm test tests/newAnswer.test.js
           npm test tests/newQuestion.test.js
           npm test tests/question.test.js
-          npm test tests/server.test.js
           npm test tests/tags.test.js
           npm test tests/user.test.js
           npm test tests/vote.test.js

@@ -13,8 +13,7 @@ const userSchema = new Schema({
         reputation: {type: Number, default: 0},
         account_creation_date_time: {type: Date, required: true},
         is_moderator: {type: Boolean, required: true},
-
-        // UML also has accountStatus (ENUM: Active, UnderReview, Banned). Not sure we want to keep it
+        
     }, { collection: "User" });
 
 userSchema.pre('save', async function(next) {

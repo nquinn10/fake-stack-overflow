@@ -22,10 +22,8 @@ const getQuestionsByFilter = async (req, res) => {
         // if search term provided, filter questions by search term
         const filteredQuestions = search ? filterQuestionsBySearch(questions, search) : questions;
 
-        // send the filtered questions as JSON response
         res.json(filteredQuestions);
     } catch (error) {
-        // Handle errors
         console.error("Error getting questions by filter:", error);
         res.status(500).json({ error: "Internal server error" });
     }
@@ -51,7 +49,7 @@ const getQuestionById = async (req, res) => {
                            select: 'display_name -_id'  // Only get the display name, exclude _id
                        }
                    })
-            .populate({           // Populate the 'asked_by' field to get 'display_name'
+            .populate({      
                           path: 'asked_by',
                           select: 'display_name -_id'
                       });
@@ -59,7 +57,6 @@ const getQuestionById = async (req, res) => {
         if (!question) {
             return res.status(404).json({ error: 'Question not found' });
         }
-        //const formattedQuestion = formatQuestionData(question);
         res.status(200).json(question);
     } catch (error) {
         console.error('Error fetching question by ID:', error);
@@ -110,9 +107,6 @@ const addQuestion = async (req, res) => {
 };
 
 // Edit Question
-// note: later with post moderation we could alter this function to change the q_status if admin
-// note: add || condition to author, so 
-// if userId = author || userId = admin, then they can edit/delete
 const editQuestion = async (req, res) => {
 
     const { qid } = req.params;
@@ -177,7 +171,6 @@ const deleteQuestion = async (req, res) => {
         // Delete all answers associated with this question
         await Answer.deleteMany({ question: qid });
 
-
         // Delete the question if user is authorized
         await Question.findByIdAndDelete(qid);
 
@@ -190,7 +183,7 @@ const deleteQuestion = async (req, res) => {
 
 };
 
-// add appropriate HTTP verbs and their endpoints to the router
+
 router.get("/getQuestion", getQuestionsByFilter);
 router.get("/getQuestionById/:qid", getQuestionById);
 router.post("/addQuestion", authRequired, addQuestion);

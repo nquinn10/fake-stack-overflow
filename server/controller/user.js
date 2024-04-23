@@ -1,8 +1,3 @@
-// This file will be the user controller
-// Once implemented, this file will define all necessary functions for a user object in the model.
-// Functionality of the user controller will cover user registration for the platform, creating and editing
-// a profile, and more. 
-
 const express = require("express");
 const User = require("../models/users");
 const bcrypt = require('bcryptjs');
@@ -13,6 +8,7 @@ const Vote = require("../models/votes");
 const router = express.Router();
 const { authRequired } = require("../utils/authMiddleware");
 
+// Register new user
 const userRegistration = async (req, res) => {
     const { first_name, last_name, email, password, display_name, about_me, location } = req.body;
 
@@ -50,6 +46,7 @@ const userRegistration = async (req, res) => {
     }
 };
 
+// Authenticate existing user (login)
 const userLogin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -59,8 +56,7 @@ const userLogin = async (req, res) => {
             return res.status(404).send('User not found. Please register.');
         }
 
-        // console.log(user); // check user object
-        if (user && await bcrypt.compare(password, user.password)) {  // In a real app, use a hashed password comparison
+        if (user && await bcrypt.compare(password, user.password)) { 
             // store session with userID
             req.session.userId = user._id;
             res.json({ message: "Logged in successfully!", display_name: user.display_name });
@@ -68,14 +64,14 @@ const userLogin = async (req, res) => {
             res.status(401).send("Invalid password. Please try again.");
         }
     } catch (error) {
-        console.error(error); // Log the error for debugging purposes
+        console.error(error); 
         res.status(500).send("An error occurred while processing your request.");
     }
 };
 
 const userProfileSummary = async (req, res) => {
     try {
-        const userId = req.session.userId; // Assumes user ID is stored in the session upon authentication
+        const userId = req.session.userId; 
         if (!userId) {
             return res.status(401).send("Unauthorized access.");
         }
@@ -138,25 +134,24 @@ const getUserAnsweredQuestions = async (req, res) => {
         // Find answers where 'ans_by' matches the logged-in user's ID and populate the corresponding question details
         const userAnswers = await Answer.find({ ans_by: userId })
             .populate({
-                          path: 'question', // Assuming 'question' is the field in Answer schema referring to the Question
+                          path: 'question',
                           populate: {
                               path: 'tags',
                               select: 'name'
                           },
-                          select: 'title text asked_by ask_date_time views vote_count' // Customize fields as needed
+                          select: 'title text asked_by ask_date_time views vote_count'
                       });
 
         if (!userAnswers.length) {
             return res.status(200).json([]);
         }
 
-        // Extract the necessary data into a new array to structure it neatly
         const results = userAnswers.map(ans => ({
             question: ans.question,
             answer: {
                 _id: ans._id,
                 text: ans.text,
-                ans_date_time: ans.ans_date_time, // or any other relevant answer details
+                ans_date_time: ans.ans_date_time, 
                 vote_count: ans.vote_count
             }
         }));
@@ -168,7 +163,7 @@ const getUserAnsweredQuestions = async (req, res) => {
     }
 };
 
-
+// Get all tags user participates in
 const getUserTags = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -176,11 +171,10 @@ const getUserTags = async (req, res) => {
             return res.status(401).send("Unauthorized access.");
         }
 
-        // Find questions asked by the user and populate the tags directly
         const userQuestions = await Question.find({ asked_by: userId })
             .populate({
-                          path: 'tags',   // Populate the tags array in the question documents
-                          select: 'name'  // Only select the name field from the tags documents
+                          path: 'tags',   
+                          select: 'name' 
                       })
 
         if (!userQuestions.length) {
@@ -211,6 +205,7 @@ const getUserTags = async (req, res) => {
     }
 };
 
+// Get all votes on questions by user
 const getUserQuestionVotes = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -256,6 +251,7 @@ const getUserQuestionVotes = async (req, res) => {
     }
 };
 
+// Get all votes on answers by user
 const getUserAnswerVotes = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -322,7 +318,7 @@ const updateUserProfile = async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { $set: updates },
-            { new: true, runValidators: true, context: 'query' } // options to return the updated document and run model validators
+            { new: true, runValidators: true, context: 'query' } 
         );
 
         if (!updatedUser) {
