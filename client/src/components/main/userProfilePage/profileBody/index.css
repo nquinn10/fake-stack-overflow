@@ -1,0 +1,15 @@
+.question_list {
+    border-bottom: #000000 1px dashed;
+}
+
+
+.answer_list {
+    padding: 20px;
+    background: #f9f9f9; /* Example background */
+    margin-top: 10px;
+}
+
+.input_error {
+    color: red;
+    margin-bottom: 20px;
+}

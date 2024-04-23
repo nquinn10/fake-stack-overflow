@@ -194,7 +194,7 @@ describe('POST /user/login', () => {
 
         // Asserting the response
         expect(response.status).toBe(401);
-        expect(response.text).toBe('Invalid credentials');
+        expect(response.text).toBe('Invalid password. Please try again.');
     });
 
     // negative test case - user email not found
@@ -215,7 +215,7 @@ describe('POST /user/login', () => {
 
         // Asserting the response
         expect(response.status).toBe(404);
-        expect(response.text).toBe('User not found');
+        expect(response.text).toBe('User not found. Please register.');
     });
 });
 
@@ -257,7 +257,8 @@ describe('POST /user/register', () => {
             .send(mockReqBody);
 
         expect(response.status).toBe(201);
-        expect(response.text).toBe('User registered successfully');
+        const responseJson = JSON.parse(response.text);
+        expect(responseJson.message).toBe('User registered successfully');
         expect(User.findOne).toHaveBeenCalledWith({ email: "janedixon@example.com" });
     });
 
@@ -291,7 +292,8 @@ describe('POST /user/register', () => {
             .send(mockReqBody);
 
         expect(response.status).toBe(400);
-        expect(response.text).toBe('User already exists');
+        const responseJson = JSON.parse(response.text);
+        expect(responseJson.message).toBe('User already exists');
         expect(User.findOne).toHaveBeenCalledWith({ email: "existing@email.com" });
     });
 });
@@ -403,9 +405,9 @@ describe('GET /my-questions', () => {
         const response = await supertest(server)
             .get('/user/my-questions');
 
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(200);
         expect(Question.find).toHaveBeenCalledWith({ asked_by: 'validUserId' });
-        expect(response.text).toContain("No questions found.");
+        expect(response.body).toEqual([]);
     });
 
     it('should return detailed question data with tags and answers populated', async () => {
@@ -492,9 +494,9 @@ describe('GET /user/my-answered-questions', () => {
         const response = await supertest(server)
             .get('/user/my-answers');
 
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(200);
         expect(Answer.find).toHaveBeenCalledWith({ ans_by: 'validUserId' });
-        expect(response.text).toContain("No answered questions found.");
+        expect(response.body).toEqual([]);
     });
 });
 
@@ -542,10 +544,14 @@ describe('GET /my-tags', () => {
 
         expect(Question.find).toHaveBeenCalledWith({ asked_by: 'validUserId' });
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(['JavaScript', 'Node.js', 'Python']);
+        expect(response.body).toEqual([
+                                          { name: 'JavaScript', count: 2 },  // JavaScript appears in both questions
+                                          { name: 'Node.js', count: 1 },
+                                          { name: 'Python', count: 1 }
+                                      ]);
     });
 
-    it('should return a 404 when no questions or tags are found', async () => {
+    it('should return empty array when no questions or tags are found', async () => {
         Question.find.mockImplementation(() => ({
             populate: jest.fn().mockResolvedValueOnce([])
         }));
@@ -554,8 +560,8 @@ describe('GET /my-tags', () => {
             .get('/user/my-tags');
 
         expect(Question.find).toHaveBeenCalledWith({ asked_by: 'validUserId' });
-        expect(response.status).toBe(404);
-        expect(response.text).toContain("No questions or tags found.");
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual([]);
     });
 });
 
@@ -642,8 +648,8 @@ describe('GET /user/my-question-votes', () => {
         const response = await supertest(server)
             .get('/user/my-question-votes');
 
-        expect(response.status).toBe(404);
-        expect(response.text).toContain("No question votes found");
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual([]);
     });
 
 });
@@ -727,8 +733,8 @@ describe('GET /user/my-answer-votes', () => {
         const response = await supertest(server)
             .get('/user/my-answer-votes');
 
-        expect(response.status).toBe(404);
-        expect(response.text).toContain("No answer votes found");
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual([]);
     });
 });
 

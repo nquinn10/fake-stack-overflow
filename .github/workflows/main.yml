@@ -52,8 +52,8 @@ jobs:
           npm test tests/tags.test.js
           npm test tests/user.test.js
           npm test tests/vote.test.js
-          npm test tests/editDeleteQuestion.test.js
-          npm test tests/editDeleteAnswer.test.js
+          npm test tests/editQuestionAnswer.test.js
+          npm test tests/deleteQuestionAnswer.test.js
           npm test tests/nonAdminUser.test.js
           npm test tests/postModeration.test.js
           npm test tests/unauthenticatedUser.test.js

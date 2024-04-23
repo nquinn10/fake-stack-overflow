@@ -157,6 +157,30 @@ describe('GET all content flagged for review', () => {
         expect(populateQuestionMock).toHaveBeenCalledWith('question', 'title');
         expect(selectMock).toHaveBeenCalledWith('text vote_count');
     });
+
+
+    it('should handle database errors during fetching questions', async () => {
+        Question.find.mockImplementation(() => {
+            throw new Error("Database error");
+        });
+
+        const response = await supertest(server).get('/postModeration/flaggedQuestions');
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe('Internal server error');
+    })
+
+    it('should handle database errors during fetching answers', async () => {
+        Answer.find.mockImplementation(() => {
+            throw new Error("Database error");
+        });
+
+        const response = await supertest(server).get('/postModeration/flaggedAnswers');
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe('Internal server error');
+    })
+
 });
 
 
@@ -197,6 +221,34 @@ describe('PUT /resetQuestion/:qid', () => {
             { new: true, select: 'title text vote_count' }
         );
     });
+
+    it('should return 404 if no question is found', async () => {
+        Question.findByIdAndUpdate.mockResolvedValue(null);
+
+        const response = await supertest(server).put('/postModeration/resetQuestion/456');
+
+        expect(response.status).toBe(404);
+        expect(response.body.message).toEqual("Question not found");
+    });
+
+    it('should handle runtime errors during reset question', async () => {
+        const mockQuestion = {
+            _id: '123',
+            title: 'Question',
+            text: 'text',
+            vote_count: -16,
+            flag: true
+        };
+        
+        Question.findByIdAndUpdate.mockImplementation(() => {
+            throw new Error("Runtime error");
+        });
+
+        const response = await supertest(server).put('/postModeration/resetQuestion/123');
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe('Internal server error');
+    })
 
 });
 
@@ -244,9 +296,28 @@ describe('PUT /resetAnswer/:aid', () => {
         expect(response.body.message).toEqual("Answer not found");
     });
 
+    it('should handle runtime errors during reset answer', async () => {
+        const mockAnswer = {
+            _id: '123',
+            title: 'Answer',
+            text: 'text',
+            vote_count: -16,
+            flag: true
+        };
+        
+        Answer.findByIdAndUpdate.mockImplementation(() => {
+            throw new Error("Runtime error");
+        });
+
+        const response = await supertest(server).put('/postModeration/resetAnswer/123');
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe('Internal server error');
+    })
+
 });
 
-// ******************************* Test PostMod Delete Question *************************************
+// ******************************* Test PostMod Delete Question/Answer *************************************
 
 
 describe('DELETE /deleteQuestion/:qid', () => {
@@ -303,4 +374,35 @@ describe('DELETE /deleteQuestion/:qid', () => {
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Question successfully deleted');
     });
+
+    it('should handle runtime errors during delete question', async () => {
+        Question.findById.mockResolvedValue({
+            _id: '123',
+            flag: true // Ensure the flag check passes
+        });
+        Question.deleteOne.mockImplementation(() => {
+            throw new Error("Runtime error");
+        });
+    
+        const response = await supertest(server).delete('/postModeration/deleteQuestion/123');
+    
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe('Internal server error');
+    });
+    
+    it('should handle runtime errors during delete answer', async () => {
+        Answer.findById.mockResolvedValue({
+            _id: '123',
+            flag: true // Ensure the flag check passes
+        });
+        Answer.deleteOne.mockImplementation(() => {
+            throw new Error("Runtime error");
+        });
+    
+        const response = await supertest(server).delete('/postModeration/deleteAnswer/123');
+    
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe('Internal server error');
+    });
+
 });
