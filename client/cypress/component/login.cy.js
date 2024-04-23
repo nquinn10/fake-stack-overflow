@@ -2,6 +2,20 @@ import Login from "../../src/components/auth/login";
 
 
 // Login Component
+
+it('mounts the component and checks initial form state', () => {
+    cy.mount(<Login onLogin={cy.spy()} />);
+    // Check initial state of inputs
+    cy.get('#loginEmailInput').should('have.value', '');
+    cy.get('#loginPasswordInput').should('have.value', '');
+});
+
+it('validates input fields are correctly filled by the user', () => {
+    cy.mount(<Login onLogin={cy.spy()} />);
+    cy.get('#loginEmailInput').type('user@example.com').should('have.value', 'user@example.com');
+    cy.get('#loginPasswordInput').type('password123').should('have.value', 'password123');
+});
+
 it('validates inputs correctly', () => {
     const onLogin = cy.spy();
     cy.mount(<Login onLogin={onLogin} />);
