@@ -1,28 +1,50 @@
-// Unit tests for addAnswer in contoller/answer.js
-
 const supertest = require("supertest")
 const { default: mongoose } = require("mongoose");
-
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
 
-// Mock the Answer model
+const { server } = require("../server");
+
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+
+jest.mock("../models/questions");
 jest.mock("../models/answers");
 
-let server;
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+jest.mock('../utils/authMiddleware', () => ({
+    authRequired: (req, res, next) => {
+        req.session = { userId: 'validUserId' };
+        next();
+    }
+}));
+
 describe("POST /addAnswer", () => {
 
     beforeEach(() => {
-        server = require("../server");
     })
 
     afterEach(async() => {
-        server.close();
+        if (server && server.close) {
+            await server.close(); 
+        }
         await mongoose.disconnect()
     });
 
     it("should add a new answer to the question", async () => {
-        // Mocking the request body
         const mockReqBody = {
             qid: "dummyQuestionId",
             ans: {
@@ -32,12 +54,11 @@ describe("POST /addAnswer", () => {
 
         const mockAnswer = {
             _id: "dummyAnswerId",
-            text: "This is a test answer"
+            text: "This is a test answer",
+            question: "dummyQuestionId"
         }
-        // Mock the create method of the Answer model
-        Answer.create.mockResolvedValueOnce(mockAnswer);
 
-        // Mocking the Question.findOneAndUpdate method
+        Answer.create.mockResolvedValueOnce(mockAnswer);
         Question.findOneAndUpdate = jest.fn().mockResolvedValueOnce({
                                                                         _id: "dummyQuestionId",
                                                                         answers: ["dummyAnswerId"]
@@ -48,20 +69,30 @@ describe("POST /addAnswer", () => {
             .post("/answer/addAnswer")
             .send(mockReqBody);
 
-        // Asserting the response
+
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockAnswer);
-
-        // Verifying that Answer.create method was called with the correct arguments
         expect(Answer.create).toHaveBeenCalledWith({
-                                                       text: "This is a test answer"
+                                                       text: "This is a test answer",
+                                                       ans_by: "validUserId",
+                                                       question: "dummyQuestionId"
                                                    });
 
-        // Verifying that Question.findOneAndUpdate method was called with the correct arguments
         expect(Question.findOneAndUpdate).toHaveBeenCalledWith(
             { _id: "dummyQuestionId" },
             { $push: { answers: { $each: ["dummyAnswerId"], $position: 0 } } },
             { new: true }
         );
     });
+
+    it('should return error not found if question does not exist', async () => {
+        Question.findById.mockResolvedValue(null);
+
+        const response = await supertest(server)
+            .post('/answer/addAnswer')
+            .send({ qid: 'nonexistant', ans: { text: "Answer text" }});
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Internal server error");
+    })
 });

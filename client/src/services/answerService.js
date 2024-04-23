@@ -10,4 +10,21 @@ const addAnswer = async (qid, ans) => {
     return res.data;
 };
 
-export { addAnswer };
+// To edit Answers
+const editAnswer = async (aid, a) => {
+    const res = await api.put(`${ANSWER_API_URL}/editAnswer/${aid}`, a);
+
+    return res.data;
+};
+
+// To delete Answers
+const deleteAnswer = async (aid) => {
+    try {
+        const response = await api.delete(`${ANSWER_API_URL}/deleteAnswer/${aid}`);
+        return response.data;
+    } catch (error) {
+        return { error: error.response?.data || 'An unexpected error occurred' };
+    }
+}
+
+export { addAnswer, editAnswer, deleteAnswer};

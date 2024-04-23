@@ -27,7 +27,6 @@ const getTagsWithQuestionNumber = async (req, res) => {
     res.status(200).json(response);
 };
 
-// add appropriate HTTP verbs and their endpoints to the router.
 router.get("/getTagsWithQuestionNumber", getTagsWithQuestionNumber);
 
 module.exports = router;

@@ -3,10 +3,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
 
 const { MONGO_URL, port, CLIENT_URL } = require("./config");
 
-mongoose.connect(MONGO_URL);
+mongoose.connect(MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const app = express();
 app.use(
@@ -18,6 +21,22 @@ app.use(
 
 app.use(express.json());
 
+const sessionStore = MongoStore.create({ mongoUrl: MONGO_URL });
+
+// Configure session middleware
+app.use(session({
+    secret: 'your_secret_key', // replace this with a secret key in true production environment
+    resave: false,
+    saveUninitialized: true,
+    store: sessionStore,
+    cookie: {
+        secure: false, // Set to false if not using HTTPS
+        maxAge: 1000 * 60 * 60 * 24, 
+        httpOnly: true,
+        sameSite: true
+    }
+}));
+
 app.get("/", (_, res) => {
     res.send("Fake SO Server Dummy Endpoint");
     res.end();
@@ -26,10 +45,16 @@ app.get("/", (_, res) => {
 const questionController = require("./controller/question");
 const tagController = require("./controller/tag");
 const answerController = require("./controller/answer");
+const userController = require("./controller/user");
+const voteController = require("./controller/vote");
+const postModerationController = require("./controller/postModeration");
 
 app.use("/question", questionController);
 app.use("/tag", tagController);
 app.use("/answer", answerController);
+app.use("/user", userController);
+app.use("/vote", voteController);
+app.use("/postModeration", postModerationController);
 
 let server = app.listen(port, () => {
     console.log(`Server starts at http://localhost:${port}`);
@@ -42,4 +67,4 @@ process.on("SIGINT", () => {
     process.exit(0);
 });
 
-module.exports = server
+module.exports = { server, sessionStore };

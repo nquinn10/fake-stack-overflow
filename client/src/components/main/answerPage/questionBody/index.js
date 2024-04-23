@@ -1,12 +1,44 @@
 import "./index.css";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { handleHyperlink } from "../../../../tool";
+import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
+import { castVote } from "../../../../services/voteService";
+import { toast } from 'react-toastify';
 
 // Component for the Question's Body
-const QuestionBody = ({ views, text, askby, meta }) => {
+const QuestionBody = ({ views, text, askby, meta, initialVote, qid }) => {
+    const [voteCount, setVoteCount] = useState(initialVote);
+    const [activeVote, setActiveVote] = useState('');
+
+
+    // Update vote count when initialVote changes
+    useEffect(() => {
+        if (initialVote !== undefined) {
+            setVoteCount(Number(initialVote));
+        }
+    }, [initialVote]);
+
+
+    const handleVote = async (voteType) => {
+        const response = await castVote(qid, voteType, 'Question');
+        if (response && response.vote_count !== undefined) {
+            setVoteCount(response.vote_count);
+            setActiveVote(voteType);
+        } else if (response.error) {
+            toast.error(response.error);
+        }
+    };
+    
     return (
         <div id="questionBody" className="questionBody right_padding">
-            <div className="bold_title answer_question_view">{views} views</div>
+            <div className="questionStatsContainer">
+                <div className="voteContainerQuestion">
+                    <BiSolidUpArrow id={"upVoteQ"} className={`bold_title voteIcon upvote ${activeVote === 'upvote' ? 'active' : ''}`} onClick={() => handleVote('upvote')} />
+                    <div id={"vote_count"} className="bold_title answer_question_vote">{voteCount}</div>
+                    <BiSolidDownArrow id={"downVoteQ"} className={`bold_title voteIcon downvote ${activeVote === 'downvote' ? 'active' : ''}`} onClick={() => handleVote('downvote')}/>
+                </div>
+                <div className="bold_title answer_question_view">{views} views</div>
+            </div>
             <div className="answer_question_text">{handleHyperlink(text)}</div>
             <div className="answer_question_right">
                 <div className="question_author">{askby}</div>

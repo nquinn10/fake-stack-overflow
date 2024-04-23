@@ -28,9 +28,11 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }) => {
             />
             <QuestionBody
                 views={question && question.views}
+                initialVote= {question && question.vote_count}
                 text={question && question.text}
-                askby={question && question.asked_by}
+                askby={question && question.asked_by?.display_name}
                 meta={question && getMetaData(new Date(question.ask_date_time))}
+                qid={question && question._id}
             />
             {question &&
              question.answers &&
@@ -38,8 +40,10 @@ const AnswerPage = ({ qid, handleNewQuestion, handleNewAnswer }) => {
                  <Answer
                      key={idx}
                      text={a.text}
-                     ansBy={a.ans_by}
+                     ansBy={a.ans_by?.display_name}
                      meta={getMetaData(new Date(a.ans_date_time))}
+                     initialVote={a.vote_count}
+                     aid={a._id}
                  />
              ))}
             <button

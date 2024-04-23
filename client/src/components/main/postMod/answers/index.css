@@ -1,0 +1,67 @@
+/* index.css for FlaggedAnswers component */
+
+.flaggedAs {
+    padding: 15px;
+    border-bottom: 1px dashed #000000; /* Adds a subtle separator */
+    margin-bottom: 10px; /* Space between entries */
+}
+
+.aText {
+    font-size: 14px;
+    color: gray;
+}
+
+
+.aVote {
+    font-size: 14px;
+    color: red;
+}
+
+.flaggedAs > div {
+    margin-bottom: 5px; /* Space between elements */
+}
+
+.resetButton, .deleteButton {
+    padding: 5px 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.resetButton:hover::after {
+    content: "Reset votes to 0 and reset flag";
+    position: absolute;
+    transform: translateX(-50%);
+    width: 200px;
+    background-color: #555;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.deleteButton:hover::after {
+    content: "Delete from website";
+    position: absolute;
+    transform: translateX(-50%);
+    width: 200px;
+    background-color: #555;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.resetButton {
+    background-color: cornflowerblue; /* Green */
+    color: white;
+}
+
+.deleteButton {
+    background-color: gray; /* Red */
+    color: white;
+}

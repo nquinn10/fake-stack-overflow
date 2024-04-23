@@ -1,11 +1,26 @@
 import "./index.css";
 import { useState } from "react";
+import {FaRegUser, FaSignInAlt, FaSignOutAlt, FaUserPlus} from "react-icons/fa";
+import { FiFlag } from "react-icons/fi";
 
-const Header = ({ search, setQuesitonPage }) => {
+
+const Header = ({ search, setQuesitonPage, user, logout, showLogin, showRegister, showProfile, showPostMod }) => {
     const [val, setVal] = useState(search);
+
+    const handleShowLogin = () => {
+        showLogin();
+    };
+
+    const handleShowRegister = () => {
+        showRegister();
+    };
+
+    const handleShowPostMod = () => {
+        showPostMod();
+    };
+
     return (
         <div id="header" className="header">
-            <div></div>
             <div className="title">Fake Stack Overflow</div>
             <input
                 id="searchBar"
@@ -22,8 +37,29 @@ const Header = ({ search, setQuesitonPage }) => {
                     }
                 }}
             />
+            <div className="icons">
+                {user ? (
+                    <>
+                        <FaRegUser id={"userProfileButton"} className="icon" onClick={showProfile} />
+                        <FiFlag className="icon" id={"postModerationButton"} onClick={handleShowPostMod} />
+                        <FaSignOutAlt className="icon" id={"logoutButton"} onClick={logout} />
+                    </>
+                ) : (
+                     <div className="auth-buttons">
+                         <button onClick={handleShowLogin}>
+                             <FaSignInAlt className="icon" />
+                             Login
+                         </button>
+                         <button onClick={handleShowRegister}>
+                             <FaUserPlus className="icon" />
+                             Register
+                         </button>
+                     </div>
+                 )}
+            </div>
         </div>
     );
+
 };
 
 export default Header;

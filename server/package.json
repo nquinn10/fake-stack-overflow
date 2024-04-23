@@ -11,6 +11,8 @@
     "license": "ISC",
     "dependencies": {
         "bcrypt": "^5.1.1",
+        "bcryptjs": "^2.4.3",
+        "connect-mongo": "^5.1.0",
         "cors": "*",
         "express": "*",
         "express-session": "*",
@@ -19,6 +21,7 @@
         "mockingoose": "^2.16.2",
         "mongoose": "*",
         "mysql": "*",
+        "react-icons": "^5.1.0",
         "supertest": "^6.3.4"
     },
     "devDependencies": {

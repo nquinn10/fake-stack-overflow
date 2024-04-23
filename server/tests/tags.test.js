@@ -1,16 +1,32 @@
-// Unit tests for getTagsWithQuestionNumber in controller/tags.js
-
 const supertest = require("supertest")
 
 const Tag = require('../models/tags');
 const Question = require('../models/questions');
 const { default: mongoose } = require("mongoose");
+const { server } = require("../server");
 
-// Mock data for tags
+jest.mock('connect-mongo', () => ({
+    create: () => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        destroy: jest.fn(),
+    })
+}));
+
+jest.mock('express-session', () => {
+    return () => (req, res, next) => {
+        req.session = {
+            userId: 'validUserId',
+            touch: () => {},
+        };
+        next();
+    };
+});
+
 const mockTags = [
     { name: 'tag1' },
     { name: 'tag2' },
-    // Add more mock tags if needed
+    { name: 'tag3' },
 ];
 
 const mockQuestions = [
@@ -18,19 +34,18 @@ const mockQuestions = [
     { tags: [mockTags[0]] },
 ]
 
-let server;
 describe('GET /getTagsWithQuestionNumber', () => {
 
     beforeEach(() => {
-        server = require("../server");
     })
     afterEach(async() => {
-        server.close();
+        if (server && server.close) {
+            await server.close();  
+        }
         await mongoose.disconnect()
     });
 
     it('should return tags with question numbers', async () => {
-        // Mocking Tag.find() and Question.find()
         Tag.find = jest.fn().mockResolvedValueOnce(mockTags);
 
         Question.find = jest.fn().mockImplementation(() => ({ populate: jest.fn().mockResolvedValueOnce(mockQuestions)}));
@@ -45,6 +60,7 @@ describe('GET /getTagsWithQuestionNumber', () => {
         expect(response.body).toEqual([
                                           { name: 'tag1', qcnt: 2 },
                                           { name: 'tag2', qcnt: 1 },
+                                          { name: 'tag3', qcnt: 0 }
 
                                       ]);
         expect(Tag.find).toHaveBeenCalled();

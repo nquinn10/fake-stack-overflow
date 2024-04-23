@@ -6,9 +6,11 @@ const handleRes = (res) => {
     return res;
 };
 
+// creates new promise that is rejected with err as the reason
+// error propagates as a rejection so can be caught appropriately to display user feedback
 const handleErr = (err) => {
     console.log(err);
-    return err;
+    return Promise.reject(err);
 };
 
 const api = _axios.create({ withCredentials: true });

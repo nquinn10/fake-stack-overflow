@@ -140,6 +140,11 @@ describe('question util module', () => {
         expect(result[1]._id).toEqual('65e9b5a995b6c7045a30d823');
     });
 
+    test('filter question with invalid tags', () => {
+        const result = filterQuestionsBySearch(_questions, '[nonexistentTag]');
+        expect(result.length).toEqual(0); // Expect no questions to match an invalid tag
+    });
+
     // getQuestionsByOrder
     test('get active questions, newest questions sorted by most recently answered 1', async () => {
         mockingoose(Question).toReturn(_questions.slice(0, 3), 'find');
@@ -155,22 +160,22 @@ describe('question util module', () => {
     test('get active questions, newest questions sorted by most recently answered 2', async () => {
         const questions = [{
             _id: '65e9b716ff0e892116b2de01',
-            answers: [_ans1, _ans3], // 18, 19 => 19
+            answers: [_ans1, _ans3],
             ask_date_time: new Date('2023-11-20T09:24:00')
         },
             {
                 _id: '65e9b716ff0e892116b2de02',
-                answers: [_ans1, _ans2, _ans3, _ans4], // 18, 20, 19, 19 => 20
+                answers: [_ans1, _ans2, _ans3, _ans4], 
                 ask_date_time: new Date('2023-11-20T09:24:00')
             },
             {
                 _id: '65e9b716ff0e892116b2de03',
-                answers: [_ans1], // 18 => 18
+                answers: [_ans1], 
                 ask_date_time: new Date('2023-11-19T09:24:00')
             },
             {
                 _id: '65e9b716ff0e892116b2de04',
-                answers: [_ans4], // 19 => 19
+                answers: [_ans4], 
                 ask_date_time: new Date('2023-11-21T09:24:00')
             },
             {

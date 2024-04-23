@@ -18,6 +18,12 @@
     color: cornflowerblue;
 }
 
+.postText {
+    font-size: 14px;
+    color: gray;
+    margin-top: 5px;
+}
+
 .question_tags {
     margin-top: 1%;
 }

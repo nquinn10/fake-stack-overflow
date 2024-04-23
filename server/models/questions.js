@@ -1,6 +1,7 @@
-// Question Document Schema
 const mongoose = require("mongoose");
+const questionSchema = require("./schema/question");
 
-const Question = require("./schema/question");
+// Compile schema to model
+const Question = mongoose.model("Question", questionSchema);
 
-module.exports = mongoose.model("Question", Question);
+module.exports = Question;

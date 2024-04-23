@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  },
+  "dependencies": {
+    "express-session": "^1.18.0",
+    "react-icons": "^5.1.0",
+    "react-toastify": "^9.0.3"
+  }
+}

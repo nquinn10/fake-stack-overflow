@@ -1,23 +1,15 @@
 import "./index.css";
 import { useState } from "react";
 import Form from "../baseComponents/form";
-import Input from "../baseComponents/input";
 import Textarea from "../baseComponents/textarea";
 import { validateHyperlink } from "../../../tool";
 import { addAnswer } from "../../../services/answerService";
 
 const NewAnswer = ({ qid, handleAnswer }) => {
-    const [usrn, setUsrn] = useState("");
     const [text, setText] = useState("");
-    const [usrnErr, setUsrnErr] = useState("");
     const [textErr, setTextErr] = useState("");
     const postAnswer = async () => {
         let isValid = true;
-
-        if (!usrn) {
-            setUsrnErr("Username cannot be empty");
-            isValid = false;
-        }
 
         if (!text) {
             setTextErr("Answer text cannot be empty");
@@ -36,7 +28,6 @@ const NewAnswer = ({ qid, handleAnswer }) => {
 
         const answer = {
             text: text,
-            ans_by: usrn,
             ans_date_time: new Date(),
         };
 
@@ -47,13 +38,6 @@ const NewAnswer = ({ qid, handleAnswer }) => {
     };
     return (
         <Form>
-            <Input
-                title={"Username"}
-                id={"answerUsernameInput"}
-                val={usrn}
-                setState={setUsrn}
-                err={usrnErr}
-            />
             <Textarea
                 title={"Answer Text"}
                 id={"answerTextInput"}

@@ -1,4 +1,4 @@
-# Test workflow
+# Final Workflow
 on:
   pull_request:
     branches:
@@ -10,26 +10,48 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '16.15'
-      - run: npm install --prefix client
+
       - run: npm install --prefix server
-      - name: Start MongoDB
-        run: |
-          cd server/
-          node init.js
-      - name: Install Cypress
-        run: npm install cypress --save-dev
-      - name: Run Cypress tests
-        uses: cypress-io/github-action@v5
-        with:
-          project: ./client
-          start: npm run start --prefix client, npm run start --prefix server
-          wait-on: 'http://localhost:3000,http://localhost:8000'
-          browser: chrome
-          timeout: 400
+
+      - name: Check if mongod running
+        run: ps aux | grep -v grep | grep mongod || echo 'mongod is not running'
+        id: check_mongod_running
+        continue-on-error: true
+
+      - name: Run mongod if not running
+        if: steps.check_mongod_running.outcome == 'failure'
+        run: mongod --config /opt/homebrew/etc/mongod.conf --fork
+
+      - name: Start the node server
+        run: node server.js > server.log 2>&1 &
+        working-directory: server/ 
+  
+      - name: Install dependencies in client directory
+        run: npm install 
+        working-directory: client/
+  
+      - name: Start the Client
+        run: npm start &
+        working-directory: client/
+
+      - name: Run component tests
+        run: npx cypress run --component
+        working-directory: client/
+          
+      - name: Run e2e tests
+        run: npx cypress run cypress/e2e/
+        working-directory: client/
+
+      - name: Kill the node server process
+        run: kill $(lsof -t -i:8000) || true
+  
+      - name: Stop the client process
+        run: kill $(lsof -t -i:3000) || true
 
   jest_tests:
     runs-on: [self-hosted, macOS, X64]
@@ -45,5 +67,15 @@ jobs:
       - name: Run Jest tests
         run: |
           cd server/
-          npm test
-      
+          npm test tests/newAnswer.test.js
+          npm test tests/newQuestion.test.js
+          npm test tests/question.test.js
+          npm test tests/tags.test.js
+          npm test tests/user.test.js
+          npm test tests/vote.test.js
+          npm test tests/editQuestionAnswer.test.js
+          npm test tests/deleteQuestionAnswer.test.js
+          npm test tests/nonAdminUser.test.js
+          npm test tests/postModeration.test.js
+          npm test tests/unauthenticatedUser.test.js
+          npm test tests/voteUtils.test.js

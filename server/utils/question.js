@@ -1,20 +1,22 @@
 const Tag = require("../models/tags");
 const Question = require("../models/questions");
-//const Answer = require("../models/answers");
 
 const addTag = async (tname) => {
     try {
-        // search for the tag in the database
-        const existingTag = await Tag.findOne({ name: tname });
+        // Normalize the tag name to lowercase
+        const normalizedTagName = tname.toLowerCase();
+
+        // Search for the tag in the database using the normalized tag name
+        const existingTag = await Tag.findOne({ name: normalizedTagName });
 
         if (existingTag) {
-            // if the tag exists, return its ID
+            // If the tag exists, return its ID
             return existingTag._id.toString();
         } else {
-            // if the tag does not exist, create a new tag
-            const newTag = new Tag({ name: tname });
+            // If the tag does not exist, create a new tag with the normalized name
+            const newTag = new Tag({ name: normalizedTagName });
             const savedTag = await newTag.save();
-            // return the ID of the newly created tag
+            // Return the ID of the newly created tag
             return savedTag._id.toString();
         }
     } catch (error) {
@@ -33,11 +35,11 @@ const getQuestionsByOrder = async (order) => {
                 .exec();
             questions.sort((a, b) => {
                 if (a.ask_date_time > b.ask_date_time) {
-                    return -1; // Return -1 if a's ask date is greater than b's ask date
+                    return -1;
                 } else if (a.ask_date_time < b.ask_date_time) {
-                    return 1; // Return 1 if a's ask date is less than b's ask date
+                    return 1; 
                 } else {
-                    return 0; // Return 0 if ask dates are equal
+                    return 0; 
                 }
             });
         } else if (order === 'active') {
@@ -92,13 +94,17 @@ const filterQuestionsBySearch = (qlist, search) => {
             // if search term is empty, return all questions
             return qlist;
         }
-        const searchTags = search.match(/\[([^\]]+)\]/g) || [];
-        const searchKeywords = search.replace(/\[([^\]]+)\]/g, " ").match(/\b\w+\b/g) || [];
+
+        const lowerCaseSearch = search.toLowerCase();
+        const searchTags = lowerCaseSearch.match(/\[([^\]]+)\]/g) || [];
+        const searchKeywords = lowerCaseSearch.replace(/\[([^\]]+)\]/g, " ").match(/\b\w+\b/g) || [];
 
         // filter the list of questions based on the search term
         const filteredQuestions = qlist.filter(question => {
+            const titleLower = question.title.toLowerCase();
+            const textLower = question.text.toLowerCase();
             const hasKeyword = searchKeywords.some(keyword =>
-                                                       question.title.includes(keyword) || question.text.includes(keyword)
+                                                       titleLower.includes(keyword) || textLower.includes(keyword)
             );
 
             const hasTag = searchTags.some(tag =>
