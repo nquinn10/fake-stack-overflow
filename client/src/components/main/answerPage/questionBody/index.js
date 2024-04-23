@@ -1,7 +1,6 @@
 import "./index.css";
 import React, { useState, useEffect } from "react";
 import { handleHyperlink } from "../../../../tool";
-// import { FiArrowUpCircle, FiArrowDownCircle } from "react-icons/fi"; 
 import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
 import { castVote } from "../../../../services/voteService";
 import { toast } from 'react-toastify';
