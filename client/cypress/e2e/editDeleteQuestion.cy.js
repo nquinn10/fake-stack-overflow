@@ -1,4 +1,4 @@
-describe('Edit User Profile Tests', () => {
+describe('Edit Delete Question Tests', () => {
 
     beforeEach(() => {
         // Seed the database before each test
@@ -115,9 +115,6 @@ describe('Edit User Profile Tests', () => {
         cy.get(".profileHeader").contains("1 items"); // 1 question fewer after deletion
         cy.get(".profileContent").find("#menu_tag").click();
         cy.get(".itemCount").contains("3 items"); // 1 fewer tag
-
     })
-
-
 
 })
