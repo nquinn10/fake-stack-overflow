@@ -1,20 +1,18 @@
 const express = require("express");
-
 const Question = require('../models/questions');
 const Answer = require('../models/answers');
 
-const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
+const { authRequired } = require("../utils/authMiddleware"); 
 const { adminRequired } = require("../utils/adminMiddleware");
 
 const router = express.Router();
 
-// Get all questions where flag === true
+// Moderator get all flagged questions
 const getFlaggedQuestions = async (req, res) => {
     try {
-        // add all fields in the Question component to see which fields need to be populated
         const flaggedQuestions = await Question.find({ flag: true })
             .populate('asked_by')
-            .select('title text vote_count'); // add/remove fields to be returned as necessary
+            .select('title text vote_count'); 
 
         res.status(200).json(flaggedQuestions);
     } catch (error) {
@@ -22,22 +20,20 @@ const getFlaggedQuestions = async (req, res) => {
     }
 };
 
-// Get all flagged answers
-// add all fields in the Answer component to see which fields need to be populated
+// Moderator get all flagged answers
 const getFlaggedAnswers = async (req, res) => {
     try {
         const flaggedAnswers = await Answer.find({ flag: true })
             .populate('ans_by')
             .populate('question', 'title')
-            .select('text vote_count'); // add/remove fields to be returned as necessary
-
+            .select('text vote_count'); 
         res.status(200).json(flaggedAnswers);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-// reset flagged question
+// Moderator reset vote count and flag on question
 const resetFlaggedQuestion = async (req, res) => {
     const { qid } = req.params; 
     try {
@@ -55,7 +51,7 @@ const resetFlaggedQuestion = async (req, res) => {
     }
 };
 
-// reset flagged answer
+// Moderator reset vote count and flag on answer
 const resetFlaggedAnswer = async (req, res) => {
     const { aid } = req.params;
     try {
@@ -73,7 +69,7 @@ const resetFlaggedAnswer = async (req, res) => {
     }
 };
 
-// delete question if flagged:
+// Moderator delete answer
 const deleteQuestion = async (req, res) => {
     const { qid } = req.params;
     try {
@@ -83,7 +79,7 @@ const deleteQuestion = async (req, res) => {
             return res.status(404).json({ message: 'Question not found' });
         }
         
-        // Check if the question is flagged
+        // Check if the question is flagged - admin can only delete if post flagged!
         if (!question.flag) {
             return res.status(403).json({ message: 'This question is not flagged for deletion' });
         }
@@ -96,7 +92,7 @@ const deleteQuestion = async (req, res) => {
     }
 };
 
-// delete answer if flagged:
+// Moderator delete answer
 const deleteAnswer = async (req, res) => {
     const { aid } = req.params;
     try {
@@ -106,7 +102,7 @@ const deleteAnswer = async (req, res) => {
             return res.status(404).json({ message: 'Answer not found' });
         }
         
-        // Check if the answer is flagged
+        // Check if the answer is flagged - admin can only delete post if flagged!
         if (!answer.flag) {
             return res.status(403).json({ message: 'This answer is not flagged for deletion' });
         }
@@ -118,8 +114,6 @@ const deleteAnswer = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
-
 
 
 router.get('/flaggedQuestions',authRequired, adminRequired, getFlaggedQuestions); 

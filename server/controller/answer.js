@@ -1,23 +1,21 @@
 const express = require("express");
 const Answer = require("../models/answers");
 const Question = require("../models/questions");
-const { authRequired } = require("../utils/authMiddleware"); // import middleware for authenticating user
+const { authRequired } = require("../utils/authMiddleware"); 
 
 
 const router = express.Router();
 
-// Adding answer
+// Add new answer to question
 const addAnswer = async (req, res) => {
     try {
         const userId = req.session.userId;
-        // extract answer data from request body
         const { qid, ans } = req.body;
 
         if (!userId) {
             return res.status(401).send("Unauthorized access.");
         }
 
-        // Add qid to the answer details
         const answerDetails = {
             ...ans,
             ans_by: userId,
@@ -40,11 +38,8 @@ const addAnswer = async (req, res) => {
     }
 };
 
-// Edit Question
-// note: add || condition to author, so 
-// if userId = author || userId = admin, then they can edit/delete
+// Edit answer
 const editAnswer = async (req, res) => {
-
     const { aid } = req.params;
     const userId = req.session.userId; 
     const updateData = req.body;
@@ -110,7 +105,6 @@ const deleteAnswer = async (req, res) => {
     }
 };
 
-// add appropriate HTTP verbs and their endpoints to the router.
 router.post("/addAnswer", authRequired, addAnswer);
 router.put("/editAnswer/:aid", authRequired, editAnswer);
 router.delete("/deleteAnswer/:aid", authRequired, deleteAnswer);
