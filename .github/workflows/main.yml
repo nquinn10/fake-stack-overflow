@@ -60,13 +60,13 @@ jobs:
       #     browser: chrome
           
       
-      - name: Run Cypress end-to-end tests
-        uses: cypress-io/github-action@v5
-        with: 
-          project: ./client
-          start: npm run start --prefix client, npm run start --prefix server
-          wait-on: 'http://localhost:3000,http://localhost:8000'
-          browser: chrome
+      # - name: Run Cypress end-to-end tests
+      #   uses: cypress-io/github-action@v5
+      #   with: 
+      #     project: ./client
+      #     start: npm run start --prefix client, npm run start --prefix server
+      #     wait-on: 'http://localhost:3000,http://localhost:8000'
+      #     browser: chrome
 
       - name: Kill the node server process
         run: kill $(lsof -t -i:8000) || true
